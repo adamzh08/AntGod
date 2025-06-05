@@ -7,14 +7,14 @@
 #define SCREEN_HEIGHT 450
 
 int main() {
-    srand(time(NULL));
+    srand(time(nullptr));
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window");
 
     SetTargetFPS(60);
 
-    Image ant = LoadImage("assets/ant.png");
-    Texture2D antTexture = LoadTextureFromImage(ant);
+    const Image ant = LoadImage("assets/ant.png");
+    const Texture2D antTexture = LoadTextureFromImage(ant);
 
     Vector2 mousePos = GetMousePosition();
     Vector2 antPos = mousePos;
