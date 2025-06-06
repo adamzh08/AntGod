@@ -20,5 +20,3 @@ target_compile_options(AntGod PRIVATE
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
-
-target_link_libraries(AntGod PRIVATE raylib)
