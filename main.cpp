@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 
+#include "raylib.h"
+#include "raymath.h"
 #include "neuralengine/Layer.h"
 #include "neuralengine/Network.h"
 #include "neuralengine/Activation.h"
@@ -10,6 +12,17 @@
 
 int main() {
     srand(time(nullptr));
+
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window");
+
+    SetTargetFPS(60);
+
+    const Image ant = LoadImage("assets/ant.png");
+    const Texture2D antTexture = LoadTextureFromImage(ant);
+
+    Vector2 mousePos = GetMousePosition();
+    Vector2 antPos = mousePos;
+    float lerpAmount = 0.22f;
 
     std::vector<Layer> layers = {
         Layer(3),
@@ -32,5 +45,21 @@ int main() {
     double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
     std::cout << elapsed << std::endl;
 
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+
+        ClearBackground(RAYWHITE);
+
+        mousePos = GetMousePosition();
+        antPos = Vector2Lerp(antPos, mousePos, lerpAmount);
+
+        DrawTextureV(antTexture, antPos, WHITE);
+
+        DrawFPS(GetScreenWidth() - 100, GetScreenHeight() - 25);
+
+        EndDrawing();
+    }
+
+    CloseWindow();
     return 0;
 }
