@@ -4,8 +4,6 @@
 
 #include "Activation.h"
 
-#define M_PI 3.1415926535897932384626433832795
-
 float Activation::sigmoid(const float x) {
     return 1.0 / (1.0 + std::exp(-x));
 }

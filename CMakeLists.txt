@@ -36,6 +36,11 @@ target_compile_options(AntGod PRIVATE
         -ffast-math           # Fast math operations
         -march=native         # Use all available CPU instructions
         -mtune=native         # Tune for native CPU
+        -Qiopenmp              # Add OpenMP compile flag
+)
+
+target_link_options(AntGod PRIVATE
+        -Qiopenmp              # Add OpenMP link flag
 )
 
 set_target_properties(AntGod PROPERTIES

@@ -2,7 +2,6 @@
 // Created by adam on 5/31/2025.
 //
 #include <iostream>
-#include <iomanip>
 #include <fstream>
 #include <functional>
 
@@ -125,7 +124,7 @@ Network::Network(const std::vector<Layer> &layers, const std::string &filename) 
 Network::Network(const Network &other) noexcept {
     this->layers = other.layers;
     this->layers_amount = other.layers_amount;
-    this->weights = weights;
+    this->weights = other.weights;
 }
 
 [[nodiscard]] std::vector<float> Network::feed_forward(const std::vector<float> &input) const {
@@ -151,7 +150,7 @@ Network::Network(const Network &other) noexcept {
 
 void Network::free_weights() {
     this->layers = std::vector<Layer>();
-    this->layers_amount = NULL;
+    this->layers_amount = 0;
 
     for (size_t layer = 0; layer < layers_amount - 1; layer++) {
         for (int output = 0; output < layers[layer + 1].amount_neurons; output++) {

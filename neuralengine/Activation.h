@@ -7,6 +7,8 @@
 
 #include <cmath>
 
+#define M_PI 3.14159265358979323846
+
 class Activation {
 public:
     static float sigmoid(float x);
