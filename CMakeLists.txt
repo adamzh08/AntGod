@@ -19,7 +19,6 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
     endif()
 endif()
 
-find_package(MKL CONFIG REQUIRED)
 find_package(OpenMP REQUIRED)
 
 add_executable(AntGod main.cpp
@@ -29,6 +28,8 @@ add_executable(AntGod main.cpp
         neuralengine/Network.h
         neuralengine/Activation.cpp
         neuralengine/Activation.h
+        gameClasses/Ant.cpp
+        gameClasses/Ant.h
 )
 
 target_compile_options(AntGod PRIVATE
@@ -44,8 +45,6 @@ set_target_properties(AntGod PROPERTIES
 
 # Link OpenMP for parallel processing
 target_link_libraries(AntGod PRIVATE OpenMP::OpenMP_CXX)
-# Link MKL libraries
-target_link_libraries(AntGod PRIVATE MKL::MKL)
 # Link RayLib library
 target_link_libraries(AntGod PRIVATE raylib)
 
