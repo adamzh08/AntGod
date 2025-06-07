@@ -21,20 +21,20 @@ const std::vector<Line> lines_conf = {
 
 const Lines lines(lines_conf);
 
+const std::vector<Layer> layers = {
+    Layer(30),
+    Layer(16, Activation::tanh),
+    Layer(16, Activation::tanh),
+    Layer(16, Activation::tanh),
+    Layer(2, Activation::tanh),
+};
+
 int main() {
     srand(time(nullptr));
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window");
 
     SetTargetFPS(60);
-
-    std::vector<Layer> layers = {
-        Layer(30),
-        Layer(16, Activation::tanh),
-        Layer(16, Activation::tanh),
-        Layer(16, Activation::tanh),
-        Layer(2, Activation::tanh),
-    };
 
     Population population = Population(layers, "pop.bin", lines, 10000, 30, 30, CARTESIAN_MOVE);
 

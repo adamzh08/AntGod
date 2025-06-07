@@ -16,8 +16,7 @@ Population::Population(const std::vector<Layer> &layers, const std::string &file
     }
 
     rays_deltas.resize(rays_amount);
-
-    float k = 2.0f * M_PI / rays_amount;
+    const float k = 2.0f * M_PI / rays_amount;
     for (int i = 0; i < rays_amount; i++) {
         rays_deltas[i].x = std::cos(i * k) * rays_length;
         rays_deltas[i].y = std::sin(i * k) * rays_length;
@@ -33,7 +32,7 @@ void Population::sum_deltas(const Vector2 start, std::vector<Vector2> &temp) con
     }
 }
 
-float Population::distance(Vector2 start, Vector2 end) {
+float Population::distance(const Vector2 start, const Vector2 end) {
     return std::sqrt(std::pow(start.x - end.x, 2) + std::pow(start.y - end.y, 2));
 }
 
