@@ -14,9 +14,9 @@ Layer::Layer(const int amount_neurons, float (*activation)(float)) {
     this->activation_fn = activation;
 }
 
-Layer::Layer(const int amount_neurons, float (*activation_alpha)(float, float), float alpha) {
+Layer::Layer(int amount_neurons, float (*activation_alpha)(float, float), float alpha) {
     this->amount_neurons = amount_neurons;
-    this->activation_fn = [activation_alpha, alpha](const float x) -> float {
+    this->activation_fn = [activation_alpha, alpha](float x) -> float {
         return activation_alpha(x, alpha);
     };
 }

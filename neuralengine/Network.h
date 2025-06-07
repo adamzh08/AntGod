@@ -24,9 +24,7 @@ private:
     void save_weights(const std::string& filename) const;
     bool load_weights(const std::string& filename);
 
-    void init(const std::vector<Layer> &layers);
 public:
-    explicit Network(const std::vector<Layer> &layers);
     Network(const std::vector<Layer> &layers, const std::string& filename);
     Network(const Network &other) noexcept;
 
