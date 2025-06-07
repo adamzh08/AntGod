@@ -46,7 +46,7 @@ int main() {
 
         ClearBackground(RAYWHITE);
 
-        for (const auto& line : lines) {
+        for (const auto& line : lines_conf) {
             DrawLineEx(line.start, line.end, 1.5, BLACK);
         }
 
