@@ -4,7 +4,9 @@
 
 #include "Population.h"
 
-Population::Population(const std::vector<Layer> &layers, const std::string &filename, const Lines &lines, const int populationSize, const int rays_amount, const int rays_length, const int move_method) {
+Population::Population(const std::vector<Layer> &layers, const std::string &filename, const Lines &lines, const int populationSize, const int rays_amount, const int rays_length, const int move_method)
+    : lines(lines), move_method(move_method), rays_amount(rays_amount), rays_length(rays_length) {
+
     this->ants.resize(populationSize, Ant(layers));
 
     this->ants[0].network = Network(layers, filename);
@@ -13,12 +15,6 @@ Population::Population(const std::vector<Layer> &layers, const std::string &file
         this->ants[i].network = Network(this->ants[0].network);
     }
 
-    this->lines = Lines(lines);
-
-    this->move_method = move_method;
-
-    this->rays_amount = rays_amount;
-    this->rays_length = rays_length;
     rays_deltas.resize(rays_amount);
 
     float k = 2.0f * M_PI / rays_amount;
