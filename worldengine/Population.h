@@ -6,6 +6,7 @@
 #define POPULATION_H
 
 #include <vector>
+#include <iostream>
 
 #include "Ant.h"
 #include "Line.h"
@@ -16,25 +17,55 @@
 
 class Population {
 private:
-    Lines lines;
+    Lines _lines{};
 
-    Vector2 init_position{};
-    int move_method = 0;
+    // Ant
+    std::string _imagePath = "assets/ant.png";
+    Texture2D _antTexture;
 
-    std::vector<Vector2> rays_deltas;
-    int rays_amount = 0;
-    int rays_length = 0;
+    // Population
+    std::vector<Ant> _ants;
+    int _ants_amount = 1000;
 
-    float max_speed = 1;
+    // Neural network
+    std::vector<Layer> _layers{};
+    std::string _filename = "weights.bin";
 
-    void sum_deltas(const Vector2 start, std::vector<Vector2> &temp) const;
-    static float distance(Vector2 start, Vector2 end);
+    // Positions
+    Vector2 _init_position{10, 10};
+    Vector2 _target_position{20, 10};
+
+    // Movement
+    int _move_method = CARTESIAN_MOVE;
+    float _max_speed = 1.0f;
+
+    // Rays
+    std::vector<Vector2> rays_deltas{};
+    int _rays_amount = 30;
+    int _rays_radius = 100;
+
+    void _sum_deltas(const Vector2 start, std::vector<Vector2> &temp) const;
+    static float _distance_compare(Vector2 start, Vector2 end);
 public:
-    std::vector<Ant> ants;
+    Population();
 
-    Population(const std::vector<Layer> &layers, const std::string& filename, const Lines &lines, int populationSize, int rays_amount, int rays_length, int move_method);
+    // Settings
+    Population& lines(const Lines &lines);
+    Population& image(const std::string &imagePath);
+    Population& ants(const int ants_amount);
+    Population& network(const std::vector<Layer> &layers, const std::string &filename);
+    Population& positions(const Vector2 init_position, const Vector2 target_position);
+    Population& movement(const int move_method, const float max_speed);
+    Population& rays(const int rays_amount, const int rays_radius);
 
+    // Load the Texture in GPU
+    void load_image();
+
+    // Calculate
     void act();
+
+    // Draw
+    void draw() const;
 };
 
 #endif //POPULATION_H

@@ -10,6 +10,7 @@
 
 class Line {
 private:
+    // Geeks for Geeks code
     static bool onSegment(Vector2 p, Vector2 q, Vector2 r);
     static int orientation(Vector2 p, Vector2 q, Vector2 r);
 

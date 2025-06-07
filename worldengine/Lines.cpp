@@ -5,6 +5,8 @@
 #include "Lines.h"
 #include <cmath>
 
+Lines::Lines() {}
+
 Lines::Lines(const std::vector<Line> &lines) {
     this->lines = lines;
 }
@@ -14,7 +16,7 @@ float Lines::compare_distance(const Vector2 start, const Vector2 end) {
 }
 
 float Lines::get_intersection(const Vector2 start, const Vector2 end) const {
-    float distance = INFINITY;
+    float distance = 100000;
     for (auto &line : lines) {
         if (Vector2 intersection_temp{}; line.doIntersect(start, end, intersection_temp)) {
             if (const float distance_temp = compare_distance(start, intersection_temp); distance_temp < distance) {
