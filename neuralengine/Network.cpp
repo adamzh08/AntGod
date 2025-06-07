@@ -2,6 +2,7 @@
 // Created by adam on 5/31/2025.
 //
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <functional>
 
@@ -103,7 +104,7 @@ bool Network::load_weights(const std::string &filename) {
     return true;
 }
 
-void Network::init(const std::vector<Layer> &layers) {
+Network::Network(const std::vector<Layer> &layers, const std::string &filename) {
     this->layers = layers;
     this->layers_amount = std::size(layers);
 
@@ -111,17 +112,9 @@ void Network::init(const std::vector<Layer> &layers) {
     for (size_t layer = 0; layer < layers_amount - 1; layer++) {
         weights[layer].resize(layers[layer + 1].amount_neurons);
         for (int output = 0; output < layers[layer + 1].amount_neurons; output++) {
-            weights[layer][output].resize(layers[layer].amount_neurons + 1);
+            weights[layer][output].resize(layers[layer].amount_neurons + 1, 0.0f);
         }
     }
-}
-
-Network::Network(const std::vector<Layer> &layers) {
-    init(layers);
-}
-
-Network::Network(const std::vector<Layer> &layers, const std::string &filename) {
-    init(layers);
 
     if (!load_weights(filename)) {
         randomize_weights();
@@ -132,9 +125,7 @@ Network::Network(const std::vector<Layer> &layers, const std::string &filename) 
 Network::Network(const Network &other) noexcept {
     this->layers = other.layers;
     this->layers_amount = other.layers_amount;
-    this->weights = other.weights;
-
-    mutate_weights(0.3, 1.0);
+    this->weights = weights;
 }
 
 [[nodiscard]] std::vector<float> Network::feed_forward(const std::vector<float> &input) const {
@@ -160,7 +151,7 @@ Network::Network(const Network &other) noexcept {
 
 void Network::free_weights() {
     this->layers = std::vector<Layer>();
-    this->layers_amount = 0;
+    this->layers_amount = NULL;
 
     for (size_t layer = 0; layer < layers_amount - 1; layer++) {
         for (int output = 0; output < layers[layer + 1].amount_neurons; output++) {
