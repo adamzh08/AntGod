@@ -19,7 +19,6 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
     endif()
 endif()
 
-find_package(MKL CONFIG REQUIRED)
 find_package(OpenMP REQUIRED)
 
 add_executable(AntGod main.cpp
@@ -43,11 +42,11 @@ target_compile_options(AntGod PRIVATE
         -ffast-math           # Fast math operations
         -march=native         # Use all available CPU instructions
         -mtune=native         # Tune for native CPU
-        -Qiopenmp              # Add OpenMP compile flag
+        -fopenmp              # Add OpenMP compile flag
 )
 
 target_link_options(AntGod PRIVATE
-        -Qiopenmp              # Add OpenMP link flag
+        -fopenmp              # Add OpenMP link flag
 )
 
 set_target_properties(AntGod PROPERTIES
@@ -56,8 +55,6 @@ set_target_properties(AntGod PROPERTIES
 
 # Link OpenMP for parallel processing
 target_link_libraries(AntGod PRIVATE OpenMP::OpenMP_CXX)
-# Link MKL libraries
-target_link_libraries(AntGod PRIVATE MKL::MKL)
 # Link RayLib library
 target_link_libraries(AntGod PRIVATE raylib)
 
