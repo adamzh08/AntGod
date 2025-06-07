@@ -9,15 +9,14 @@
 #include "Line.h"
 
 class Lines {
-public:
+private:
     // Array of lines
-    std::vector<Line> lines{};
+    std::vector<Line> _lines{};
 
+    static float _compare_distance(Vector2 start, Vector2 end);
+public:
     Lines();
     explicit Lines(const std::vector<Line> &lines);
-
-    //
-    static float compare_distance(Vector2 start, Vector2 end);
 
     // Get the nearest intersection using Start -> End points
     float get_intersection(Vector2 start, Vector2 end) const;

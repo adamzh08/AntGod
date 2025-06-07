@@ -14,17 +14,17 @@
 
 class Network {
 private:
-    std::vector<Layer> layers;
-    size_t layers_amount;
+    std::vector<Layer> _layers;
+    size_t _layers_amount;
 
-    std::vector<std::vector<std::vector<float>>> weights;
+    std::vector<std::vector<std::vector<float>>> _weights;
 
-    void randomize_weights();
+    void _randomize_weights();
 
-    void save_weights(const std::string& filename) const;
-    bool load_weights(const std::string& filename);
+    void _save_weights(const std::string& filename) const;
+    bool _load_weights(const std::string& filename);
 
-    void init(const std::vector<Layer> &layers);
+    void _init(const std::vector<Layer> &layers);
 public:
     explicit Network(const std::vector<Layer> &layers);
     Network(const std::vector<Layer> &layers, const std::string& filename);

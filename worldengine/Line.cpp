@@ -10,7 +10,7 @@ Line::Line(const Vector2 start, const Vector2 end) {
 }
 
 // Function to check if a point lies on a given line segment
-bool Line::onSegment(const Vector2 p, const Vector2 q, const Vector2 r) {
+bool Line::_onSegment(const Vector2 p, const Vector2 q, const Vector2 r) {
     if (q.x <=  std::max(p.x, r.x) && q.x >=  std::min(p.x, r.x)
         && q.y <=  std::max(p.y, r.y) && q.y >=  std::min(p.y, r.y))
         return true;
@@ -20,7 +20,7 @@ bool Line::onSegment(const Vector2 p, const Vector2 q, const Vector2 r) {
 // Function to find the orientation of the ordered triplet
 // (p, q, r) 0 -> p, q and r are collinear 1 -> Clockwise 2
 // -> Counterclockwise
-int Line::orientation(const Vector2 p, const Vector2 q, const Vector2 r) {
+int Line::_orientation(const Vector2 p, const Vector2 q, const Vector2 r) {
     const double val = (q.y - p.y) * (r.x - q.x)
                  - (q.x - p.x) * (r.y - q.y);
     if (val == 0)
@@ -40,10 +40,10 @@ bool Line::doIntersect(const Vector2 p1, const Vector2 q1, Vector2& res) const {
 
     // Find the four orientations needed for general and
     // special cases
-    const int o1 = orientation(p1, q1, p2);
-    const int o2 = orientation(p1, q1, q2);
-    const int o3 = orientation(p2, q2, p1);
-    const int o4 = orientation(p2, q2, q1);
+    const int o1 = _orientation(p1, q1, p2);
+    const int o2 = _orientation(p1, q1, q2);
+    const int o3 = _orientation(p2, q2, p1);
+    const int o4 = _orientation(p2, q2, q1);
 
     // General case: lines intersect if they have different
     // orientations
@@ -69,13 +69,13 @@ bool Line::doIntersect(const Vector2 p1, const Vector2 q1, Vector2& res) const {
 
     // Special Cases: check if the lines are collinear and
     // overlap
-    if (o1 == 0 && onSegment(p1, p2, q1))
+    if (o1 == 0 && _onSegment(p1, p2, q1))
         return true;
-    if (o2 == 0 && onSegment(p1, q2, q1))
+    if (o2 == 0 && _onSegment(p1, q2, q1))
         return true;
-  	if (o3 == 0 && onSegment(p2, p1, q2))
+  	if (o3 == 0 && _onSegment(p2, p1, q2))
         return true;
-    if (o4 == 0 && onSegment(p2, q1, q2))
+    if (o4 == 0 && _onSegment(p2, q1, q2))
         return true;
 
     // Lines do not intersect in any case

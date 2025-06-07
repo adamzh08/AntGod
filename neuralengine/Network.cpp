@@ -7,26 +7,26 @@
 
 #include "Network.h"
 
-void Network::randomize_weights() {
-    for (int layer = 0; layer < layers_amount - 1; layer++) {
+void Network::_randomize_weights() {
+    for (int layer = 0; layer < _layers_amount - 1; layer++) {
         // Xavier/Glorot initialization
-        const float scale = sqrtf(2.0f / static_cast<float>(layers[layer].amount_neurons));
+        const float scale = sqrtf(2.0f / static_cast<float>(_layers[layer].amount_neurons));
 
-        for (int i = 0; i < layers[layer + 1].amount_neurons; i++) {
-            for (int j = 0; j < layers[layer].amount_neurons + 1; j++) {
+        for (int i = 0; i < _layers[layer + 1].amount_neurons; i++) {
+            for (int j = 0; j < _layers[layer].amount_neurons + 1; j++) {
                 float r = (static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f);
-                weights[layer][i][j] = r * scale;
+                _weights[layer][i][j] = r * scale;
             }
         }
     }
 }
 
 void Network::mutate_weights(const float mutation_probability, const float mutation_amplitude) {
-    for (int layer = 0; layer < layers_amount - 1; layer++) {
-        for (int output = 0; output < layers[layer + 1].amount_neurons; output++) {
-            for (int input_idx = 0; input_idx < layers[layer].amount_neurons + 1; input_idx++) {
+    for (int layer = 0; layer < _layers_amount - 1; layer++) {
+        for (int output = 0; output < _layers[layer + 1].amount_neurons; output++) {
+            for (int input_idx = 0; input_idx < _layers[layer].amount_neurons + 1; input_idx++) {
                 if (static_cast<float>(rand()) / RAND_MAX < mutation_probability) {
-                    weights[layer][output][input_idx] += (
+                    _weights[layer][output][input_idx] += (
                         static_cast<float>(rand()) * 2 * mutation_amplitude / RAND_MAX) - mutation_amplitude;
                 }
             }
@@ -49,7 +49,7 @@ inline std::size_t hash_layer_vector(const std::vector<Layer> &layers) {
     return seed;
 }
 
-void Network::save_weights(const std::string &filename) const {
+void Network::_save_weights(const std::string &filename) const {
     std::ofstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         std::cerr << "Error: Couldn't write to a file!" << std::endl;
@@ -57,14 +57,14 @@ void Network::save_weights(const std::string &filename) const {
     }
 
     // Calculate and save architecture hash
-    size_t architecture_hash = hash_layer_vector(layers);
+    size_t architecture_hash = hash_layer_vector(_layers);
     file.write(reinterpret_cast<const char *>(&architecture_hash), sizeof(architecture_hash));
 
     // Save weights
-    for (int layer = 0; layer < layers_amount - 1; layer++) {
-        for (int output = 0; output < layers[layer + 1].amount_neurons; output++) {
-            for (int input_idx = 0; input_idx < layers[layer].amount_neurons + 1; input_idx++) {
-                file.write(reinterpret_cast<const char *>(&weights[layer][output][input_idx]), sizeof(float));
+    for (int layer = 0; layer < _layers_amount - 1; layer++) {
+        for (int output = 0; output < _layers[layer + 1].amount_neurons; output++) {
+            for (int input_idx = 0; input_idx < _layers[layer].amount_neurons + 1; input_idx++) {
+                file.write(reinterpret_cast<const char *>(&_weights[layer][output][input_idx]), sizeof(float));
             }
         }
     }
@@ -72,7 +72,7 @@ void Network::save_weights(const std::string &filename) const {
     file.close();
 }
 
-bool Network::load_weights(const std::string &filename) {
+bool Network::_load_weights(const std::string &filename) {
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         return false;
@@ -82,7 +82,7 @@ bool Network::load_weights(const std::string &filename) {
     size_t saved_hash;
     file.read(reinterpret_cast<char *>(&saved_hash), sizeof(saved_hash));
 
-    size_t current_hash = hash_layer_vector(layers);
+    size_t current_hash = hash_layer_vector(_layers);
 
     if (saved_hash != current_hash) {
         file.close();
@@ -91,10 +91,10 @@ bool Network::load_weights(const std::string &filename) {
     }
 
     // Load weights
-    for (int layer = 0; layer < layers_amount - 1; layer++) {
-        for (int output = 0; output < layers[layer + 1].amount_neurons; output++) {
-            for (int input_idx = 0; input_idx < layers[layer].amount_neurons + 1; input_idx++) {
-                file.read(reinterpret_cast<char *>(&weights[layer][output][input_idx]), sizeof(float));
+    for (int layer = 0; layer < _layers_amount - 1; layer++) {
+        for (int output = 0; output < _layers[layer + 1].amount_neurons; output++) {
+            for (int input_idx = 0; input_idx < _layers[layer].amount_neurons + 1; input_idx++) {
+                file.read(reinterpret_cast<char *>(&_weights[layer][output][input_idx]), sizeof(float));
             }
         }
     }
@@ -103,36 +103,36 @@ bool Network::load_weights(const std::string &filename) {
     return true;
 }
 
-void Network::init(const std::vector<Layer> &layers) {
-    this->layers = layers;
-    this->layers_amount = std::size(layers);
+void Network::_init(const std::vector<Layer> &layers) {
+    this->_layers = layers;
+    this->_layers_amount = std::size(layers);
 
-    weights.resize(layers_amount - 1);
-    for (size_t layer = 0; layer < layers_amount - 1; layer++) {
-        weights[layer].resize(layers[layer + 1].amount_neurons);
+    _weights.resize(_layers_amount - 1);
+    for (size_t layer = 0; layer < _layers_amount - 1; layer++) {
+        _weights[layer].resize(layers[layer + 1].amount_neurons);
         for (int output = 0; output < layers[layer + 1].amount_neurons; output++) {
-            weights[layer][output].resize(layers[layer].amount_neurons + 1);
+            _weights[layer][output].resize(layers[layer].amount_neurons + 1);
         }
     }
 }
 
 Network::Network(const std::vector<Layer> &layers) {
-    init(layers);
+    _init(layers);
 }
 
 Network::Network(const std::vector<Layer> &layers, const std::string &filename) {
-    init(layers);
+    _init(layers);
 
-    if (!load_weights(filename)) {
-        randomize_weights();
-        save_weights(filename);
+    if (!_load_weights(filename)) {
+        _randomize_weights();
+        _save_weights(filename);
     }
 }
 
 Network::Network(const Network &other) noexcept {
-    this->layers = other.layers;
-    this->layers_amount = other.layers_amount;
-    this->weights = other.weights;
+    this->_layers = other._layers;
+    this->_layers_amount = other._layers_amount;
+    this->_weights = other._weights;
 
     mutate_weights(0.3, 1.0);
 }
@@ -140,16 +140,16 @@ Network::Network(const Network &other) noexcept {
 [[nodiscard]] std::vector<float> Network::feed_forward(const std::vector<float> &input) const {
     std::vector<float> current_layer = input;
 
-    for (int layer = 0; layer < layers_amount - 1; layer++) {
-        std::vector<float> next_layer(layers[layer + 1].amount_neurons);
+    for (int layer = 0; layer < _layers_amount - 1; layer++) {
+        std::vector<float> next_layer(_layers[layer + 1].amount_neurons);
 
 #pragma omp parallel for
-        for (int output = 0; output < layers[layer + 1].amount_neurons; output++) {
-            next_layer[output] = weights[layer][output][0];
-            for (int input_idx = 1; input_idx < layers[layer].amount_neurons + 1; input_idx++) {
-                next_layer[output] += current_layer[input_idx - 1] * weights[layer][output][input_idx];
+        for (int output = 0; output < _layers[layer + 1].amount_neurons; output++) {
+            next_layer[output] = _weights[layer][output][0];
+            for (int input_idx = 1; input_idx < _layers[layer].amount_neurons + 1; input_idx++) {
+                next_layer[output] += current_layer[input_idx - 1] * _weights[layer][output][input_idx];
             }
-            next_layer[output] = layers[layer + 1].activation(next_layer[output]);
+            next_layer[output] = _layers[layer + 1].activation(next_layer[output]);
         }
 
         current_layer = std::move(next_layer);
@@ -159,14 +159,14 @@ Network::Network(const Network &other) noexcept {
 }
 
 void Network::free_weights() {
-    this->layers = std::vector<Layer>();
-    this->layers_amount = 0;
+    this->_layers = std::vector<Layer>();
+    this->_layers_amount = 0;
 
-    for (size_t layer = 0; layer < layers_amount - 1; layer++) {
-        for (int output = 0; output < layers[layer + 1].amount_neurons; output++) {
-            weights[layer][output] = std::vector<float>();
+    for (size_t layer = 0; layer < _layers_amount - 1; layer++) {
+        for (int output = 0; output < _layers[layer + 1].amount_neurons; output++) {
+            _weights[layer][output] = std::vector<float>();
         }
-        weights[layer] = std::vector<std::vector<float> >();
+        _weights[layer] = std::vector<std::vector<float> >();
     }
-    weights = std::vector<std::vector<std::vector<float> > >();
+    _weights = std::vector<std::vector<std::vector<float> > >();
 }

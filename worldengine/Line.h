@@ -11,8 +11,8 @@
 class Line {
 private:
     // Geeks for Geeks code
-    static bool onSegment(Vector2 p, Vector2 q, Vector2 r);
-    static int orientation(Vector2 p, Vector2 q, Vector2 r);
+    static bool _onSegment(Vector2 p, Vector2 q, Vector2 r);
+    static int _orientation(Vector2 p, Vector2 q, Vector2 r);
 
 public:
     Vector2 start{};
