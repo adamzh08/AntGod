@@ -82,6 +82,8 @@ add_executable(AntGod main.cpp
         worldengine/Ant.h
         worldengine/Lines.cpp
         worldengine/Lines.h
+        worldengine/Textures.h
+        worldengine/Textures.cpp
 )
 
 target_compile_options(AntGod PRIVATE

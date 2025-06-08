@@ -9,6 +9,7 @@
 #include "worldengine/Line.h"
 #include "worldengine/Lines.h"
 #include "worldengine/Population.h"
+#include "worldengine/Textures.h"
 
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
@@ -32,8 +33,7 @@ const std::vector<Layer> layers = {
 // Population
 Population population = Population()
     .lines(lines)
-    .image("assets/ant.png")
-    .ants(50000)
+    .ants(10000)
     .network(layers, "weights.bin")
     .positions(Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2}, Vector2{400, 100})
     .movement(RADIAL_MOVE, 2)
@@ -46,10 +46,10 @@ int main() {
     // Init the window
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window");
 
-    SetTargetFPS(30);
+    SetTargetFPS(60);
 
-    // loading the image in the GPU
-    population.load_image();
+    // loading all textures in the GPU at once
+    Textures::LoadAll();
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -63,7 +63,7 @@ int main() {
 
 
         // Calculating the Ant positions
-        population.act();
+        population.calculateFrame();
 
         // Draw the ants
         population.draw();
@@ -72,6 +72,8 @@ int main() {
 
         EndDrawing();
     }
+
+    Textures::FreeAll();
 
     CloseWindow();
     return 0;
