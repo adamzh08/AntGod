@@ -12,6 +12,8 @@ class Ant {
 public:
     Network network;
     Vector2 position{};
+    float direction = 0.0;
+    bool alive = true;
 
     explicit Ant(const std::vector<Layer> &layers);
 };

@@ -23,8 +23,7 @@ const Lines lines{lines_conf};
 
 // Layers
 const std::vector<Layer> layers = {
-    Layer(4),
-    Layer(8, Activation::tanh),
+    Layer(30),
     Layer(8, Activation::tanh),
     Layer(8, Activation::tanh),
     Layer(2, Activation::tanh),
@@ -37,8 +36,8 @@ Population population = Population()
     .ants(50000)
     .network(layers, "weights.bin")
     .positions(Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2}, Vector2{400, 100})
-    .movement(CARTESIAN_MOVE, 1)
-    .rays(15, 100);
+    .movement(RADIAL_MOVE, 2)
+    .rays(30, 100);
 
 int main() {
     // Setting random seed by the CPU time
@@ -60,6 +59,8 @@ int main() {
         for (const auto& line : lines_conf) {
             DrawLineEx(line.start, line.end, 1.5, BLACK);
         }
+
+
 
         // Calculating the Ant positions
         population.act();

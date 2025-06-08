@@ -16,7 +16,7 @@ float Lines::_compare_distance(const Vector2 start, const Vector2 end) {
 }
 
 float Lines::get_intersection(const Vector2 start, const Vector2 end) const {
-    float distance = 100000;
+    float distance = 1000000;
     for (auto &line : _lines) {
         if (Vector2 intersection_temp{}; line.doIntersect(start, end, intersection_temp)) {
             if (const float distance_temp = _compare_distance(start, intersection_temp); distance_temp < distance) {
@@ -25,7 +25,11 @@ float Lines::get_intersection(const Vector2 start, const Vector2 end) const {
         }
     }
 
-    return sqrt(distance);
+    if (distance == 1000000) {
+        return 1000000;
+    } else {
+        return sqrt(distance);
+    }
 }
 
 float Lines::get_intersection_delta(const Vector2 start, const Vector2 delta) const {

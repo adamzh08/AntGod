@@ -22,6 +22,7 @@ private:
     // Ant
     std::string _imagePath = "assets/ant.png";
     Texture2D _antTexture;
+    Vector2 _origin_point{};
 
     // Population
     std::vector<Ant> _ants;
@@ -40,12 +41,9 @@ private:
     float _max_speed = 1.0f;
 
     // Rays
-    std::vector<Vector2> rays_deltas{};
+    std::vector<Vector2> _rays_deltas{};
     int _rays_amount = 30;
     int _rays_radius = 100;
-
-    void _sum_deltas(const Vector2 start, std::vector<Vector2> &temp) const;
-    static float _distance_compare(Vector2 start, Vector2 end);
 public:
     Population();
 
