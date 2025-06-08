@@ -34,7 +34,7 @@ const std::vector<Layer> layers = {
 Population population = Population()
     .lines(lines)
     .image("assets/ant.png")
-    .ants(30000)
+    .ants(50000)
     .network(layers, "weights.bin")
     .positions(Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2}, Vector2{400, 100})
     .movement(CARTESIAN_MOVE, 1)

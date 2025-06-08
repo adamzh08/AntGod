@@ -19,7 +19,7 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
     endif()
 endif()
 
-find_package(MKL CONFIG REQUIRED)
+find_package(MKL CONFIG)
 find_package(OpenMP REQUIRED)
 
 add_executable(AntGod main.cpp
@@ -43,21 +43,33 @@ target_compile_options(AntGod PRIVATE
         -ffast-math           # Fast math operations
         -march=native         # Use all available CPU instructions
         -mtune=native         # Tune for native CPU
-        -Qiopenmp              # Add OpenMP compile flag
 )
 
-target_link_options(AntGod PRIVATE
-        -Qiopenmp              # Add OpenMP link flag
-)
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "IntelLLVM")
+    target_compile_options(AntGod PRIVATE -Qiopenmp)
+    target_link_options(AntGod PRIVATE -Qiopenmp)
 
-set_target_properties(AntGod PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
-)
+    # Add static linking for Intel libraries
+    target_compile_options(AntGod PRIVATE -static-intel)
+    target_link_options(AntGod PRIVATE -static-intel)
+
+    set_target_properties(AntGod PROPERTIES
+            INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
+    )
+
+    # Link MKL libraries with static linking preference
+    target_link_libraries(AntGod PRIVATE MKL::MKL)
+else ()
+    target_compile_options(AntGod PRIVATE -fopenmp)
+    target_link_options(AntGod PRIVATE -fopenmp)
+
+    target_compile_options(AntGod PRIVATE -static-libgcc -static-libstdc++)
+    target_link_options(AntGod PRIVATE -static-libgcc -static-libstdc++ -static)
+endif()
 
 # Link OpenMP for parallel processing
 target_link_libraries(AntGod PRIVATE OpenMP::OpenMP_CXX)
-# Link MKL libraries
-target_link_libraries(AntGod PRIVATE MKL::MKL)
+
 # Link RayLib library
 target_link_libraries(AntGod PRIVATE raylib)
 
