@@ -26,17 +26,17 @@ Population::Population() {
     }
 }
 
-Population & Population::lines(const Lines &lines) { _lines = lines; return *this; }
-
-Population & Population::image(const std::string &imagePath) {
-    _imagePath = imagePath;
-
+Population &Population::lines(const Lines &lines) {
+    _lines = lines;
     return *this;
 }
 
-Population & Population::ants(const int ants_amount) { _ants_amount = ants_amount; return *this; }
+Population &Population::ants(const int ants_amount) {
+    _ants_amount = ants_amount;
+    return *this;
+}
 
-Population & Population::network(const std::vector<Layer> &layers, const std::string &filename) {
+Population &Population::network(const std::vector<Layer> &layers, const std::string &filename) {
     _layers = layers;
 
     this->_ants.resize(_ants_amount, Ant(layers));
@@ -49,20 +49,24 @@ Population & Population::network(const std::vector<Layer> &layers, const std::st
     return *this;
 }
 
-Population & Population::positions(const Vector2 init_position, const Vector2 target_position) {
+Population &Population::positions(const Vector2 init_position, const Vector2 target_position) {
     _init_position = init_position;
     _target_position = target_position;
 
-    for (auto& ant : this->_ants) {
+    for (auto &ant: this->_ants) {
         ant.position = init_position;
     }
 
     return *this;
 }
 
-Population & Population::movement(const int move_method, const float max_speed) { _move_method = move_method; _max_speed = max_speed; return *this; }
+Population &Population::movement(const int move_method, const float max_speed) {
+    _move_method = move_method;
+    _max_speed = max_speed;
+    return *this;
+}
 
-Population & Population::rays(const int rays_amount, const int rays_radius) {
+Population &Population::rays(const int rays_amount, const int rays_radius) {
     _rays_amount = rays_amount;
     _rays_radius = rays_radius;
 
@@ -76,16 +80,10 @@ Population & Population::rays(const int rays_amount, const int rays_radius) {
     return *this;
 }
 
-void Population::load_image() {
-    const Image antImage = LoadImage(_imagePath.c_str());
-    _antTexture = LoadTextureFromImage(antImage);
-    UnloadImage(antImage);
-}
-
 /* --- Main Logics Part --- */
-void Population::act() {
+void Population::calculateFrame() {
 #pragma omp parallel for
-    for (auto& ant : this->_ants) {
+    for (auto &ant: this->_ants) {
         // TODO
         std::vector<float> output = ant.network.feed_forward(std::vector<float>{0.1, 0.1, 0.1, 0.1});
 
@@ -94,8 +92,8 @@ void Population::act() {
     }
 }
 
-void Population::draw() const {
-    for (auto& ant : this->_ants) {
-        DrawTextureV(_antTexture, ant.position, WHITE);
+void Population::draw() {
+    for (auto &ant: this->_ants) {
+        ant.draw();
     }
 }

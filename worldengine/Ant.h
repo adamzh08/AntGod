@@ -12,6 +12,9 @@ class Ant {
 public:
     Network network;
     Vector2 position{};
+    float rotation{};
+
+    void draw();
 
     explicit Ant(const std::vector<Layer> &layers);
 };

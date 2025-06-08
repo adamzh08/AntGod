@@ -19,10 +19,6 @@ class Population {
 private:
     Lines _lines{};
 
-    // Ant
-    std::string _imagePath = "assets/ant.png";
-    Texture2D _antTexture;
-
     // Population
     std::vector<Ant> _ants;
     int _ants_amount = 1000;
@@ -51,21 +47,17 @@ public:
 
     // Settings
     Population& lines(const Lines &lines);
-    Population& image(const std::string &imagePath);
     Population& ants(const int ants_amount);
     Population& network(const std::vector<Layer> &layers, const std::string &filename);
     Population& positions(const Vector2 init_position, const Vector2 target_position);
     Population& movement(const int move_method, const float max_speed);
     Population& rays(const int rays_amount, const int rays_radius);
 
-    // Load the Texture in GPU
-    void load_image();
-
     // Calculate
-    void act();
+    void calculateFrame();
 
     // Draw
-    void draw() const;
+    void draw();
 };
 
 #endif //POPULATION_H
