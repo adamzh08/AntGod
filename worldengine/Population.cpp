@@ -13,17 +13,22 @@ Population::Population() {
     }
 }
 
-Population & Population::lines(const Lines &lines) { _lines = lines; return *this; }
-
-Population & Population::image(const std::string &imagePath) {
-    _imagePath = imagePath;
-
+Population &Population::setLines(const Lines &lines) {
+    _lines = lines;
     return *this;
 }
 
-Population & Population::ants(const int ants_amount) { _ants_amount = ants_amount; return *this; }
+Population &Population::setAntTexture(const Texture2D &texture) {
+    _antTexture = texture;
+    return *this;
+}
 
-Population & Population::network(const std::vector<Layer> &layers, const std::string &filename) {
+Population &Population::setAnts(const int ants_amount) {
+    _ants_amount = ants_amount;
+    return *this;
+}
+
+Population &Population::setNetwork(const std::vector<Layer> &layers, const std::string &filename) {
     _layers = layers;
 
     this->_ants.resize(_ants_amount, Ant(layers));
@@ -36,20 +41,24 @@ Population & Population::network(const std::vector<Layer> &layers, const std::st
     return *this;
 }
 
-Population & Population::positions(const Vector2 init_position, const Vector2 target_position) {
+Population &Population::setPositions(const Vector2 init_position, const Vector2 target_position) {
     _init_position = init_position;
     _target_position = target_position;
 
-    for (auto& ant : this->_ants) {
+    for (auto &ant: this->_ants) {
         ant.position = init_position;
     }
 
     return *this;
 }
 
-Population & Population::movement(const int move_method, const float max_speed) { _move_method = move_method; _max_speed = max_speed; return *this; }
+Population &Population::setMovement(const int move_method, const float max_speed) {
+    _move_method = move_method;
+    _max_speed = max_speed;
+    return *this;
+}
 
-Population & Population::rays(const int rays_amount, const int rays_radius) {
+Population &Population::setRays(const int rays_amount, const int rays_radius) {
     _rays_amount = rays_amount;
     _rays_radius = rays_radius;
 
@@ -63,17 +72,10 @@ Population & Population::rays(const int rays_amount, const int rays_radius) {
     return *this;
 }
 
-void Population::load_image() {
-    const Image antImage = LoadImage(_imagePath.c_str());
-    _antTexture = LoadTextureFromImage(antImage);
-    UnloadImage(antImage);
-    _origin_point = Vector2{_antTexture.width / 2.0f, _antTexture.height / 2.0f};
-}
-
 /* --- Main Logics Part --- */
 void Population::act() {
 #pragma omp parallel for
-    for (auto& ant : this->_ants) {
+    for (auto &ant: this->_ants) {
         if (ant.alive) {
             // TODO
 
@@ -100,14 +102,27 @@ void Population::act() {
                 temp_position.y = ant.position.y + sin(ant.direction) * (output[0] + 1) / 2;
             }
 
-            if ( temp_position.x > 1080 ) {  ant.alive = false; continue; }
-            if ( temp_position.x < 0 ) {  ant.alive = false; continue; }
+            if (temp_position.x > 1080) {
+                ant.alive = false;
+                continue;
+            }
+            if (temp_position.x < 0) {
+                ant.alive = false;
+                continue;
+            }
 
-            if ( temp_position.y > 720 ) {  ant.alive = false; continue; }
-            if ( temp_position.y < 0 ) {  ant.alive = false; continue; }
+            if (temp_position.y > 720) {
+                ant.alive = false;
+                continue;
+            }
+            if (temp_position.y < 0) {
+                ant.alive = false;
+                continue;
+            }
 
             if (_lines.get_intersection(ant.position, temp_position) != 1000000) {
-                ant.alive = false; continue;
+                ant.alive = false;
+                continue;
             }
 
             ant.position = temp_position;
@@ -116,15 +131,29 @@ void Population::act() {
 }
 
 void Population::draw() const {
-    for (auto& ant : this->_ants) {
+
+    if (_antTexture.id == 0) {
+        std::cerr << "Texture not loaded!\n";
+    }
+    for (auto &ant: this->_ants) {
         if (ant.alive) {
             DrawTexturePro(
                 _antTexture,
-                (Rectangle){ 0, 0, _antTexture.width, _antTexture.height },  // Source rectangle
-                (Rectangle){ ant.position.x, ant.position.y, _antTexture.width, _antTexture.height }, // Destination rectangle
-                _origin_point,     // Origin point for rotation
-                ant.direction * 57.2957795,   // Rotation angle in degrees
-                WHITE       // Tint color
+                (Rectangle){
+                    0,
+                    0,
+                    static_cast<float>(_antTexture.width),
+                    static_cast<float>(_antTexture.height)
+                }, // Source rectangle
+                (Rectangle){
+                    ant.position.x,
+                    ant.position.y,
+                    static_cast<float>(_antTexture.width),
+                    static_cast<float>(_antTexture.height)
+                }, // Destination rectangle
+                _origin_point, // Origin point for rotation
+                ant.direction * 57.2957795, // Rotation angle in degrees
+                WHITE // Tint color
             );
         }
     }

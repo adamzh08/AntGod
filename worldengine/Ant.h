@@ -16,6 +16,8 @@ public:
     bool alive = true;
 
     explicit Ant(const std::vector<Layer> &layers);
+
+    void draw();
 };
 
 #endif //ANT_H

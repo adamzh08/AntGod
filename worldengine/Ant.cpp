@@ -1,11 +1,11 @@
 #include "Ant.h"
 
-#include "Textures.h"
+#include "TextureCollection.h"
 
 Ant::Ant(const std::vector<Layer> &layers): network(layers) {}
 
 
 void Ant::draw() {
-    DrawTextureEx(Textures::ant, position, rotation, 1, WHITE);
+    DrawTextureEx(TextureCollection::ant, position, 0, 1, WHITE);
 }
 

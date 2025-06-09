@@ -7,9 +7,11 @@
 #include "raylib.h"
 
 
-namespace Textures {
-    extern Texture2D ant;
+namespace TextureCollection {
+    // ---- textures ----
+    inline Texture2D ant;
 
+    // ---- loaders ----
     void LoadAll();
     void FreeAll();
 }
