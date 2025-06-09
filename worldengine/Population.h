@@ -14,17 +14,19 @@
 #define CARTESIAN_MOVE 0
 #define RADIAL_MOVE 1
 
+class World;
+
 class Population {
 public:
-    Lines _lines{};
+    World* _world;
 
-    // Ant
-    Texture2D _antTexture;
-    Vector2 _origin_point{};
-
-    // Population
+    // -------- Population ---------
     std::vector<Ant> _ants;
-    int _ants_amount = 1000;
+    int _ants_amount{};
+
+    // Ant settings
+    Texture2D _entityTexture;
+    Vector2 _origin_point{};
 
     // Neural network
     std::vector<Layer> _layers{};
@@ -42,22 +44,20 @@ public:
     std::vector<Vector2> _rays_deltas{};
     int _rays_amount = 30;
     int _rays_radius = 100;
-public:
-    Population();
 
-    // Settings
-    Population& setLines(const Lines &lines);
-    Population& setAntTexture(const Texture2D &image);
-    Population& setAnts(const int ants_amount);
-    Population& setNetwork(std::vector<Layer> &layers, const std::string &filename);
-    Population& setPositions(const Vector2 init_position, const Vector2 target_position);
-    Population& setMovement(const int move_method, const float max_speed);
-    Population& setRays(const int rays_amount, const int rays_radius);
 
-    // Calculate
+    Population(
+        World &world,
+        const Texture2D &texture,
+        int ants_amount,
+        std::vector<Layer> &layers, const std::string &filename,
+        Vector2 init_position, Vector2 target_position,
+        int move_method, float max_speed,
+        int rays_amount, int rays_radius
+    );
+
     void act();
 
-    // Draw
     void draw() const;
 };
 

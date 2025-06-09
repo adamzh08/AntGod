@@ -18,7 +18,7 @@ public:
     Vector2 start{};
     Vector2 end{};
 
-    Line(const Vector2 start, const Vector2 end);
+    Line(Vector2 start, Vector2 end);
     bool doIntersect(Vector2 p1, Vector2 q1, Vector2& res) const;
 };
 

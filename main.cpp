@@ -9,7 +9,9 @@
 #include "worldengine/Line.h"
 #include "worldengine/Lines.h"
 #include "worldengine/Population.h"
+#include "worldengine/PopulationBuilder.h"
 #include "worldengine/TextureCollection.h"
+#include "worldengine/World.h"
 
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
@@ -31,7 +33,6 @@ std::vector<Layer> layers = {
 };
 
 
-
 int main() {
     // Setting random seed by the CPU time
     srand(time(nullptr));
@@ -46,30 +47,40 @@ int main() {
     TextureCollection::LoadAll();
 
 
-    // Population
-    Population population = Population()
-        .setLines(lines)
-        .setAnts(100)
-        .setAntTexture(TextureCollection::ant)
-        .setNetwork(layers, "weights.bin")
-        .setPositions(Vector2{SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2}, Vector2{400, 100})
-        .setMovement(RADIAL_MOVE, 2)
-        .setRays(30, 100);
+    // World
+    World world = World().setLines(lines);
+
+    // Populations
+    Population antPopulation = PopulationBuilder(world)
+            .setAnts(100)
+            .setNetwork(layers, "weights.bin")
+            .setPositions(Vector2{50, 50}, Vector2{400, 200})
+            .setMovement(RADIAL_MOVE, 1)
+            .setRays(30, 100)
+            .setEntityTexture(TextureCollection::ant)
+            .build();
+
+    Population beesPopulation = PopulationBuilder(world)
+            .setAnts(100)
+            .setNetwork(layers, "weights.bin")
+            .setPositions(Vector2{100, 150}, Vector2{400, 100})
+            .setMovement(RADIAL_MOVE, 1)
+            .setRays(30, 100)
+            .setEntityTexture(TextureCollection::bee)
+            .build();
+
+    world.setPopulations({
+        antPopulation,
+        beesPopulation
+    });
 
     while (!WindowShouldClose()) {
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
 
-        for (const auto& line : lines_conf) {
-            DrawLineEx(line.start, line.end, 1.5, BLACK);
-        }
-
-        // Calculating the Ant positions
-        population.act();
-
-        // Draw the ants
-        population.draw();
+        world.act();
+        world.draw();
 
         DrawFPS(GetScreenWidth() - 100, GetScreenHeight() - 25);
 

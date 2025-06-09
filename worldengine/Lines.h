@@ -9,12 +9,12 @@
 #include "Line.h"
 
 class Lines {
-private:
+public:
     // Array of lines
     std::vector<Line> _lines{};
 
     static float _compare_distance(Vector2 start, Vector2 end);
-public:
+
     Lines();
     explicit Lines(const std::vector<Line> &lines);
 

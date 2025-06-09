@@ -14,15 +14,15 @@ class Ant {
 public:
     Population* population;
     Network network;
+
     Vector2 position{};
-    int movementMode;
     float rotation = 0.0;
     bool alive = true;
 
-    explicit Ant(Population* population, int movementMode, std::vector<Layer> &layers);
+    Ant(Population& population, std::vector<Layer> &layers);
 
     void act();
-    void draw();
+    void draw() const;
 };
 
 #endif //ANT_H

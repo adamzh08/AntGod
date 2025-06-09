@@ -10,6 +10,7 @@
 namespace TextureCollection {
     // ---- textures ----
     inline Texture2D ant;
+    inline Texture2D bee;
 
     // ---- loaders ----
     void LoadAll();
