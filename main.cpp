@@ -23,7 +23,7 @@ const std::vector<Line> lines_conf = {
 const Lines lines{lines_conf};
 
 // Layers
-const std::vector<Layer> layers = {
+std::vector<Layer> layers = {
     Layer(30),
     Layer(8, Activation::tanh),
     Layer(8, Activation::tanh),

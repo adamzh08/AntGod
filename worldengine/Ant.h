@@ -8,15 +8,20 @@
 #include "raylib.h"
 #include "../neuralengine/Network.h"
 
+class Population;
+
 class Ant {
 public:
+    Population* population;
     Network network;
     Vector2 position{};
-    float direction = 0.0;
+    int movementMode;
+    float rotation = 0.0;
     bool alive = true;
 
-    explicit Ant(const std::vector<Layer> &layers);
+    explicit Ant(Population* population, int movementMode, std::vector<Layer> &layers);
 
+    void act();
     void draw();
 };
 

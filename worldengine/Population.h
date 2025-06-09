@@ -6,7 +6,6 @@
 #define POPULATION_H
 
 #include <vector>
-#include <iostream>
 
 #include "Ant.h"
 #include "Line.h"
@@ -16,7 +15,7 @@
 #define RADIAL_MOVE 1
 
 class Population {
-private:
+public:
     Lines _lines{};
 
     // Ant
@@ -50,7 +49,7 @@ public:
     Population& setLines(const Lines &lines);
     Population& setAntTexture(const Texture2D &image);
     Population& setAnts(const int ants_amount);
-    Population& setNetwork(const std::vector<Layer> &layers, const std::string &filename);
+    Population& setNetwork(std::vector<Layer> &layers, const std::string &filename);
     Population& setPositions(const Vector2 init_position, const Vector2 target_position);
     Population& setMovement(const int move_method, const float max_speed);
     Population& setRays(const int rays_amount, const int rays_radius);

@@ -4,6 +4,8 @@
 
 #include "Population.h"
 
+#include <iostream>
+
 Population::Population() {
     _rays_deltas.resize(_rays_amount);
     const float k = 2.0f * M_PI / _rays_amount;
@@ -28,10 +30,10 @@ Population &Population::setAnts(const int ants_amount) {
     return *this;
 }
 
-Population &Population::setNetwork(const std::vector<Layer> &layers, const std::string &filename) {
+Population &Population::setNetwork(std::vector<Layer> &layers, const std::string &filename) {
     _layers = layers;
 
-    this->_ants.resize(_ants_amount, Ant(layers));
+    this->_ants.resize(_ants_amount, Ant(this, RADIAL_MOVE, layers));
 
     this->_ants[0].network = Network(layers, filename);
     for (int i = 1; i < _ants_amount; i++) {
@@ -79,53 +81,7 @@ void Population::act() {
         if (ant.alive) {
             // TODO
 
-            std::vector<float> input(_rays_amount);
-
-            for (int i = 0; i < _rays_amount; i++) {
-                input[i] = _lines.get_intersection_delta(ant.position, _rays_deltas[i]);
-                if (input[i] != 1000000) {
-                    input[i] = (_rays_radius - input[i]) / _rays_radius;
-                }
-            }
-
-            std::vector<float> output = ant.network.feed_forward(input);
-
-            Vector2 temp_position{};
-
-            if (_move_method == CARTESIAN_MOVE) {
-                temp_position.x = ant.position.x + output[0] * _max_speed;
-                temp_position.y = ant.position.y + output[1] * _max_speed;
-                ant.direction = std::atan(output[1] / output[0]);
-            } else if (_move_method == RADIAL_MOVE) {
-                ant.direction += output[1] * PI;
-                temp_position.x = ant.position.x + cos(ant.direction) * (output[0] + 1) / 2;
-                temp_position.y = ant.position.y + sin(ant.direction) * (output[0] + 1) / 2;
-            }
-
-            if (temp_position.x > 1080) {
-                ant.alive = false;
-                continue;
-            }
-            if (temp_position.x < 0) {
-                ant.alive = false;
-                continue;
-            }
-
-            if (temp_position.y > 720) {
-                ant.alive = false;
-                continue;
-            }
-            if (temp_position.y < 0) {
-                ant.alive = false;
-                continue;
-            }
-
-            if (_lines.get_intersection(ant.position, temp_position) != 1000000) {
-                ant.alive = false;
-                continue;
-            }
-
-            ant.position = temp_position;
+            ant.act();
         }
     }
 }
@@ -152,7 +108,7 @@ void Population::draw() const {
                     static_cast<float>(_antTexture.height)
                 }, // Destination rectangle
                 _origin_point, // Origin point for rotation
-                ant.direction * 57.2957795, // Rotation angle in degrees
+                ant.rotation * RAD2DEG, // Rotation angle in degrees
                 WHITE // Tint color
             );
         }
