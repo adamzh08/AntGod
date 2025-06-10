@@ -52,7 +52,7 @@ int main() {
 
     // Populations
     Population antPopulation = PopulationBuilder(world)
-            .setAnts(100)
+            .setCount(100)
             .setNetwork(layers, "weights.bin")
             .setPositions(Vector2{50, 50}, Vector2{400, 200})
             .setMovement(RADIAL_MOVE, 1)
@@ -61,7 +61,7 @@ int main() {
             .build();
 
     Population beesPopulation = PopulationBuilder(world)
-            .setAnts(100)
+            .setCount(100)
             .setNetwork(layers, "weights.bin")
             .setPositions(Vector2{100, 150}, Vector2{400, 100})
             .setMovement(RADIAL_MOVE, 1)

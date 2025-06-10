@@ -4,28 +4,50 @@
 
 #include "PopulationBuilder.h"
 
-PopulationBuilder::PopulationBuilder(World& world): _world(world) {
+PopulationBuilder::PopulationBuilder(World &world): _world(world) {
 }
+#define REQUIRE_NOT_EMPTY(field, name) if (!field.has_value()) throw std::runtime_error(name " is empty, you have to set it to build a Population");
 
+/**
+ * @throws std::runtime_error if not all fields are set
+ * @return a Population with the specified settings
+ */
 Population PopulationBuilder::build() {
-    return Population(_world, _entityTexture, _entityCount, _layers, _filename, _init_position, _target_position,
-                      _move_method, _max_speed, _rays_amount, _rays_radius);
+    REQUIRE_NOT_EMPTY(_entityTexture, "texture");
+    REQUIRE_NOT_EMPTY(_entityCount, "count");
+    REQUIRE_NOT_EMPTY(_layers, "layers");
+    REQUIRE_NOT_EMPTY(_filename, "file name");
+    REQUIRE_NOT_EMPTY(_init_position, "init position");
+    REQUIRE_NOT_EMPTY(_target_position, "target position");
+    REQUIRE_NOT_EMPTY(_move_method, "movement method");
+    REQUIRE_NOT_EMPTY(_max_speed, "speed");
+    REQUIRE_NOT_EMPTY(_rays_amount, "ray amount");
+    REQUIRE_NOT_EMPTY(_rays_radius, "ray radius");
+    return Population(
+        _world,
+        _entityTexture.value(),
+        _entityCount.value(),
+        _layers.value(), _filename.value(),
+        _init_position.value(), _target_position.value(),
+        _move_method.value(), _max_speed.value(),
+        _rays_amount.value(), _rays_radius.value()
+    );
 }
 
 
 PopulationBuilder &PopulationBuilder::setEntityTexture(const Texture2D &texture) {
     _entityTexture = texture;
-    _entityTexture = texture;
     return *this;
 }
 
-PopulationBuilder &PopulationBuilder::setAnts(const int ants_amount) {
-    _entityCount = ants_amount;
+PopulationBuilder &PopulationBuilder::setCount(const int entity_count) {
+    _entityCount = entity_count;
     return *this;
 }
 
 PopulationBuilder &PopulationBuilder::setNetwork(std::vector<Layer> &layers, const std::string &filename) {
     _layers = layers;
+    _filename = filename;
     return *this;
 }
 
