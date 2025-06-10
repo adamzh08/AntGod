@@ -12,13 +12,13 @@ Population::Population(
     int ants_amount,
     std::vector<Layer> &layers, const std::string &filename,
     Vector2 init_position, Vector2 target_position,
-    int move_method, float max_speed,
+    int move_method, float max_speed, float max_angle,
     int rays_amount, int rays_radius): _world(&world),
                                        _entityTexture(texture),
                                        _ants_amount(ants_amount),
                                        _layers(layers), _filename(filename),
                                        _init_position(init_position), _target_position(target_position),
-                                       _move_method(move_method), _max_speed(max_speed),
+                                       _move_method(move_method), _max_speed(max_speed), _max_angle(max_angle),
                                        _rays_amount(rays_amount), _rays_radius(rays_radius) {
     // ants
     this->_ants.resize(_ants_amount, Ant(*this, layers));

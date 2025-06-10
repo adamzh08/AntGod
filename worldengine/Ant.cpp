@@ -28,7 +28,7 @@ void Ant::act() {
             break;
         }
         case RADIAL_MOVE: {
-            rotation += output[1] * PI / 10;
+            rotation += output[1] * population->_max_angle;
             const float speed = (output[0] + 1) / 2 * population->_max_speed;
             position.x += cos(rotation) * speed;
             position.y += sin(rotation) * speed;

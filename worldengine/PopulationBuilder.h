@@ -28,6 +28,7 @@ public:
     // Movement
     std::optional<int> _move_method;
     std::optional<float> _max_speed;
+    std::optional<float> _max_angle;
 
     // Rays
     std::optional<int> _rays_amount;
@@ -41,7 +42,7 @@ public:
     PopulationBuilder& setCount(int ants_amount);
     PopulationBuilder& setNetwork(std::vector<Layer> &layers, const std::string &filename);
     PopulationBuilder& setPositions(Vector2 init_position, Vector2 target_position);
-    PopulationBuilder& setMovement(int move_method, float max_speed);
+    PopulationBuilder& setMovement(int move_method, float max_speed, float max_angle);
     PopulationBuilder& setRays(int rays_amount, int rays_radius);
 
     Population build();

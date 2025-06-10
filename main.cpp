@@ -52,19 +52,19 @@ int main() {
 
     // Populations
     Population antPopulation = PopulationBuilder(world)
-            .setCount(100)
+            .setCount(10000)
             .setNetwork(layers, "weights.bin")
             .setPositions(Vector2{50, 50}, Vector2{400, 200})
-            .setMovement(RADIAL_MOVE, 1)
+            .setMovement(RADIAL_MOVE, 1, 10 * DEG2RAD)
             .setRays(30, 100)
             .setEntityTexture(TextureCollection::ant)
             .build();
 
     Population beesPopulation = PopulationBuilder(world)
-            .setCount(100)
+            .setCount(10000)
             .setNetwork(layers, "weights.bin")
             .setPositions(Vector2{100, 150}, Vector2{400, 100})
-            .setMovement(RADIAL_MOVE, 1)
+            .setMovement(RADIAL_MOVE, 1, 3 * DEG2RAD)
             .setRays(30, 100)
             .setEntityTexture(TextureCollection::bee)
             .build();

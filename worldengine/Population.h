@@ -26,24 +26,25 @@ public:
 
     // Ant settings
     Texture2D _entityTexture;
-    Vector2 _origin_point{};
+    Vector2 _origin_point;
 
     // Neural network
-    std::vector<Layer> _layers{};
-    std::string _filename = "weights.bin";
+    std::vector<Layer> _layers;
+    std::string _filename;
 
     // Positions
-    Vector2 _init_position{10, 10};
-    Vector2 _target_position{20, 10};
+    Vector2 _init_position;
+    Vector2 _target_position;
 
     // Movement
-    int _move_method = CARTESIAN_MOVE;
-    float _max_speed = 1.0f;
+    int _move_method;
+    float _max_speed;
+    float _max_angle;
 
     // Rays
-    std::vector<Vector2> _rays_deltas{};
-    int _rays_amount = 30;
-    int _rays_radius = 100;
+    std::vector<Vector2> _rays_deltas;
+    int _rays_amount;
+    int _rays_radius;
 
 
     Population(
@@ -52,7 +53,7 @@ public:
         int ants_amount,
         std::vector<Layer> &layers, const std::string &filename,
         Vector2 init_position, Vector2 target_position,
-        int move_method, float max_speed,
+        int move_method, float max_speed, float max_angle,
         int rays_amount, int rays_radius
     );
 

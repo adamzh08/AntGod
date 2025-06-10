@@ -21,6 +21,7 @@ Population PopulationBuilder::build() {
     REQUIRE_NOT_EMPTY(_target_position, "target position");
     REQUIRE_NOT_EMPTY(_move_method, "movement method");
     REQUIRE_NOT_EMPTY(_max_speed, "speed");
+    REQUIRE_NOT_EMPTY(_max_angle, "max angle");
     REQUIRE_NOT_EMPTY(_rays_amount, "ray amount");
     REQUIRE_NOT_EMPTY(_rays_radius, "ray radius");
     return Population(
@@ -29,7 +30,7 @@ Population PopulationBuilder::build() {
         _entityCount.value(),
         _layers.value(), _filename.value(),
         _init_position.value(), _target_position.value(),
-        _move_method.value(), _max_speed.value(),
+        _move_method.value(), _max_speed.value(), _max_angle.value(),
         _rays_amount.value(), _rays_radius.value()
     );
 }
@@ -57,9 +58,10 @@ PopulationBuilder &PopulationBuilder::setPositions(const Vector2 init_position, 
     return *this;
 }
 
-PopulationBuilder &PopulationBuilder::setMovement(const int move_method, const float max_speed) {
+PopulationBuilder &PopulationBuilder::setMovement(const int move_method, const float max_speed, float max_angle) {
     _move_method = move_method;
     _max_speed = max_speed;
+    _max_angle = max_angle;
     return *this;
 }
 
