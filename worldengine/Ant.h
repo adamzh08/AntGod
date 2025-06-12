@@ -12,17 +12,21 @@ class Population;
 
 class Ant {
 public:
-    Population* population;
+    Population *population;
     Network network;
 
     Vector2 position{};
     float rotation = 0.0;
     bool alive = true;
 
-    Ant(Population& population, std::vector<Layer> &layers);
+    Ant(Population &population, std::vector<Layer> &layers);
+    Ant(const Ant& other);
 
     void act();
+
     void draw() const;
+
+    [[nodiscard]] float calculateReward() const;
 };
 
 #endif //ANT_H

@@ -17,8 +17,16 @@ World& World::setPopulations(std::vector<Population> populations) {
     return *this;
 }
 
-
+int frameCounter = 0;
 void World::act() {
+    frameCounter++;
+
+    if (frameCounter == 2 * 60) {
+        frameCounter = 0;
+        for (Population& population : _populations) {
+            population.flood();
+        }
+    }
     for (Population& population : _populations) {
         population.act();
     }

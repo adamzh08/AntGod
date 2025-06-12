@@ -129,12 +129,10 @@ Network::Network(const std::vector<Layer> &layers, const std::string &filename) 
     }
 }
 
-Network::Network(const Network &other) noexcept {
+Network::Network(const Network &other) {
     this->_layers = other._layers;
     this->_layers_amount = other._layers_amount;
     this->_weights = other._weights;
-
-    mutate_weights(0.3, 1.0);
 }
 
 [[nodiscard]] std::vector<float> Network::feed_forward(const std::vector<float> &input) const {

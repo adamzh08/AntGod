@@ -15,7 +15,7 @@
 class Network {
 private:
     std::vector<Layer> _layers;
-    size_t _layers_amount;
+    int _layers_amount;
 
     std::vector<std::vector<std::vector<float>>> _weights;
 
@@ -28,7 +28,7 @@ private:
 public:
     explicit Network(const std::vector<Layer> &layers);
     Network(const std::vector<Layer> &layers, const std::string& filename);
-    Network(const Network &other) noexcept;
+    Network(const Network &other);
 
     void mutate_weights(float mutation_probability, float mutation_amplitude);
 

@@ -10,6 +10,7 @@
 #include "Ant.h"
 #include "Line.h"
 #include "Lines.h"
+#include "raylib.h"
 
 #define CARTESIAN_MOVE 0
 #define RADIAL_MOVE 1
@@ -18,7 +19,7 @@ class World;
 
 class Population {
 public:
-    World* _world;
+    World *_world;
 
     // -------- Population ---------
     std::vector<Ant> _ants;
@@ -58,6 +59,10 @@ public:
     );
 
     void act();
+
+    void flood();
+
+    static Ant tournamentSelectFromPool(const std::vector<Ant> &pool, const int k);
 
     void draw() const;
 };

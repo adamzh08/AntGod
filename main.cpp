@@ -26,8 +26,7 @@ const Lines lines{lines_conf};
 
 // Layers
 std::vector<Layer> layers = {
-    Layer(30),
-    Layer(8, Activation::tanh),
+    Layer(2),
     Layer(8, Activation::tanh),
     Layer(2, Activation::tanh),
 };
@@ -51,35 +50,27 @@ int main() {
     World world = World().setLines(lines);
 
     // Populations
-    Population antPopulation = PopulationBuilder(world)
-            .setCount(10000)
-            .setNetwork(layers, "weights.bin")
-            .setPositions(Vector2{50, 50}, Vector2{400, 200})
-            .setMovement(RADIAL_MOVE, 1, 10 * DEG2RAD)
-            .setRays(30, 100)
-            .setEntityTexture(TextureCollection::ant)
-            .build();
-
     Population beesPopulation = PopulationBuilder(world)
-            .setCount(10000)
-            .setNetwork(layers, "weights.bin")
-            .setPositions(Vector2{100, 150}, Vector2{400, 100})
-            .setMovement(RADIAL_MOVE, 1, 3 * DEG2RAD)
+            .setCount(5000)
+            .setNetwork(layers, "weights123.bin")
+            .setPositions(Vector2{100, 150}, Vector2{50, 600})
+            .setMovement(RADIAL_MOVE, 10, 10 * DEG2RAD)
             .setRays(30, 100)
             .setEntityTexture(TextureCollection::bee)
             .build();
 
     world.setPopulations({
-        antPopulation,
         beesPopulation
     });
 
     while (!WindowShouldClose()) {
+        world.act();
+
+
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
 
-        world.act();
         world.draw();
 
         DrawFPS(GetScreenWidth() - 100, GetScreenHeight() - 25);

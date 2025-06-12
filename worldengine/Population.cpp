@@ -4,7 +4,11 @@
 
 #include "Population.h"
 
+#include <cfloat>
 #include <iostream>
+#include <random>
+#include <ranges>
+#include <set>
 
 Population::Population(
     World &world,
@@ -21,14 +25,12 @@ Population::Population(
                                        _move_method(move_method), _max_speed(max_speed), _max_angle(max_angle),
                                        _rays_amount(rays_amount), _rays_radius(rays_radius) {
     // ants
-    this->_ants.resize(_ants_amount, Ant(*this, layers));
+    Ant defaultAnt(*this, layers);
+    _ants.resize(_ants_amount, Ant(defaultAnt));
 
-    this->_ants[0].network = Network(layers, filename);
-    for (int i = 1; i < _ants_amount; i++) {
-        this->_ants[i].network = Network(this->_ants[0].network);
-    }
-    for (auto &ant: this->_ants) {
-        ant.position = init_position;
+
+    for (Ant &ant: this->_ants) {
+        ant.network.mutate_weights(0.05, 0.1);
     }
 
     // rays
@@ -50,13 +52,64 @@ void Population::act() {
     }
 }
 
+void Population::flood() {
+    std::vector<Ant> selectedAnts;
+
+    for (Ant &ant: _ants) {
+        if (ant.alive) {
+            selectedAnts.push_back(ant);
+        }
+    }
+
+    for (int i = 0; i < _ants_amount; i++) {
+        _ants[i] = Ant(tournamentSelectFromPool(selectedAnts, static_cast<int>(_ants_amount * 0.1)));
+        _ants[i].network.mutate_weights(0.01, 0.1);
+    }
+}
+
+Ant Population::tournamentSelectFromPool(const std::vector<Ant> &pool, const int k) {
+    std::vector<int> indices(pool.size());
+    std::iota(indices.begin(), indices.end(), 0); // Fill with 0..n-1
+    std::shuffle(indices.begin(), indices.end(), std::mt19937{std::random_device{}()});
+
+    std::vector<int> selectedIndexes(indices.begin(), indices.begin() + k);
+
+
+    const Ant *best = nullptr;
+    float highestReward = -FLT_MAX;
+
+    for (int i = 0; i < k; i++) {
+        const Ant &random = pool[selectedIndexes[i]];
+
+        float reward = random.calculateReward();
+        if (reward > highestReward) {
+            highestReward = reward;
+            best = &random;
+        }
+    }
+    return *best;
+}
+
 void Population::draw() const {
     DrawCircleV(_init_position, 10, GREEN);
     DrawCircleV(_target_position, 10, RED);
 
+    const Ant *best = nullptr;
+    float highestReward = -FLT_MAX;
+
     for (const Ant &ant: this->_ants) {
         if (ant.alive) {
-            ant.draw();
+            float reward = ant.calculateReward();
+            if (reward > highestReward) {
+                highestReward = reward;
+                best = &ant;
+            }
         }
+    }
+
+
+    DrawEllipse(best->position.x, best->position.y, 10, 10, Color(0, 0, 255, 150));
+    for (const Ant &ant: _ants) {
+        ant.draw();
     }
 }

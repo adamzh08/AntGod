@@ -8,15 +8,25 @@
 
 Ant::Ant(Population &population, std::vector<Layer> &layers): population(&population), network(layers) {}
 
-void Ant::act() {
-    std::vector<float> input(population->_rays_amount);
+Ant::Ant(const Ant &other) : population(other.population), network(other.network), position(other.population->_init_position) {}
 
+
+void Ant::act() {
+    // std::vector<float> input(population->_rays_amount);
+
+    std::vector<float> input {
+        position.x / 1000,
+        position.y / 1000,
+    };
+
+    /*
     for (int i = 0; i < population->_rays_amount; i++) {
         input[i] = population->_world->_lines.get_intersection_delta(position, population->_rays_deltas[i]);
         if (input[i] != 1000000) {
             input[i] = (population->_rays_radius - input[i]) / population->_rays_radius;
         }
     }
+    */
 
     const auto output = network.feed_forward(input);
 
@@ -40,6 +50,12 @@ void Ant::act() {
     if (position.x > 1080 || position.x < 0 || position.y > 720 || position.y < 0) {
         alive = false;
     }
+}
+
+float Ant::calculateReward() const {
+    const float dx = population->_target_position.x - position.x;
+    const float dy = population->_target_position.y - position.y;
+    return -(dx * dx + dy * dy);
 }
 
 void Ant::draw() const {
