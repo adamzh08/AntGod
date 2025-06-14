@@ -21,6 +21,7 @@ public:
     // Neural network
     std::optional<std::vector<Layer>> _layers;
     std::optional<std::string> _filename;
+    std::optional<float> _mutation_probability;
 
     // Positions
     std::optional<Vector2> _init_position;
@@ -46,6 +47,7 @@ public:
     PopulationBuilder& setMovement(int move_method, float max_speed, float max_angle);
     PopulationBuilder& setRays(int rays_amount, int rays_radius);
     PopulationBuilder& setElitePercentage(float elite_percentage);
+    PopulationBuilder& setMutationProbability(float probability);
 
 
     Population build();

@@ -8,6 +8,27 @@
 #include "Network.h"
 
 #include <assert.h>
+#include <random>
+
+
+Network::Network(const std::vector<Layer> &layers) {
+    _init(layers);
+    _randomize_weights();
+}
+
+Network::Network(const std::vector<Layer> &layers, const std::string &filename) {
+    _init(layers);
+
+    if (!_load_weights(filename)) {
+        _randomize_weights();
+        _save_weights(filename);
+    }
+}
+
+Network::Network(const Network &other) {
+    this->_layers = other._layers;
+    this->_weights = other._weights;
+}
 
 void Network::_randomize_weights() {
     for (int layer = 0; layer < _layers.size() - 1; layer++) {
@@ -35,6 +56,23 @@ void Network::mutate_weights(const float mutation_probability, const float mutat
         }
     }
 }
+
+void Network::replaceWeightsWithOther(const Network &other, double p) {
+    assert(_weights.size() == other._weights.size());
+
+    for (int i = 0; i < _weights.size(); i++) {
+        assert(_weights[i].size() == other._weights[i].size());
+        for (int j = 0; j < _weights[i].size(); j++) {
+            assert(_weights[i][j].size() == other._weights[i][j].size());
+            for (int k = 0; k < _weights[i][j].size(); k++) {
+                if (static_cast<double>(rand()) / RAND_MAX < p) {
+                    _weights[i][j][k] = other._weights[i][j][k];
+                }
+            }
+        }
+    }
+}
+
 
 inline std::size_t hash_layer_vector(const std::vector<Layer> &layers) {
     std::size_t seed = layers.size();
@@ -103,25 +141,6 @@ bool Network::_load_weights(const std::string &filename) {
 
     file.close();
     return true;
-}
-
-Network::Network(const std::vector<Layer> &layers) {
-    _init(layers);
-    _randomize_weights();
-}
-
-Network::Network(const std::vector<Layer> &layers, const std::string &filename) {
-    _init(layers);
-
-    if (!_load_weights(filename)) {
-        _randomize_weights();
-        _save_weights(filename);
-    }
-}
-
-Network::Network(const Network &other) {
-    this->_layers = other._layers;
-    this->_weights = other._weights;
 }
 
 [[nodiscard]] std::vector<float> Network::feed_forward(const std::vector<float> &input) const {

@@ -1,20 +1,28 @@
 #include "Ant.h"
 
+#include <assert.h>
 #include <iostream>
 
 #include "Population.h"
 #include "TextureCollection.h"
 #include "World.h"
 
-Ant::Ant(Population &population, std::vector<Layer> &layers): population(population), network(layers) {
+Ant::Ant(Population &population, const std::vector<Layer> &layers): _population(population), _network(layers),
+                                                                    _position(population._init_position) {
 }
 
-Ant::Ant(const Ant &other) : population(other.population), network(other.network),
-                             position(other.population._init_position) {
+Ant::Ant(const Ant &other) : _population(other._population), _network(other._network),
+                             _position(other._population._init_position) {
+}
+Ant::Ant(const Ant &parent1, const Ant &parent2) : _population(parent1._population), _network(parent1._network),
+                                                   _position(_population._init_position) {
+    assert(&parent1._population == &parent2._population);
+    _network.replaceWeightsWithOther(parent2._network, 0.5);
 }
 
 
 void Ant::act() {
+    // Todo make rays work
     /*
     std::vector<float> input(population->_rays_amount);
 
@@ -27,40 +35,42 @@ void Ant::act() {
     */
 
     std::vector<float> input{
-        position.x / 1000.f,
-        position.y / 1000.f,
+        _position.x / 1000.f,
+        _position.y / 1000.f,
     };
 
-    const auto output = network.feed_forward(input);
+    const auto output = _network.feed_forward(input);
 
-    switch (population._move_method) {
+    switch (_population._move_method) {
         case CARTESIAN_MOVE: {
-            position.x += output[0] * population._max_speed;
-            position.y += output[1] * population._max_speed;
-            rotation = std::atan2(output[1], output[0]);
+            _position.x += output[0] * _population._max_speed;
+            _position.y += output[1] * _population._max_speed;
+            _rotation = std::atan2(output[1], output[0]);
             break;
         }
         case RADIAL_MOVE: {
-            rotation += output[1] * population._max_angle;
-            const float speed = output[0] * population._max_speed;
-            position.x += cos(rotation) * speed;
-            position.y += sin(rotation) * speed;
+            const float speedOutput = output[0] * _population._max_speed;
+            const float rotationOutput = output[1] * _population._max_angle;
+            _rotation += rotationOutput;
+            _position.x += cos(_rotation) * speedOutput;
+            _position.y += sin(_rotation) * speedOutput;
             break;
         }
         default:
             std::cerr << "Invalid movement mode" << std::endl;
     }
-    if (position.x < 0 || position.x > 1080 || position.y < 0 || position.y > 720) {
-        alive = false;
+
+    if (_position.x < 0 || _position.x > 1080 || _position.y < 0 || _position.y > 720) {
+        _alive = false;
     }
 }
 
 float Ant::calculateReward() const {
-    const float dx = population._target_position.x - position.x;
-    const float dy = population._target_position.y - position.y;
+    const float dx = _population._target_position.x - _position.x;
+    const float dy = _population._target_position.y - _position.y;
     return -(dx * dx + dy * dy);
 }
 
 void Ant::draw() const {
-    DrawTextureEx(population._entityTexture, position, rotation * RAD2DEG, 1, WHITE);
+    DrawTextureEx(_population._entityTexture, _position, _rotation * RAD2DEG, 1, WHITE);
 }

@@ -15,24 +15,30 @@
 class Network {
 private:
     std::vector<Layer> _layers;
-    std::vector<std::vector<std::vector<float>>> _weights;
+    std::vector<std::vector<std::vector<float> > > _weights;
 
     void _randomize_weights();
 
-    void _save_weights(const std::string& filename) const;
-    bool _load_weights(const std::string& filename);
+    void _save_weights(const std::string &filename) const;
+
+    bool _load_weights(const std::string &filename);
 
     void _init(const std::vector<Layer> &layers);
+
 public:
     explicit Network(const std::vector<Layer> &layers);
-    Network(const std::vector<Layer> &layers, const std::string& filename);
+
+    Network(const std::vector<Layer> &layers, const std::string &filename);
+
     Network(const Network &other);
 
     void mutate_weights(float mutation_probability, float mutation_amplitude);
 
-    [[nodiscard]] std::vector<float> feed_forward(const std::vector<float>& input) const;
+    [[nodiscard]] std::vector<float> feed_forward(const std::vector<float> &input) const;
 
     void free_weights();
+
+    void replaceWeightsWithOther(const Network &other, double p);
 };
 
 #endif //NETWORK_H

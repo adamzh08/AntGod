@@ -33,6 +33,7 @@ public:
     // Neural network
     std::vector<Layer> _layers;
     std::string _filename;
+    float _mutation_probability;
 
     // Positions
     Vector2 _init_position;
@@ -54,7 +55,7 @@ public:
         int ants_amount,
         float elite_percentage,
         const Texture2D &texture,
-        std::vector<Layer> &layers, const std::string &filename,
+        std::vector<Layer> &layers, const std::string &filename, float mutation_probability,
         Vector2 init_position, Vector2 target_position,
         int move_method, float max_speed, float max_angle,
         int rays_amount, int rays_radius

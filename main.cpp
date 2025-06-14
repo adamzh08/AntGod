@@ -61,6 +61,7 @@ int main() {
             .setCount(10000)
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
+            .setMutationProbability(0.3)
             .setPositions(Vector2{700, 350}, Vector2{50, 600})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 100)

@@ -12,14 +12,15 @@ class Population;
 
 class Ant {
 public:
-    Population &population;
-    Network network;
+    Population &_population;
+    Network _network;
 
-    Vector2 position{};
-    float rotation = 0.0;
-    bool alive = true;
+    Vector2 _position;
+    float _rotation = 0.0;
+    bool _alive = true;
 
-    Ant(Population &population, std::vector<Layer> &layers);
+    Ant(Population &population, const std::vector<Layer> &layers);
+    Ant(const Ant& parent1, const Ant& parent2);
 
     Ant(const Ant& other);
 

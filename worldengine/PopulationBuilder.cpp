@@ -6,6 +6,7 @@
 
 PopulationBuilder::PopulationBuilder(World &world): _world(world) {
 }
+
 #define REQUIRE_NOT_EMPTY(field, name) if (!field.has_value()) throw std::runtime_error(name " is empty, you have to set it to build a Population");
 
 /**
@@ -18,6 +19,7 @@ Population PopulationBuilder::build() {
     REQUIRE_NOT_EMPTY(_entityTexture, "texture");
     REQUIRE_NOT_EMPTY(_layers, "layers");
     REQUIRE_NOT_EMPTY(_filename, "file name");
+    REQUIRE_NOT_EMPTY(_mutation_probability, "mutation probability");
     REQUIRE_NOT_EMPTY(_init_position, "init position");
     REQUIRE_NOT_EMPTY(_target_position, "target position");
     REQUIRE_NOT_EMPTY(_move_method, "movement method");
@@ -30,7 +32,7 @@ Population PopulationBuilder::build() {
         _entityCount.value(),
         _elite_percentage.value(),
         _entityTexture.value(),
-        _layers.value(), _filename.value(),
+        _layers.value(), _filename.value(), _mutation_probability.value(),
         _init_position.value(), _target_position.value(),
         _move_method.value(), _max_speed.value(), _max_angle.value(),
         _rays_amount.value(), _rays_radius.value()
@@ -47,10 +49,12 @@ PopulationBuilder &PopulationBuilder::setCount(const int entity_count) {
     _entityCount = entity_count;
     return *this;
 }
+
 PopulationBuilder &PopulationBuilder::setElitePercentage(float elite_percentage) {
     _elite_percentage = elite_percentage;
     return *this;
 }
+
 PopulationBuilder &PopulationBuilder::setNetwork(std::vector<Layer> &layers, const std::string &filename) {
     _layers = layers;
     _filename = filename;
@@ -73,5 +77,10 @@ PopulationBuilder &PopulationBuilder::setMovement(const int move_method, const f
 PopulationBuilder &PopulationBuilder::setRays(const int rays_amount, const int rays_radius) {
     _rays_amount = rays_amount;
     _rays_radius = rays_radius;
+    return *this;
+}
+
+PopulationBuilder &PopulationBuilder::setMutationProbability(const float mutation_probability) {
+    _mutation_probability = mutation_probability;
     return *this;
 }
