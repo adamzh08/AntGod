@@ -61,16 +61,27 @@ int main() {
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutationProbability(0.3)
-            .setPositions(Vector2{700, 350}, Vector2{50, 600})
+            .setPositions(Vector2{700, 300}, Vector2{50, 400})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 100)
             .setEntityTexture(TextureCollection::bee)
+            .build();
+    Population antsPopulation = PopulationBuilder(*world)
+            .setCount(10000)
+            .setElitePercentage(0.3)
+            .setNetwork(layers, "")
+            .setMutationProbability(0.3)
+            .setPositions(Vector2{700, 500}, Vector2{50, 400})
+            .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
+            .setRays(30, 100)
+            .setEntityTexture(TextureCollection::ant)
             .build();
 
     world->setLines(lines)
             .setGenerationDuration(10 * 60)
             .setPopulations({
-                beesPopulation
+                beesPopulation,
+                antsPopulation,
             });
 
     while (!WindowShouldClose()) {
