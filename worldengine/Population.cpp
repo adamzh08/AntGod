@@ -74,6 +74,10 @@ void Population::flood() {
         }
     }
 
+    std::sort(selectedAnts.begin(), selectedAnts.end(), [](const Ant* ant1, const Ant* ant2) {
+        return ant1->calculateReward() > ant2->calculateReward();
+    });
+
     std::vector<Ant> nextGen;
     nextGen.reserve(_ants_amount);
 
@@ -83,9 +87,7 @@ void Population::flood() {
         nextGen.push_back(Ant(*selectedAnts[i]));
     }
 
-    std::sort(selectedAnts.begin(), selectedAnts.end(), [](const Ant* ant1, const Ant* ant2) {
-        return ant1->calculateReward() > ant2->calculateReward();
-    });
+
 
     for (int i = topX; i < _ants_amount; i++) {
         const int parentIndex = tournamentSelectFromPool(selectedAnts,
