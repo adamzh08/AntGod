@@ -77,11 +77,21 @@ void Population::flood() {
     std::vector<Ant> nextGen;
     nextGen.reserve(_ants_amount);
 
-    for (int i = 0; i < _ants_amount; i++) {
-        const int parentIndex = tournamentSelectFromPool(selectedAnts,
-                                                         static_cast<int>(_ants_amount * _elite_percentage));
+    const int topX = static_cast<int>(_elite_percentage * selectedAnts.size());
 
-        Ant child(_ants[parentIndex]);
+    for (int i = 0; i < topX; ++i) {
+        nextGen.push_back(Ant(*selectedAnts[i]));
+    }
+
+    std::sort(selectedAnts.begin(), selectedAnts.end(), [](const Ant* ant1, const Ant* ant2) {
+        return ant1->calculateReward() > ant2->calculateReward();
+    });
+
+    for (int i = topX; i < _ants_amount; i++) {
+        const int parentIndex = tournamentSelectFromPool(selectedAnts,
+                                                         static_cast<int>(_ants_amount * 0.3));
+
+        Ant child(*selectedAnts[parentIndex]);
         child.network.mutate_weights(0.01, 0.1);
 
         nextGen.push_back(child);
@@ -129,9 +139,12 @@ void Population::draw() const {
         }
     }
 
-
+    // drawing a blue circle on the best ant
     DrawEllipse(best->position.x, best->position.y, 10, 10, Color(0, 0, 255, 150));
+
     for (const Ant &ant: _ants) {
-        ant.draw();
+        if (ant.alive) {
+            ant.draw();
+        }
     }
 }

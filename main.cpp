@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include "raylib.h"
@@ -17,6 +18,10 @@
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
 
+void draw();
+
+void handleUserInput();
+
 // Initializing Obstacles
 const std::vector<Line> lines_conf = {
     Line(Vector2{500, 0}, Vector2{500, 300}),
@@ -32,6 +37,7 @@ std::vector<Layer> layers = {
     Layer(2, Activation::tanh),
 };
 
+World *world = nullptr;
 
 int main() {
     // Setting random seed by the CPU time
@@ -48,41 +54,55 @@ int main() {
 
 
     // World
-    World world = World()
-            .setLines(lines)
-            .setGenerationDuration(10 * 60);
+    world = new World();
 
     // Populations
-    Population beesPopulation = PopulationBuilder(world)
-            .setCount(1e4)
+    Population beesPopulation = PopulationBuilder(*world)
+            .setCount(10000)
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
-            .setPositions(Vector2{100, 150}, Vector2{50, 600})
+            .setPositions(Vector2{700, 350}, Vector2{50, 600})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 100)
             .setEntityTexture(TextureCollection::bee)
             .build();
 
-    world.setPopulations({
-        beesPopulation
-    });
+    world->setLines(lines)
+            .setGenerationDuration(10 * 60)
+            .setPopulations({
+                beesPopulation
+            });
 
     while (!WindowShouldClose()) {
-        world.act();
+        handleUserInput();
 
+        world->act();
 
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-
-        world.draw();
-        DrawFPS(GetScreenWidth() - 100, GetScreenHeight() - 25);
-
-        EndDrawing();
+        draw();
     }
 
     // free all
     TextureCollection::FreeAll();
 
+    delete world;
+
     CloseWindow();
     return 0;
+}
+
+void draw() {
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+
+    world->draw();
+    DrawFPS(GetScreenWidth() - 100, GetScreenHeight() - 25);
+
+    EndDrawing();
+}
+
+
+void handleUserInput() {
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        std::cout << "pressed!" << std::endl;
+    }
 }
