@@ -9,6 +9,10 @@
 
 
 class World {
+private:
+    // drawing
+    std::optional<Vector2> _rayStartPos{};
+    std::optional<Vector2> _rayEndPos{};
 public:
     Lines _lines{};
     std::vector<Population> _populations;
@@ -20,6 +24,7 @@ public:
 
     void act();
     void draw() const;
+    void handleUserInput();
 };
 
 

@@ -18,9 +18,8 @@
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
 
-void draw();
 
-void handleUserInput();
+void draw();
 
 // Initializing Obstacles
 const std::vector<Line> lines_conf = {
@@ -75,10 +74,8 @@ int main() {
             });
 
     while (!WindowShouldClose()) {
-        handleUserInput();
-
+        world->handleUserInput();
         world->act();
-
         draw();
     }
 
@@ -99,11 +96,4 @@ void draw() {
     DrawFPS(GetScreenWidth() - 100, GetScreenHeight() - 25);
 
     EndDrawing();
-}
-
-
-void handleUserInput() {
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        std::cout << "pressed!" << std::endl;
-    }
 }
