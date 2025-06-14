@@ -15,8 +15,6 @@
 class Network {
 private:
     std::vector<Layer> _layers;
-    int _layers_amount;
-
     std::vector<std::vector<std::vector<float>>> _weights;
 
     void _randomize_weights();

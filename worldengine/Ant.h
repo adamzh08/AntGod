@@ -12,7 +12,7 @@ class Population;
 
 class Ant {
 public:
-    Population *population;
+    Population &population;
     Network network;
 
     Vector2 position{};
@@ -20,6 +20,7 @@ public:
     bool alive = true;
 
     Ant(Population &population, std::vector<Layer> &layers);
+
     Ant(const Ant& other);
 
     void act();

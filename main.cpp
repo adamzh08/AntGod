@@ -1,3 +1,4 @@
+#include <cassert>
 #include <iostream>
 #include <vector>
 
@@ -47,14 +48,17 @@ int main() {
 
 
     // World
-    World world = World().setLines(lines);
+    World world = World()
+            .setLines(lines)
+            .setGenerationDuration(10 * 60);
 
     // Populations
     Population beesPopulation = PopulationBuilder(world)
-            .setCount(5000)
-            .setNetwork(layers, "weights123.bin")
+            .setCount(1e4)
+            .setElitePercentage(0.3)
+            .setNetwork(layers, "")
             .setPositions(Vector2{100, 150}, Vector2{50, 600})
-            .setMovement(RADIAL_MOVE, 10, 10 * DEG2RAD)
+            .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 100)
             .setEntityTexture(TextureCollection::bee)
             .build();
@@ -68,16 +72,15 @@ int main() {
 
 
         BeginDrawing();
-
         ClearBackground(RAYWHITE);
 
         world.draw();
-
         DrawFPS(GetScreenWidth() - 100, GetScreenHeight() - 25);
 
         EndDrawing();
     }
 
+    // free all
     TextureCollection::FreeAll();
 
     CloseWindow();

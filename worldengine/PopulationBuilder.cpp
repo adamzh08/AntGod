@@ -13,8 +13,9 @@ PopulationBuilder::PopulationBuilder(World &world): _world(world) {
  * @return a Population with the specified settings
  */
 Population PopulationBuilder::build() {
-    REQUIRE_NOT_EMPTY(_entityTexture, "texture");
     REQUIRE_NOT_EMPTY(_entityCount, "count");
+    REQUIRE_NOT_EMPTY(_elite_percentage, "elite percentage");
+    REQUIRE_NOT_EMPTY(_entityTexture, "texture");
     REQUIRE_NOT_EMPTY(_layers, "layers");
     REQUIRE_NOT_EMPTY(_filename, "file name");
     REQUIRE_NOT_EMPTY(_init_position, "init position");
@@ -26,8 +27,9 @@ Population PopulationBuilder::build() {
     REQUIRE_NOT_EMPTY(_rays_radius, "ray radius");
     return Population(
         _world,
-        _entityTexture.value(),
         _entityCount.value(),
+        _elite_percentage.value(),
+        _entityTexture.value(),
         _layers.value(), _filename.value(),
         _init_position.value(), _target_position.value(),
         _move_method.value(), _max_speed.value(), _max_angle.value(),
@@ -45,7 +47,10 @@ PopulationBuilder &PopulationBuilder::setCount(const int entity_count) {
     _entityCount = entity_count;
     return *this;
 }
-
+PopulationBuilder &PopulationBuilder::setElitePercentage(float elite_percentage) {
+    _elite_percentage = elite_percentage;
+    return *this;
+}
 PopulationBuilder &PopulationBuilder::setNetwork(std::vector<Layer> &layers, const std::string &filename) {
     _layers = layers;
     _filename = filename;

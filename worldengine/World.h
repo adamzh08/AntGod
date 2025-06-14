@@ -11,10 +11,12 @@
 class World {
 public:
     Lines _lines{};
-    std::vector<Population> _populations{};
+    std::vector<Population> _populations;
+    int _generation_frameDuration;
 
-    World& setLines(Lines lines);
-    World& setPopulations(std::vector<Population> populations);
+    World& setLines(const Lines &lines);
+    World& setPopulations(std::vector<Population>&& populations);
+    World& setGenerationDuration(int duration);
 
     void act();
     void draw() const;

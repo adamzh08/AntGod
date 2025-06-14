@@ -19,11 +19,12 @@ class World;
 
 class Population {
 public:
-    World *_world;
+    World &_world;
 
     // -------- Population ---------
     std::vector<Ant> _ants;
-    int _ants_amount{};
+    int _ants_amount;
+    float _elite_percentage;
 
     // Ant settings
     Texture2D _entityTexture;
@@ -50,8 +51,9 @@ public:
 
     Population(
         World &world,
-        const Texture2D &texture,
         int ants_amount,
+        float elite_percentage,
+        const Texture2D &texture,
         std::vector<Layer> &layers, const std::string &filename,
         Vector2 init_position, Vector2 target_position,
         int move_method, float max_speed, float max_angle,
@@ -62,7 +64,7 @@ public:
 
     void flood();
 
-    static Ant tournamentSelectFromPool(const std::vector<Ant> &pool, const int k);
+    static int tournamentSelectFromPool(const std::vector<Ant*> &pool, int k);
 
     void draw() const;
 };

@@ -12,6 +12,7 @@ class PopulationBuilder {
 public:
     World &_world;
     std::optional<int> _entityCount;
+    std::optional<float> _elite_percentage;
 
     // Ant settings
     std::optional<Texture2D> _entityTexture;
@@ -44,6 +45,8 @@ public:
     PopulationBuilder& setPositions(Vector2 init_position, Vector2 target_position);
     PopulationBuilder& setMovement(int move_method, float max_speed, float max_angle);
     PopulationBuilder& setRays(int rays_amount, int rays_radius);
+    PopulationBuilder& setElitePercentage(float elite_percentage);
+
 
     Population build();
 };
