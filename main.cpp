@@ -54,7 +54,7 @@ int main() {
 
     // Populations
     Population beesPopulation = PopulationBuilder(*world)
-            .setCount(1000)
+            .setCount(3000)
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutationProbability(0.3)
@@ -64,7 +64,7 @@ int main() {
             .setEntityTexture(TextureCollection::bee)
             .build();
     Population antsPopulation = PopulationBuilder(*world)
-            .setCount(1000)
+            .setCount(3000)
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutationProbability(0.3)
@@ -83,7 +83,6 @@ int main() {
             });
 
     while (!WindowShouldClose()) {
-        world->handleUserInput();
         world->act();
         draw();
     }

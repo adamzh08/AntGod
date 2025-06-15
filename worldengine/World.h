@@ -11,7 +11,7 @@
 #include "World.h"
 
 enum UserMode {
-    JUST_LOOKING,
+    OBSERVE,
     DRAWING,
     MOVE_OBJECTS
 };
@@ -22,16 +22,19 @@ private:
     int _generation_frameDuration{};
     int _generation_count{};
     int _frameCount{};
+    bool _paused = false;
 
     // drawing
-    UserMode _userMode = JUST_LOOKING;
+    UserMode _userMode = OBSERVE;
     std::optional<Vector2> _drawVar_borderStartPos;
 
     void drawGame() const;
 
     void drawUserInfo() const;
 
-    void drawButtons();
+    void handleUserInput();
+    void handleMouseClicks();
+    void handleButtons();
 
     void drawLineOfText(const char *str, int idx) const;
 
@@ -55,8 +58,6 @@ public:
     void act();
 
     void draw();
-
-    void handleUserInput();
 };
 
 

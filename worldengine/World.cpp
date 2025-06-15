@@ -33,23 +33,25 @@ World &World::setLayout(int space_right, int space_bottom) {
 }
 
 void World::act() {
-    _frameCount++;
+    if (!_paused) {
+        _frameCount++;
 
-    if (_frameCount == _generation_frameDuration) {
-        for (Population &population: _populations) {
-            population.flood();
+        if (_frameCount == _generation_frameDuration) {
+            for (Population &population: _populations) {
+                population.flood();
+            }
+            _generation_count++;
+            _frameCount = 0;
         }
-        _generation_count++;
-        _frameCount = 0;
-    }
-    for (Population &population: _populations) {
-        population.act();
+        for (Population &population: _populations) {
+            population.act();
+        }
     }
 }
 
 void World::draw() {
     drawGame();
-    drawButtons();
+    handleUserInput();
     drawUserInfo();
 }
 
@@ -80,6 +82,67 @@ void World::drawGame() const {
     // new wall that is being drawn
     if (_drawVar_borderStartPos.has_value()) {
         DrawLineV(_drawVar_borderStartPos.value(), GetMousePosition(), BLUE);
+    }
+}
+
+void World::handleUserInput() {
+    handleMouseClicks();
+    handleButtons();
+}
+
+
+void World::handleButtons() {
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+
+    // switch to normal mode button
+    if (GuiButton(Rectangle(0, GetScreenHeight() - 60, 100, 50), "Observe")) {
+        _userMode = OBSERVE;
+    }
+    // switch to draw mode button
+    if (GuiButton(Rectangle(125, GetScreenHeight() - 60, 100, 50), "Draw")) {
+        _userMode = DRAWING;
+    }
+    // switch to normal mode button
+    if (GuiButton(Rectangle(250, GetScreenHeight() - 60, 100, 50), "Move")) {
+        _userMode = MOVE_OBJECTS;
+    }
+
+    // pause button
+    if (GuiButton(Rectangle(375, GetScreenHeight() - 60, 50, 50), _paused? "#131#" : "#132#")) {
+        _paused = !_paused;
+    }
+}
+
+void World::handleMouseClicks() {
+    switch (_userMode) {
+        case OBSERVE: {
+            break;
+        }
+        case DRAWING: {
+            const bool isInBounds_x = 0 < GetMousePosition().x && GetMousePosition().x < GetScreenWidth() - _space_right;
+            const bool isInBounds_y = 0 < GetMousePosition().y && GetMousePosition().y < GetScreenHeight() - _space_bottom;
+
+            if (!isInBounds_x || !isInBounds_y) {
+                _drawVar_borderStartPos.reset();
+            }
+
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                if (isInBounds_x && isInBounds_y) {
+                    _drawVar_borderStartPos = GetMousePosition();
+                }
+            } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+                if (_drawVar_borderStartPos.has_value()) {
+                    _lines.addLine(_drawVar_borderStartPos.value(), GetMousePosition());
+                }
+                _drawVar_borderStartPos.reset();
+            }
+
+            break;
+        }
+        case MOVE_OBJECTS: {
+            // Todo
+            break;
+        }
     }
 }
 
@@ -115,60 +178,11 @@ void World::drawLineOfText(const char *line, int idx) const {
     );
 }
 
-void World::drawButtons() {
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
-
-    // switch to normal mode button
-    if (GuiButton(Rectangle(0, GetScreenHeight() - 60, 100, 50), "Observe")) {
-        _userMode = JUST_LOOKING;
-    }
-    // switch to draw mode button
-    if (GuiButton(Rectangle(125, GetScreenHeight() - 60, 100, 50), "Draw")) {
-        _userMode = DRAWING;
-    }
-    // switch to normal mode button
-    if (GuiButton(Rectangle(250, GetScreenHeight() - 60, 100, 50), "Move")) {
-        _userMode = MOVE_OBJECTS;
-    }
-}
-
-void World::handleUserInput() {
-    switch (_userMode) {
-        case JUST_LOOKING: {
-            break;
-        }
-        case DRAWING: {
-            const bool isInBounds_x = 0 < GetMousePosition().x && GetMousePosition().x < GetScreenWidth() - _space_right;
-            const bool isInBounds_y = 0 < GetMousePosition().y && GetMousePosition().y < GetScreenHeight() - _space_bottom;
-
-            if (!isInBounds_x || !isInBounds_y) {
-                _drawVar_borderStartPos.reset();
-            }
-
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                if (isInBounds_x && isInBounds_y) {
-                    _drawVar_borderStartPos = GetMousePosition();
-                }
-            } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-                if (_drawVar_borderStartPos.has_value()) {
-                    _lines.addLine(_drawVar_borderStartPos.value(), GetMousePosition());
-                }
-                _drawVar_borderStartPos.reset();
-            }
-
-            break;
-        }
-        case MOVE_OBJECTS: {
-            // Todo
-            break;
-        }
-    }
-}
 
 
 char *World::strFromUserMode() const {
     switch (_userMode) {
-        case JUST_LOOKING: return "observe";
+        case OBSERVE: return "observe";
         case DRAWING: return "draw";
         case MOVE_OBJECTS: return "move";
         default: return "?";
