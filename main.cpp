@@ -28,7 +28,7 @@ Lines lines = Lines()
 
 // Layers
 std::vector<Layer> layers = {
-    Layer(2),
+    Layer(30),
     Layer(8, Activation::tanh),
     Layer(2, Activation::tanh),
 };
@@ -53,7 +53,7 @@ int main() {
 
     // Populations
     Population beesPopulation = PopulationBuilder(*world)
-            .setCount(1000)
+            .setCount(10)
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutationProbability(0.3)
@@ -63,7 +63,7 @@ int main() {
             .setEntityTexture(TextureCollection::bee)
             .build();
     Population antsPopulation = PopulationBuilder(*world)
-            .setCount(1000)
+            .setCount(10)
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutationProbability(0.3)
