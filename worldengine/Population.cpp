@@ -57,6 +57,7 @@ Population::Population(
 }
 
 void Population::act() {
+#pragma omp parallel for
     for (auto &ant: this->_ants) {
         if (ant._alive) {
             ant.act();
