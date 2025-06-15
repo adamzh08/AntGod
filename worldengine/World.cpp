@@ -107,10 +107,13 @@ void World::handleButtons() {
         _userMode = MOVE_OBJECTS;
     }
 
-    // pause button
     // info for RayGui icons: in raygui.h, look at enum 'GuiIconName' with ctrl + f to find the icon ids fast
+    // pause button
     if (GuiButton(Rectangle(375, GetScreenHeight() - 60, 50, 50), _paused ? "#131#" : "#132#")) {
         _paused = !_paused;
+    }
+    if (GuiButton(Rectangle(450, GetScreenHeight() - 60, 50, 50), "#64#")) {
+        _showRays = !_showRays;
     }
 }
 

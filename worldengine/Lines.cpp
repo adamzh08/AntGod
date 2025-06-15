@@ -60,7 +60,7 @@ Vector2 vectorSum(const Vector2 point1, const Vector2 point2) {
     return Vector2{point1.x + point2.x, point1.y + point2.y};
 }
 
-std::vector<float> Lines::getRays(const Vector2 mainPoint, const int raysAmount, const float raysRadius) const {
+std::vector<float> Lines::getRays(const Vector2 mainPoint, const int raysAmount, const float raysRadius, const bool draw) const {
     const std::vector<Vector2> deltaPoints = _searchRaysDB(raysAmount, raysRadius);
 
     std::vector rays(raysAmount, raysRadius);
@@ -73,6 +73,12 @@ std::vector<float> Lines::getRays(const Vector2 mainPoint, const int raysAmount,
 
     for (int i = 0; i < raysAmount; i++) {
         rays[i] = 1.0 - (rays[i] / raysRadius);
+    }
+
+    if (draw) {
+        for (auto deltaPoint : deltaPoints) {
+            DrawLineEx(mainPoint, vectorSum(mainPoint, deltaPoint), 1.0, BLACK);
+        }
     }
 
     return rays;

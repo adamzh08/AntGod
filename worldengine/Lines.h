@@ -36,7 +36,7 @@ public:
 
     void draw() const;
 
-    std::vector<float> getRays(Vector2 mainPoint, int raysAmount, float raysRadius) const;
+    std::vector<float> getRays(Vector2 mainPoint, int raysAmount, float raysRadius, bool draw) const;
     bool validMove(Vector2 startPoint, Vector2 deltaPoint) const;
 };
 

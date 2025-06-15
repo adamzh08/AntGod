@@ -46,6 +46,7 @@ public:
 
     int _space_right{};
     int _space_bottom{};
+    bool _showRays = false;
 
     World &setLines(const Lines &lines);
 
