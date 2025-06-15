@@ -108,7 +108,8 @@ void World::handleButtons() {
     }
 
     // pause button
-    if (GuiButton(Rectangle(375, GetScreenHeight() - 60, 50, 50), _paused? "#131#" : "#132#")) {
+    // info for RayGui icons: in raygui.h, look at enum 'GuiIconName' with ctrl + f to find the icon ids fast
+    if (GuiButton(Rectangle(375, GetScreenHeight() - 60, 50, 50), _paused ? "#131#" : "#132#")) {
         _paused = !_paused;
     }
 }
@@ -119,8 +120,10 @@ void World::handleMouseClicks() {
             break;
         }
         case DRAWING: {
-            const bool isInBounds_x = 0 < GetMousePosition().x && GetMousePosition().x < GetScreenWidth() - _space_right;
-            const bool isInBounds_y = 0 < GetMousePosition().y && GetMousePosition().y < GetScreenHeight() - _space_bottom;
+            const bool isInBounds_x = 0 < GetMousePosition().x && GetMousePosition().x < GetScreenWidth() -
+                                      _space_right;
+            const bool isInBounds_y = 0 < GetMousePosition().y && GetMousePosition().y < GetScreenHeight() -
+                                      _space_bottom;
 
             if (!isInBounds_x || !isInBounds_y) {
                 _drawVar_borderStartPos.reset();
@@ -177,7 +180,6 @@ void World::drawLineOfText(const char *line, int idx) const {
         BLACK
     );
 }
-
 
 
 char *World::strFromUserMode() const {
