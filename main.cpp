@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include "raygui.h"
 #include "raylib.h"
 #include "raymath.h"
 #include "neuralengine/Layer.h"
@@ -51,6 +52,7 @@ int main() {
     // loading all textures in the GPU at once
     TextureCollection::LoadAll();
 
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
 
     // World
     world = new World();
@@ -61,7 +63,7 @@ int main() {
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutationProbability(0.3)
-            .setPositions(Vector2{700, 300}, Vector2{50, 400})
+            .setPositions(Vector2{600, 300}, Vector2{50, 400})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 100)
             .setEntityTexture(TextureCollection::bee)
@@ -71,7 +73,7 @@ int main() {
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutationProbability(0.3)
-            .setPositions(Vector2{700, 500}, Vector2{50, 400})
+            .setPositions(Vector2{600, 500}, Vector2{50, 400})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 100)
             .setEntityTexture(TextureCollection::ant)

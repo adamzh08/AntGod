@@ -6,13 +6,24 @@
 #define WORLD_H
 #include "Lines.h"
 #include "Population.h"
+#include "World.h"
+
+enum UserMode {
+    JUST_LOOKING,
+    DRAWING,
+    MOVE_OBJECTS
+};
 
 
 class World {
 private:
     // drawing
-    std::optional<Vector2> _rayStartPos{};
-    std::optional<Vector2> _rayEndPos{};
+    UserMode _userMode = JUST_LOOKING;
+    std::optional<Vector2> _drawVar_borderStartPos;
+
+    void drawGame() const;
+    void drawUserInfo() const;
+    void drawButtons();
 public:
     Lines _lines{};
     std::vector<Population> _populations;
@@ -23,7 +34,7 @@ public:
     World& setGenerationDuration(int duration);
 
     void act();
-    void draw() const;
+    void draw();
     void handleUserInput();
 };
 
