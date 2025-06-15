@@ -14,6 +14,7 @@ Ant::Ant(Population &population, const std::vector<Layer> &layers): _population(
 Ant::Ant(const Ant &other) : _population(other._population), _network(other._network),
                              _position(other._population._init_position) {
 }
+
 Ant::Ant(const Ant &parent1, const Ant &parent2) : _population(parent1._population), _network(parent1._network),
                                                    _position(_population._init_position) {
     assert(&parent1._population == &parent2._population);
@@ -60,7 +61,8 @@ void Ant::act() {
             std::cerr << "Invalid movement mode" << std::endl;
     }
 
-    if (_position.x < 0 || _position.x > 1080 || _position.y < 0 || _position.y > 720) {
+    if (_position.x < 0 || _position.x > GetScreenWidth() - 300
+        || _position.y < 0 || _position.y > GetScreenHeight() - 100) {
         _alive = false;
     }
 }

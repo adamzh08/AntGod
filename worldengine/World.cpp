@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <string>
 
 #include "World.h"
 
@@ -24,8 +25,6 @@ World &World::setGenerationDuration(int duration) {
     _generation_frameDuration = duration;
     return *this;
 }
-
-int frameCounter = 0;
 
 void World::act() {
     frameCounter++;
@@ -52,6 +51,20 @@ void World::drawGame() const {
     for (const Line &line: _lines._lines) {
         DrawLineEx(line.start, line.end, 1.5, BLACK);
     }
+    // the bottom game boundary
+    DrawLineEx(
+        Vector2(0, GetScreenHeight() - 100),
+        Vector2(GetScreenWidth() - 300, GetScreenHeight() - 100),
+        5,
+        BLACK
+    );
+    // the right game boundary
+    DrawLineEx(
+        Vector2(GetScreenWidth() - 300, 0),
+        Vector2(GetScreenWidth() - 300, GetScreenHeight() - 100),
+        5,
+        BLACK
+    );
 
     // colonies
     for (const Population &population: _populations) {
@@ -65,18 +78,22 @@ void World::drawGame() const {
 }
 
 void World::drawUserInfo() const {
-    std::ostringstream totalInfo;
+    drawLineOfText(("user mode: " + std::string(strFromUserMode())).c_str(), 0);
+    drawLineOfText(("frames left: " + std::to_string(_generation_frameDuration - frameCounter)).c_str(), 1);
+}
 
-    totalInfo << "Your total info" << std::endl;
-    totalInfo << std::endl;
-    totalInfo << "user mode: " << _userMode << std::endl;
-    totalInfo << "frames left: " << _generation_frameDuration - frameCounter << std::endl;
 
-    GuiTextBox(
-        Rectangle(GetScreenWidth() - 200.f, 0, GetScreenWidth(), GetScreenHeight()),
-        const_cast<char *>(totalInfo.str().c_str()),
-        50,
-        false
+void World::drawLineOfText(const char *line, int idx) const {
+    GuiDrawText(
+        line,
+        Rectangle(
+            GetScreenWidth() - 290,
+            10 + idx * GuiGetStyle(DEFAULT, TEXT_SIZE),
+            190,
+            10
+        ),
+        TEXT_ALIGN_LEFT | TEXT_ALIGN_TOP,
+        BLACK
     );
 }
 
@@ -110,5 +127,15 @@ void World::handleUserInput() {
             // Todo
             break;
         }
+    }
+}
+
+
+char *World::strFromUserMode() const {
+    switch (_userMode) {
+        case JUST_LOOKING: return "normal";
+        case DRAWING: return "drawing";
+        case MOVE_OBJECTS: return "move";
+        default: return "?";
     }
 }

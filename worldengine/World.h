@@ -17,13 +17,20 @@ enum UserMode {
 
 class World {
 private:
+    int frameCounter = 0;
+
     // drawing
     UserMode _userMode = JUST_LOOKING;
     std::optional<Vector2> _drawVar_borderStartPos;
 
     void drawGame() const;
     void drawUserInfo() const;
+
+
     void drawButtons();
+    void drawLineOfText(const char* str, int idx) const;
+
+    char* strFromUserMode() const;
 public:
     Lines _lines{};
     std::vector<Population> _populations;
