@@ -52,9 +52,6 @@ int main() {
     // loading all textures in the GPU at once
     TextureCollection::LoadAll();
 
-    // RayGui config
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
-
     // World
     world = new World();
 
@@ -81,6 +78,7 @@ int main() {
             .build();
 
     world->setLines(lines)
+            .setLayout(300, 100)
             .setGenerationDuration(10 * 60)
             .setPopulations({
                 beesPopulation,

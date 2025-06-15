@@ -17,34 +17,45 @@ enum UserMode {
 
 class World {
 private:
-    int frameCounter = 0;
+    int _generation_frameDuration{};
+    int _generation_count{};
+    int _frameCount{};
 
     // drawing
     UserMode _userMode = JUST_LOOKING;
     std::optional<Vector2> _drawVar_borderStartPos;
 
     void drawGame() const;
+
     void drawUserInfo() const;
 
-
     void drawButtons();
-    void drawLineOfText(const char* str, int idx) const;
 
-    char* strFromUserMode() const;
+    void drawLineOfText(const char *str, int idx) const;
+
+    char *strFromUserMode() const;
+
 public:
     Lines _lines{};
     std::vector<Population> _populations;
-    int _generation_frameDuration;
 
-    World& setLines(const Lines &lines);
-    World& setPopulations(std::vector<Population>&& populations);
-    World& setGenerationDuration(int duration);
+    int _space_right{};
+    int _space_bottom{};
+
+    World &setLines(const Lines &lines);
+
+    World &setPopulations(std::vector<Population> &&populations);
+
+    World &setGenerationDuration(int duration);
+
+    World& setLayout(int space_right, int space_bottom);
 
     void act();
+
     void draw();
+
     void handleUserInput();
 };
-
 
 
 #endif //WORLD_H

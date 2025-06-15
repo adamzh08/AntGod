@@ -61,8 +61,8 @@ void Ant::act() {
             std::cerr << "Invalid movement mode" << std::endl;
     }
 
-    if (_position.x < 0 || _position.x > GetScreenWidth() - 300
-        || _position.y < 0 || _position.y > GetScreenHeight() - 100) {
+    if (_position.x < 0 || _position.x > GetScreenWidth() - _population._world._space_right
+        || _position.y < 0 || _position.y > GetScreenHeight() - _population._world._space_bottom) {
         _alive = false;
     }
 }

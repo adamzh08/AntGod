@@ -26,14 +26,21 @@ World &World::setGenerationDuration(int duration) {
     return *this;
 }
 
-void World::act() {
-    frameCounter++;
+World &World::setLayout(int space_right, int space_bottom) {
+    _space_right = space_right;
+    _space_bottom = space_bottom;
+    return *this;
+}
 
-    if (frameCounter == _generation_frameDuration) {
-        frameCounter = 0;
+void World::act() {
+    _frameCount++;
+
+    if (_frameCount == _generation_frameDuration) {
         for (Population &population: _populations) {
             population.flood();
         }
+        _generation_count++;
+        _frameCount = 0;
     }
     for (Population &population: _populations) {
         population.act();
@@ -53,15 +60,15 @@ void World::drawGame() const {
     }
     // the bottom game boundary
     DrawLineEx(
-        Vector2(0, GetScreenHeight() - 100),
-        Vector2(GetScreenWidth() - 300, GetScreenHeight() - 100),
+        Vector2(0, GetScreenHeight() - _space_bottom),
+        Vector2(GetScreenWidth() - _space_right, GetScreenHeight() - _space_bottom),
         5,
         BLACK
     );
     // the right game boundary
     DrawLineEx(
-        Vector2(GetScreenWidth() - 300, 0),
-        Vector2(GetScreenWidth() - 300, GetScreenHeight() - 100),
+        Vector2(GetScreenWidth() - _space_right, 0),
+        Vector2(GetScreenWidth() - _space_right, GetScreenHeight() - _space_bottom),
         5,
         BLACK
     );
@@ -78,8 +85,20 @@ void World::drawGame() const {
 }
 
 void World::drawUserInfo() const {
-    drawLineOfText(("user mode: " + std::string(strFromUserMode())).c_str(), 0);
-    drawLineOfText(("frames left: " + std::to_string(_generation_frameDuration - frameCounter)).c_str(), 1);
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 30);
+
+    drawLineOfText(
+        ("user mode: " + std::string(strFromUserMode())).c_str(),
+        0
+    );
+    drawLineOfText(
+        ("frames left: " + std::to_string(_generation_frameDuration - _frameCount)).c_str(),
+        1
+    );
+    drawLineOfText(
+        ("gen count: " + std::to_string(_generation_count)).c_str(),
+        2
+    );
 }
 
 
@@ -87,9 +106,9 @@ void World::drawLineOfText(const char *line, int idx) const {
     GuiDrawText(
         line,
         Rectangle(
-            GetScreenWidth() - 290,
+            GetScreenWidth() - (_space_right - 10),
             10 + idx * GuiGetStyle(DEFAULT, TEXT_SIZE),
-            190,
+            _space_right - 10,
             10
         ),
         TEXT_ALIGN_LEFT | TEXT_ALIGN_TOP,
@@ -98,13 +117,15 @@ void World::drawLineOfText(const char *line, int idx) const {
 }
 
 void World::drawButtons() {
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+
     // switch to draw mode button
-    if (GuiButton(Rectangle(0, GetScreenHeight() - 60, 200, 50), "switch to draw mode")) {
+    if (GuiButton(Rectangle(0, GetScreenHeight() - 60, 225, 50), "switch to draw mode")) {
         _userMode = DRAWING;
     }
 
     // switch to normal mode button
-    if (GuiButton(Rectangle(230, GetScreenHeight() - 60, 200, 50), "switch to normal mode")) {
+    if (GuiButton(Rectangle(250, GetScreenHeight() - 60, 225, 50), "switch to observe mode")) {
         _userMode = JUST_LOOKING;
     }
 }
@@ -133,8 +154,8 @@ void World::handleUserInput() {
 
 char *World::strFromUserMode() const {
     switch (_userMode) {
-        case JUST_LOOKING: return "normal";
-        case DRAWING: return "drawing";
+        case JUST_LOOKING: return "observe";
+        case DRAWING: return "draw";
         case MOVE_OBJECTS: return "move";
         default: return "?";
     }
