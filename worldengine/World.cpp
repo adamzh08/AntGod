@@ -54,10 +54,9 @@ void World::draw() {
 }
 
 void World::drawGame() const {
-    // borders
-    for (const Line &line: _lines._lines) {
-        DrawLineEx(line.start, line.end, 1.5, BLACK);
-    }
+    // obstacles
+    _lines.draw();
+
     // the bottom game boundary
     DrawLineEx(
         Vector2(0, GetScreenHeight() - _space_bottom),
@@ -152,7 +151,7 @@ void World::handleUserInput() {
                 }
             } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
                 if (_drawVar_borderStartPos.has_value()) {
-                    _lines._lines.push_back(Line(_drawVar_borderStartPos.value(), GetMousePosition()));
+                    _lines.addLine(_drawVar_borderStartPos.value(), GetMousePosition());
                 }
                 _drawVar_borderStartPos.reset();
             }

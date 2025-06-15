@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include "Population.h"
-#include "TextureCollection.h"
 #include "World.h"
 
 Ant::Ant(Population &population, const std::vector<Layer> &layers): _population(population), _network(layers),

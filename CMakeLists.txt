@@ -74,20 +74,19 @@ add_executable(AntGod main.cpp
         neuralengine/Network.cpp
         neuralengine/Network.h
         neuralengine/Activation.h
-        worldengine/Line.cpp
-        worldengine/Line.h
         worldengine/Population.cpp
         worldengine/Population.h
         worldengine/Ant.cpp
         worldengine/Ant.h
-        worldengine/Lines.cpp
-        worldengine/Lines.h
         worldengine/TextureCollection.h
         worldengine/TextureCollection.cpp
         worldengine/World.cpp
         worldengine/World.h
         worldengine/PopulationBuilder.cpp
         worldengine/PopulationBuilder.h
+        worldengine/Lines.cpp
+        worldengine/Lines.h
+        worldengine/LineIntersection.h
 )
 
 target_compile_options(AntGod PRIVATE

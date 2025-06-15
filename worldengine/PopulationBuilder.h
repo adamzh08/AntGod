@@ -4,6 +4,8 @@
 
 #ifndef POPULATIONBUILDER_H
 #define POPULATIONBUILDER_H
+#include <optional>
+
 #include "Population.h"
 #include "raylib.h"
 

@@ -8,8 +8,6 @@
 #include <vector>
 
 #include "Ant.h"
-#include "Line.h"
-#include "Lines.h"
 #include "raylib.h"
 
 #define CARTESIAN_MOVE 0

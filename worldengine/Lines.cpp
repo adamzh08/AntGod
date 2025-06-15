@@ -1,40 +1,94 @@
 //
-// Created by adam on 6/7/2025.
+// Created by adam on 6/15/2025.
 //
 
 #include "Lines.h"
-#include <cmath>
+
+#include <iostream>
+
+#include "LineIntersection.h"
+
+std::vector<RaysDB> Lines::_raysDB;
+int Lines::_raysDBAmount = 0;
 
 Lines::Lines() {}
 
-Lines::Lines(const std::vector<Line> &lines) {
-    this->_lines = lines;
+Lines Lines::addLine(Vector2 startPoint, Vector2 endPoint) {
+    _linesAmount += 1;
+    _lines.resize(_linesAmount);
+    _lines.back().startPoint = startPoint;
+    _lines.back().endPoint = endPoint;
+
+    return *this;
 }
 
-float Lines::_compare_distance(const Vector2 start, const Vector2 end) {
-    return std::pow(start.x - end.x, 2) + std::pow(start.y - end.y, 2);
+void Lines::draw() const {
+    for (auto [startPoint, endPoint] : _lines) {
+        DrawLineEx(startPoint, endPoint, 1.5, BLACK);
+    }
 }
 
-float Lines::get_intersection(const Vector2 start, const Vector2 end) const {
-    float distance = 1000000;
-    for (auto &line : _lines) {
-        if (Vector2 intersection_temp{}; line.doIntersect(start, end, intersection_temp)) {
-            if (const float distance_temp = _compare_distance(start, intersection_temp); distance_temp < distance) {
-                distance = distance_temp;
-            }
+std::vector<Vector2> Lines::_searchRaysDB(const int raysAmount, const double raysRadius) {
+    // ReSharper disable once CppUseStructuredBinding
+    for (auto raysRec: _raysDB) {
+        if (raysAmount == raysRec.raysAmount && raysRadius == raysRec.raysRadius) {
+            return raysRec.deltaPoints;
         }
     }
 
-    if (distance == 1000000) {
-        return 1000000;
+    std::cout << "Adding a record... " << std::endl;
+    _raysDBAmount += 1;
+    _raysDB.resize(_raysDBAmount);
+
+    _raysDB.back().raysAmount = raysAmount;
+    _raysDB.back().raysRadius = raysRadius;
+    _raysDB.back().deltaPoints.resize(raysAmount);
+
+    const double angle = 2*PI/raysAmount;
+    for (int i = 0; i < raysAmount; i++) {
+        _raysDB.back().deltaPoints[i].x = cos(angle*i) * raysRadius;
+        _raysDB.back().deltaPoints[i].y = sin(angle*i) * raysRadius;
     }
-    return sqrt(distance);
+
+    std::cout << "Returned... " << std::endl;
+    return _raysDB.back().deltaPoints;
 }
 
-float Lines::get_intersection_delta(const Vector2 start, const Vector2 delta) const {
-    Vector2 end{};
-    end.x = start.x + delta.x;
-    end.y = start.y + delta.y;
+Vector2 vectorSum(const Vector2 point1, const Vector2 point2) {
+    return Vector2{point1.x + point2.x, point1.y + point2.y};
+}
 
-    return get_intersection(start, end);
+std::vector<double> Lines::getRays(const Vector2 mainPoint, const int raysAmount, const double raysRadius) const {
+    const std::vector<Vector2> deltaPoints = _searchRaysDB(raysAmount, raysRadius);
+
+    std::vector rays(raysAmount, raysRadius);
+
+    for (int i = 0; i < raysAmount; i++) {
+        for (int j = 0; j < _linesAmount; j++) {
+            rays[i] = fmin(rays[i], IntersectionLength(mainPoint, deltaPoints[i], _lines[j].startPoint, _lines[j].endPoint));
+        }
+    }
+
+    for (int i = 0; i < raysAmount; i++) {
+        rays[i] = 1.0 - (rays[i] / raysRadius);
+    }
+
+
+    for (auto deltaPoint : deltaPoints) {
+        DrawLineEx(mainPoint, vectorSum(mainPoint, deltaPoint), 1.0, BLACK);
+    }
+
+
+    return rays;
+}
+
+bool Lines::validMove(const Vector2 startPoint, const Vector2 deltaPoint) const {
+    // ReSharper disable once CppUseStructuredBinding
+    for (const auto line : _lines) {
+        if (doIntersect(startPoint, deltaPoint, line.startPoint, line.endPoint)) {
+            return false;
+        }
+    }
+
+    return true;
 }

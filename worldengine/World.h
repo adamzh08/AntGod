@@ -4,6 +4,8 @@
 
 #ifndef WORLD_H
 #define WORLD_H
+#include <optional>
+
 #include "Lines.h"
 #include "Population.h"
 #include "World.h"

@@ -1,28 +1,43 @@
 //
-// Created by adam on 6/7/2025.
+// Created by adam on 6/15/2025.
 //
 
 #ifndef LINES_H
 #define LINES_H
+
 #include <vector>
 
-#include "Line.h"
+#include "raylib.h"
+
+struct Line {
+    Vector2 startPoint;
+    Vector2 endPoint;
+};
+
+struct RaysDB {
+    int raysAmount;
+    double raysRadius;
+
+    std::vector<Vector2> deltaPoints;
+};
 
 class Lines {
+private:
+    std::vector<Line> _lines; // MKL allocator?
+    int _linesAmount = 0;
+
+    static std::vector<RaysDB> _raysDB;
+    static int _raysDBAmount;
+
+    static std::vector<Vector2> _searchRaysDB(int raysAmount, double raysRadius);
 public:
-    // Array of lines
-    std::vector<Line> _lines{};
-
-    static float _compare_distance(Vector2 start, Vector2 end);
-
     Lines();
-    explicit Lines(const std::vector<Line> &lines);
+    Lines addLine(Vector2 startPoint, Vector2 endPoint);
 
-    // Get the nearest intersection using Start -> End points
-    float get_intersection(Vector2 start, Vector2 end) const;
+    void draw() const;
 
-    // Get the nearest intersection using Start -> (Start + Delta) points
-    float get_intersection_delta(Vector2 start, Vector2 delta) const;
+    std::vector<double> getRays(Vector2 mainPoint, int raysAmount, double raysRadius) const;
+    bool validMove(Vector2 startPoint, Vector2 deltaPoint) const;
 };
 
 #endif //LINES_H

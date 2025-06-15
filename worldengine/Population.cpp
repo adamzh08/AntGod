@@ -4,6 +4,7 @@
 
 #include "Population.h"
 
+#include <algorithm>
 #include <cfloat>
 #include <iostream>
 #include <random>

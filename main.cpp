@@ -3,18 +3,16 @@
 #include <memory>
 #include <vector>
 
-#include "raygui.h"
 #include "raylib.h"
 #include "raymath.h"
 #include "neuralengine/Layer.h"
 #include "neuralengine/Network.h"
 #include "neuralengine/Activation.h"
-#include "worldengine/Line.h"
-#include "worldengine/Lines.h"
 #include "worldengine/Population.h"
 #include "worldengine/PopulationBuilder.h"
 #include "worldengine/TextureCollection.h"
 #include "worldengine/World.h"
+#include "worldengine/Lines.h"
 
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
@@ -23,12 +21,10 @@
 void draw();
 
 // Initializing Obstacles
-const std::vector<Line> lines_conf = {
-    Line(Vector2{500, 0}, Vector2{500, 300}),
-    Line(Vector2{600, 450}, Vector2{600, 150}),
-    Line(Vector2{700, 0}, Vector2{700, 300}),
-};
-const Lines lines{lines_conf};
+Lines lines = Lines()
+            .addLine(Vector2{500, 0}, Vector2{500, 300})
+            .addLine(Vector2{600, 450}, Vector2{600, 150})
+            .addLine(Vector2{700, 0}, Vector2{700, 300});
 
 // Layers
 std::vector<Layer> layers = {
