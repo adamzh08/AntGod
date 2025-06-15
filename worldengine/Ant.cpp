@@ -40,7 +40,7 @@ void Ant::act() {
         _position.y / 1000.f,
     };
 
-    const auto output = _network.feed_forward(input);
+    const std::vector<float> output = _network.feed_forward(input);
 
     switch (_population._move_method) {
         case CARTESIAN_MOVE: {

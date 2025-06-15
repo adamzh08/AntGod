@@ -119,14 +119,17 @@ void World::drawLineOfText(const char *line, int idx) const {
 void World::drawButtons() {
     GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
 
+    // switch to normal mode button
+    if (GuiButton(Rectangle(0, GetScreenHeight() - 60, 100, 50), "Observe")) {
+        _userMode = JUST_LOOKING;
+    }
     // switch to draw mode button
-    if (GuiButton(Rectangle(0, GetScreenHeight() - 60, 225, 50), "switch to draw mode")) {
+    if (GuiButton(Rectangle(125, GetScreenHeight() - 60, 100, 50), "Draw")) {
         _userMode = DRAWING;
     }
-
     // switch to normal mode button
-    if (GuiButton(Rectangle(250, GetScreenHeight() - 60, 225, 50), "switch to observe mode")) {
-        _userMode = JUST_LOOKING;
+    if (GuiButton(Rectangle(250, GetScreenHeight() - 60, 100, 50), "Move")) {
+        _userMode = MOVE_OBJECTS;
     }
 }
 
@@ -136,12 +139,24 @@ void World::handleUserInput() {
             break;
         }
         case DRAWING: {
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                _drawVar_borderStartPos = GetMousePosition();
-            } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-                _lines._lines.push_back(Line(_drawVar_borderStartPos.value(), GetMousePosition()));
+            const bool isInBounds_x = 0 < GetMousePosition().x && GetMousePosition().x < GetScreenWidth() - _space_right;
+            const bool isInBounds_y = 0 < GetMousePosition().y && GetMousePosition().y < GetScreenHeight() - _space_bottom;
+
+            if (!isInBounds_x || !isInBounds_y) {
                 _drawVar_borderStartPos.reset();
             }
+
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                if (isInBounds_x && isInBounds_y) {
+                    _drawVar_borderStartPos = GetMousePosition();
+                }
+            } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+                if (_drawVar_borderStartPos.has_value()) {
+                    _lines._lines.push_back(Line(_drawVar_borderStartPos.value(), GetMousePosition()));
+                }
+                _drawVar_borderStartPos.reset();
+            }
+
             break;
         }
         case MOVE_OBJECTS: {

@@ -55,7 +55,6 @@ Population::Population(
     }
 }
 
-/* --- Main Logics Part --- */
 void Population::act() {
 #pragma omp parallel for
     for (auto &ant: this->_ants) {
@@ -153,8 +152,12 @@ void Population::draw() const {
         }
     }
 
-    // drawing a blue circle on the best ant
-    DrawEllipse(best->_position.x, best->_position.y, 10, 10, Color(0, 0, 255, 150));
+    if (best != nullptr) {
+        // drawing a blue circle on the best ant
+        DrawEllipse(best->_position.x, best->_position.y, 10, 10, Color(0, 0, 255, 150));
+    } else {
+        std::cerr << "[Warning] No more ants alive in population " << this << std::endl;
+    }
 
     for (const Ant &ant: _ants) {
         if (ant._alive) {
