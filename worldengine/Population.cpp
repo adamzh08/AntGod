@@ -11,6 +11,8 @@
 #include <ranges>
 #include <set>
 
+#include "World.h"
+
 Population::Population(
     World &world,
     int ants_amount,
@@ -163,6 +165,9 @@ void Population::draw() const {
     for (const Ant &ant: _ants) {
         if (ant._alive) {
             ant.draw();
+            if (_world._showRays) {
+                _world._lines.drawRays(ant._position, _rays_amount, _rays_radius);
+            }
         }
     }
 }
