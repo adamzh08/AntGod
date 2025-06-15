@@ -22,17 +22,6 @@ Ant::Ant(const Ant &parent1, const Ant &parent2) : _population(parent1._populati
 
 
 void Ant::act() {
-    // Todo make rays work
-    /*
-    std::vector<float> input(population->_rays_amount);
-
-    for (int i = 0; i < population->_rays_amount; i++) {
-        input[i] = population->_world->_lines.get_intersection_delta(position, population->_rays_deltas[i]);
-        if (input[i] != 1000000) {
-            input[i] = (population->_rays_radius - input[i]) / population->_rays_radius;
-        }
-    }
-    */
 
     std::vector<float> input = _population._world._lines.getRays(_position, _population._rays_amount, _population._rays_radius);
 
