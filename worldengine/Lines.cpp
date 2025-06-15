@@ -81,7 +81,7 @@ std::vector<float> Lines::getRays(const Vector2 mainPoint, const int raysAmount,
 void Lines::drawRays(Vector2 mainPoint, int raysAmount, float raysRadius) {
     const std::vector<Vector2> deltaPoints = _searchRaysDB(raysAmount, raysRadius);
     for (auto deltaPoint : deltaPoints) {
-        DrawLineEx(mainPoint, vectorSum(mainPoint, deltaPoint), 1.0, GRAY);
+        DrawLineEx(mainPoint, vectorSum(mainPoint, deltaPoint), 1, GRAY);
     }
 }
 

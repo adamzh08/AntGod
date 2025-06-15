@@ -68,5 +68,12 @@ float Ant::calculateReward() const {
 }
 
 void Ant::draw() const {
-    DrawTextureEx(_population._entityTexture, _position, _rotation * RAD2DEG, 1, WHITE);
+    DrawTexturePro(
+        _population._entityTexture,
+        (Rectangle){ 0, 0, _population._entityTexture.width, _population._entityTexture.height },  // Source rectangle
+        (Rectangle){ _position.x, _position.y, _population._entityTexture.width, _population._entityTexture.height }, // Destination rectangle
+        Vector2{_population._entityTexture.width / 2.0f, _population._entityTexture.height / 2.0f},     // Origin point for rotation
+        _rotation * RAD2DEG,   // Rotation angle in degrees
+        WHITE       // Tint color
+    );
 }

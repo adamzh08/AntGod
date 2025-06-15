@@ -152,22 +152,17 @@ void Population::draw() const {
                 highestReward = reward;
                 best = &ant;
             }
+            ant.draw();
         }
     }
 
     if (best != nullptr) {
+        if (_world._showRays) {
+            _world._lines.drawRays(best->_position, _rays_amount, _rays_radius);
+        }
         // drawing a blue circle on the best ant
         DrawEllipse(best->_position.x, best->_position.y, 10, 10, Color(0, 0, 255, 150));
     } else {
         std::cerr << "[Warning] No more ants alive in population " << this << std::endl;
-    }
-
-    for (const Ant &ant: _ants) {
-        if (ant._alive) {
-            ant.draw();
-            if (_world._showRays) {
-                _world._lines.drawRays(ant._position, _rays_amount, _rays_radius);
-            }
-        }
     }
 }
