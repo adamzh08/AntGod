@@ -28,29 +28,31 @@ void Lines::draw() const {
     }
 }
 
-std::vector<Vector2> Lines::_searchRaysDB(const int raysAmount, const double raysRadius) {
+std::vector<Vector2> Lines::_searchRaysDB(const int raysAmount, const float raysRadius) {
     // ReSharper disable once CppUseStructuredBinding
     for (auto raysRec: _raysDB) {
         if (raysAmount == raysRec.raysAmount && raysRadius == raysRec.raysRadius) {
             return raysRec.deltaPoints;
         }
     }
+#pragma omp critical
+    {
+        std::cout << "Adding a record... " << std::endl;
+        _raysDBAmount += 1;
+        _raysDB.resize(_raysDBAmount);
 
-    std::cout << "Adding a record... " << std::endl;
-    _raysDBAmount += 1;
-    _raysDB.resize(_raysDBAmount);
+        _raysDB.back().raysAmount = raysAmount;
+        _raysDB.back().raysRadius = raysRadius;
+        _raysDB.back().deltaPoints.resize(raysAmount);
 
-    _raysDB.back().raysAmount = raysAmount;
-    _raysDB.back().raysRadius = raysRadius;
-    _raysDB.back().deltaPoints.resize(raysAmount);
+        const float angle = 2*PI/raysAmount;
+        for (int i = 0; i < raysAmount; i++) {
+            _raysDB.back().deltaPoints[i].x = cos(angle*i) * raysRadius;
+            _raysDB.back().deltaPoints[i].y = sin(angle*i) * raysRadius;
+        }
 
-    const double angle = 2*PI/raysAmount;
-    for (int i = 0; i < raysAmount; i++) {
-        _raysDB.back().deltaPoints[i].x = cos(angle*i) * raysRadius;
-        _raysDB.back().deltaPoints[i].y = sin(angle*i) * raysRadius;
+        std::cout << "Returned... " << std::endl;
     }
-
-    std::cout << "Returned... " << std::endl;
     return _raysDB.back().deltaPoints;
 }
 
@@ -58,7 +60,7 @@ Vector2 vectorSum(const Vector2 point1, const Vector2 point2) {
     return Vector2{point1.x + point2.x, point1.y + point2.y};
 }
 
-std::vector<double> Lines::getRays(const Vector2 mainPoint, const int raysAmount, const double raysRadius) const {
+std::vector<float> Lines::getRays(const Vector2 mainPoint, const int raysAmount, const float raysRadius) const {
     const std::vector<Vector2> deltaPoints = _searchRaysDB(raysAmount, raysRadius);
 
     std::vector rays(raysAmount, raysRadius);
@@ -72,12 +74,6 @@ std::vector<double> Lines::getRays(const Vector2 mainPoint, const int raysAmount
     for (int i = 0; i < raysAmount; i++) {
         rays[i] = 1.0 - (rays[i] / raysRadius);
     }
-
-
-    for (auto deltaPoint : deltaPoints) {
-        DrawLineEx(mainPoint, vectorSum(mainPoint, deltaPoint), 1.0, BLACK);
-    }
-
 
     return rays;
 }

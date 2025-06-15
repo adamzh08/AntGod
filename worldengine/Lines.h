@@ -16,7 +16,7 @@ struct Line {
 
 struct RaysDB {
     int raysAmount;
-    double raysRadius;
+    float raysRadius;
 
     std::vector<Vector2> deltaPoints;
 };
@@ -29,14 +29,14 @@ private:
     static std::vector<RaysDB> _raysDB;
     static int _raysDBAmount;
 
-    static std::vector<Vector2> _searchRaysDB(int raysAmount, double raysRadius);
+    static std::vector<Vector2> _searchRaysDB(int raysAmount, float raysRadius);
 public:
     Lines();
     Lines addLine(Vector2 startPoint, Vector2 endPoint);
 
     void draw() const;
 
-    std::vector<double> getRays(Vector2 mainPoint, int raysAmount, double raysRadius) const;
+    std::vector<float> getRays(Vector2 mainPoint, int raysAmount, float raysRadius) const;
     bool validMove(Vector2 startPoint, Vector2 deltaPoint) const;
 };
 

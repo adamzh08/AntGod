@@ -34,12 +34,12 @@ void Ant::act() {
     }
     */
 
-    std::vector<float> input{
-        _position.x / 1000.f,
-        _position.y / 1000.f,
-    };
+    std::vector<float> input = _population._world._lines.getRays(_position, _population._rays_amount, _population._rays_radius);
 
     const std::vector<float> output = _network.feed_forward(input);
+
+    Vector2 temp = _position;
+    float rot_temp = _rotation;
 
     switch (_population._move_method) {
         case CARTESIAN_MOVE: {
@@ -58,6 +58,12 @@ void Ant::act() {
         }
         default:
             std::cerr << "Invalid movement mode" << std::endl;
+    }
+
+    if (!_population._world._lines.validMove(temp, _position)) {
+        _position = temp;
+        _rotation = rot_temp;
+        _alive = false;
     }
 
     if (_position.x < 0 || _position.x > GetScreenWidth() - _population._world._space_right

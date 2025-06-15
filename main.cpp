@@ -28,8 +28,9 @@ Lines lines = Lines()
 
 // Layers
 std::vector<Layer> layers = {
-    Layer(2),
-    Layer(8, Activation::tanh),
+    Layer(30),
+    Layer(16, Activation::tanh),
+    Layer(16, Activation::tanh),
     Layer(2, Activation::tanh),
 };
 
@@ -57,7 +58,7 @@ int main() {
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutationProbability(0.3)
-            .setPositions(Vector2{600, 300}, Vector2{50, 400})
+            .setPositions(Vector2{650, 300}, Vector2{50, 400})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 100)
             .setEntityTexture(TextureCollection::bee)

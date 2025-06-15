@@ -70,9 +70,6 @@ inline double IntersectionLength(const Vector2 mainPoint, const Vector2 deltaPoi
         double determinant = a1 * b2 - a2 * b1;
 
         if (determinant != 0) {
-
-            DrawCircleV(sum(mainPoint, Vector2{(-c2 * b1)/determinant, (a1 * c2)/determinant}), 5, RED);
-
             return sqrt(sq(c2 * b1) + sq(a1 * c2)) / determinant;
         }
     }
