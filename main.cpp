@@ -44,6 +44,10 @@ int main() {
     // Init the window
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window");
 
+    InitAudioDevice();              // Initialize audio device
+    Music music = LoadMusicStream("assets/main_theme.wav");
+    PlayMusicStream(music);
+
     SetTargetFPS(60);
 
     // loading all textures in the GPU at once
@@ -83,15 +87,16 @@ int main() {
             });
 
     while (!WindowShouldClose()) {
+        UpdateMusicStream(music);   // Update music buffer with new stream data
         world->act();
         draw();
     }
 
+    UnloadMusicStream(music);   // Unload music stream buffers from RAM
+    CloseAudioDevice();         // Close audio device (music streaming is automatically stopped)
     // free all
     TextureCollection::FreeAll();
-
     delete world;
-
     CloseWindow();
     return 0;
 }
