@@ -139,9 +139,6 @@ int Population::tournamentSelectFromPool(const std::vector<Ant *> &pool, const i
 }
 
 void Population::draw() {
-    DrawCircleV(_init_position, 10, GREEN);
-    DrawCircleV(_target_position, 10, RED);
-
     for (const Ant& ant: _ants) {
         if (ant._alive) {
             ant.draw();
@@ -160,6 +157,10 @@ void Population::draw() {
     } else {
         std::cerr << "[Warning] No more ants alive in population " << this << std::endl;
     }
+
+    // both positions
+    DrawCircleV(_init_position, 10, GREEN);
+    DrawCircleV(_target_position, 10, RED);
 }
 
 

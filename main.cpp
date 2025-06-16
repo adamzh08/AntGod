@@ -20,17 +20,18 @@
 #define SCREEN_HEIGHT 1000
 
 void draw();
+
 void setGuiStyles();
 
 // Initializing Obstacles
 Lines lines = Lines()
-            .addLine(Vector2{0, 0}, Vector2{SCREEN_WIDTH, 0})
-            .addLine(Vector2{0, 0}, Vector2{0, SCREEN_HEIGHT})
-            .addLine(Vector2{SCREEN_WIDTH, 0}, Vector2{SCREEN_WIDTH, SCREEN_HEIGHT})
-            .addLine(Vector2{0, SCREEN_HEIGHT}, Vector2{SCREEN_WIDTH, SCREEN_HEIGHT})
-            .addLine(Vector2{500, 0}, Vector2{500, 300})
-            .addLine(Vector2{600, 450}, Vector2{600, 150})
-            .addLine(Vector2{600, 450}, Vector2{600, 150});
+        .addLine(Vector2{0, 0}, Vector2{SCREEN_WIDTH, 0})
+        .addLine(Vector2{0, 0}, Vector2{0, SCREEN_HEIGHT})
+        .addLine(Vector2{SCREEN_WIDTH, 0}, Vector2{SCREEN_WIDTH, SCREEN_HEIGHT})
+        .addLine(Vector2{0, SCREEN_HEIGHT}, Vector2{SCREEN_WIDTH, SCREEN_HEIGHT})
+        .addLine(Vector2{500, 0}, Vector2{500, 300})
+        .addLine(Vector2{600, 450}, Vector2{600, 150})
+        .addLine(Vector2{600, 450}, Vector2{600, 150});
 
 // Layers
 std::vector<Layer> layers = {
@@ -59,7 +60,7 @@ int main() {
     // raygui
     setGuiStyles();
 
-    InitAudioDevice();              // Initialize audio device
+    InitAudioDevice(); // Initialize audio device
     Music music = LoadMusicStream("assets/main_theme.wav");
     PlayMusicStream(music);
 
@@ -77,7 +78,7 @@ int main() {
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutationProbability(0.3)
-            .setPositions(Vector2{650, 300}, Vector2{50, 300})
+            .setPositions(Vector2{400, 300}, Vector2{50, 300})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 100)
             .setEntityTexture(TextureCollection::bee)
@@ -87,7 +88,17 @@ int main() {
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutationProbability(0.3)
-            .setPositions(Vector2{600, 500}, Vector2{50, 500})
+            .setPositions(Vector2{550, 400}, Vector2{50, 400})
+            .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
+            .setRays(30, 200)
+            .setEntityTexture(TextureCollection::ant)
+            .build();
+    Population antsPopulation2 = PopulationBuilder(*world)
+            .setCount(1000)
+            .setElitePercentage(0.3)
+            .setNetwork(layers, "")
+            .setMutationProbability(0.3)
+            .setPositions(Vector2{700, 500}, Vector2{50, 500})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 200)
             .setEntityTexture(TextureCollection::ant)
@@ -98,18 +109,19 @@ int main() {
             .setPopulations({
                 beesPopulation,
                 antsPopulation,
+                antsPopulation2,
             });
 
     std::jthread t(gameLoop);
 
     while (!WindowShouldClose()) {
-        UpdateMusicStream(music);   // Update music buffer with new stream data
+        UpdateMusicStream(music); // Update music buffer with new stream data
         draw();
     }
 
     t.request_stop();
-    UnloadMusicStream(music);   // Unload music stream buffers from RAM
-    CloseAudioDevice();         // Close audio device (music streaming is automatically stopped)
+    UnloadMusicStream(music); // Unload music stream buffers from RAM
+    CloseAudioDevice(); // Close audio device (music streaming is automatically stopped)
     // free all
     TextureCollection::FreeAll();
     delete world;

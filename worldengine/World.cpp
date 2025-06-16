@@ -13,6 +13,8 @@
 
 #include "../raygui.h"
 
+World::World() {
+}
 
 World &World::setLines(const Lines &lines) {
     _lines = lines;
@@ -21,6 +23,17 @@ World &World::setLines(const Lines &lines) {
 
 World &World::setPopulations(std::vector<Population> &&populations) {
     _populations = std::move(populations);
+
+    // graphs
+    for (int i = 0; i < _populations.size(); i++) {
+        _graphs.emplace_back(Rectangle(
+            GetScreenWidth() - 400,
+            GetScreenHeight() / 2 * (1 + static_cast<float>(i) / _populations.size()),
+            400,
+            GetScreenHeight() / 2 / _populations.size() - 15
+        ));
+    }
+
     return *this;
 }
 
@@ -118,7 +131,7 @@ void World::handleButtons() {
     if (GuiButton(Rectangle(450, GetScreenHeight() - 60, 50, 50), "#64#")) {
         _showRays = !_showRays;
     }
-    if (GuiButton(Rectangle(GetScreenWidth() - (_showInfo? 450 : 50), 0, 50, 50), _showInfo? "#115#" : "#114#")) { // 113 121 122
+    if (GuiButton(Rectangle(GetScreenWidth() - (_showInfo ? 450 : 50), 0, 50, 50), _showInfo ? "#115#" : "#114#")) {
         _showInfo = !_showInfo;
     }
 
@@ -291,6 +304,7 @@ void World::drawUserInfo() {
         3
     );
     for (int i = 0; i < _populations.size(); i++) {
+        /*
         if (!_paused) {
             _populations[i].getAntsHistory();
         }
@@ -299,13 +313,20 @@ void World::drawUserInfo() {
                 j, _populations[i]._ants_amount * 0.2 - (
                        _populations[i]._sizeHistory[_populations[i]._sizeHistory.size() * j / GetScreenWidth()] * 0.2),
                 BLACK);
-        }
+
         drawLineOfText(
             ("Alive #" + std::to_string(i) + ": " + std::to_string(_populations[i].getAliveCount())).c_str(),
             4 + i
         );
+        }*/
+        _graphs[i].addPoint(
+            _generation_frameDuration * _generation_count + _frameCount,
+            _populations[i].getAliveCount()
+        );
+        _graphs[i].draw();
     }
-    int nextIdx = 4 + _populations.size();
+
+    int nextIdx = 4; // + _populations.size();
     for (int i = 0; i < _populations.size(); i++) {
         drawLineOfText(
             std::string("Best #" + std::to_string(i) + ": " +
@@ -356,7 +377,7 @@ void World::drawLineOfText(const char *line, int idx) {
 }
 
 
-char *World::strFromUserMode() const {
+const char *World::strFromUserMode() const {
     switch (_userMode) {
         case OBSERVE: return "observe";
         case EDIT_MAP: return "edit";
@@ -364,12 +385,13 @@ char *World::strFromUserMode() const {
     }
 }
 
-char *World::strFromDrawMode(int action) const {
+const char *World::strFromDrawMode(int action) const {
     switch (action) {
         case NONE: return "None";
         case DRAW_WALL: return "Draw Wall";
         case DELETE_WALL: return "Delete Wall";
         case MOVE_COLONY_INIT: return "Move Colony Init";
         case MOVE_COLONY_TARGET: return "Move Colony Target";
+        default: std::cerr << "undefined action" << std::endl;
     }
 }

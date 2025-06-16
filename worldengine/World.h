@@ -6,6 +6,7 @@
 #define WORLD_H
 #include <optional>
 
+#include "Graph.h"
 #include "Lines.h"
 #include "Population.h"
 #include "World.h"
@@ -24,8 +25,11 @@ enum DrawAction {
 
 class World {
 private:
-    bool _paused = false;
+
+    std::vector<Graph> _graphs{};
+
     bool _showInfo = true;
+    bool _paused = false;
 
     // drawing
     UserMode _userMode = OBSERVE;
@@ -51,8 +55,8 @@ private:
 
     static void drawLineOfText(const char *str, int idx) ;
 
-    [[nodiscard]] char *strFromUserMode() const;
-    [[nodiscard]] char *strFromDrawMode(int action) const;
+    [[nodiscard]] const char *strFromUserMode() const;
+    [[nodiscard]] const char *strFromDrawMode(int action) const;
 
 public:
     Lines _lines;
@@ -63,6 +67,8 @@ public:
     int _frameCount{};
 
     bool _showRays = false;
+
+    World();
 
     World &setLines(const Lines &lines);
 

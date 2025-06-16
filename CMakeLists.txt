@@ -87,6 +87,8 @@ add_executable(AntGod main.cpp
         worldengine/Lines.cpp
         worldengine/Lines.h
         worldengine/LineIntersection.h
+        worldengine/Graph.cpp
+        worldengine/Graph.h
 )
 
 target_compile_options(AntGod PRIVATE
