@@ -124,12 +124,7 @@ void World::handleButtons() {
 
     // the edit menu
     if (_drawVar_hasRightClicked) {
-        // button
         const Color niceButtonGreen = Fade((Color){0, 0, 0}, 0.75f);
-        GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(niceButtonGreen));
-        GuiSetStyle(BUTTON, BORDER_COLOR_NORMAL, ColorToInt(niceButtonGreen));
-        GuiSetStyle(BUTTON, TEXT_COLOR_NORMAL, ColorToInt(Fade(WHITE, 0.8f)));
-
 
         Rectangle menuRect{
             _drawVar_menuPos.x,
@@ -138,18 +133,28 @@ void World::handleButtons() {
             200
         };
         for (int i = 0; i < _drawVar_menuOptionsCount; i++) {
-            if (menuOptionAvailable(i)) {
-                if (GuiButton({
-                                  _drawVar_menuPos.x,
-                                  _drawVar_menuPos.y + 200 * i / _drawVar_menuOptionsCount,
-                                  200,
-                                  30
-                              }, strFromDrawMode(i))) {
-                    _drawVar_hasRightClicked = false;
-                    _drawVar_action = i;
-                    afterEditOptionSelected();
-                }
+            bool available = menuOptionAvailable(i);
+            if (available) {
+                GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(niceButtonGreen));
+                GuiSetStyle(BUTTON, BORDER_COLOR_NORMAL, ColorToInt(niceButtonGreen));
+                GuiSetStyle(BUTTON, TEXT_COLOR_NORMAL, ColorToInt(Fade(WHITE, 0.8f)));
+            } else {
+                GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(niceButtonGreen));
+                GuiSetStyle(BUTTON, BORDER_COLOR_NORMAL, ColorToInt(niceButtonGreen));
+                GuiSetStyle(BUTTON, TEXT_COLOR_NORMAL, ColorToInt(Fade(WHITE, 0.8f)));
             }
+            if (!available) GuiDisable();
+            if (GuiButton({
+                              _drawVar_menuPos.x,
+                              _drawVar_menuPos.y + 200 * i / _drawVar_menuOptionsCount,
+                              200,
+                              30
+                          }, strFromDrawMode(i))) {
+                _drawVar_hasRightClicked = false;
+                _drawVar_action = i;
+                afterEditOptionSelected();
+            }
+            if (!available) GuiEnable();
         }
 
         DrawRectangleRec(menuRect, Fade(DARKGRAY, 0.5f));
