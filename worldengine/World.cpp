@@ -59,29 +59,9 @@ void World::drawGame() const {
     // obstacles
     _lines.draw();
 
-    // the bottom game boundary
-    DrawLineEx(
-        Vector2(0, GetScreenHeight() - _space_bottom),
-        Vector2(GetScreenWidth() - _space_right, GetScreenHeight() - _space_bottom),
-        5,
-        BLACK
-    );
-    // the right game boundary
-    DrawLineEx(
-        Vector2(GetScreenWidth() - _space_right, 0),
-        Vector2(GetScreenWidth() - _space_right, GetScreenHeight() - _space_bottom),
-        5,
-        BLACK
-    );
-
     // colonies
     for (const Population &population: _populations) {
         population.draw();
-    }
-
-    // new wall that is being drawn
-    if (_drawVar_borderStartPos.has_value()) {
-        DrawLineV(_drawVar_borderStartPos.value(), GetMousePosition(), BLUE);
     }
 }
 

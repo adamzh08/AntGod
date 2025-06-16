@@ -80,7 +80,7 @@ int main() {
             .setMutationProbability(0.3)
             .setPositions(Vector2{600, 500}, Vector2{50, 400})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
-            .setRays(30, 100)
+            .setRays(30, 200)
             .setEntityTexture(TextureCollection::ant)
             .build();
 

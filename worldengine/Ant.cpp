@@ -54,11 +54,6 @@ void Ant::act() {
         _rotation = rot_temp;
         _alive = false;
     }
-
-    if (_position.x < 0 || _position.x > GetScreenWidth() - _population._world._space_right
-        || _position.y < 0 || _position.y > GetScreenHeight() - _population._world._space_bottom) {
-        _alive = false;
-    }
 }
 
 float Ant::calculateReward() const {

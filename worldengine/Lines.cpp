@@ -79,9 +79,23 @@ std::vector<float> Lines::getRays(const Vector2 mainPoint, const int raysAmount,
 }
 
 void Lines::drawRays(Vector2 mainPoint, int raysAmount, float raysRadius) {
+    //DrawLineEx(mainPoint, vectorSum(mainPoint, getIntersection(mainPoint, deltaPoints[i], _lines[j].startPoint, _lines[j].endPoint)), 1, GRAY);
+
     const std::vector<Vector2> deltaPoints = _searchRaysDB(raysAmount, raysRadius);
-    for (auto deltaPoint : deltaPoints) {
-        DrawLineEx(mainPoint, vectorSum(mainPoint, deltaPoint), 1, GRAY);
+
+    std::vector<Vector2> rays(raysAmount, Vector2{1000, 1000});
+
+    for (int i = 0; i < raysAmount; i++) {
+        for (int j = 0; j < _linesAmount; j++) {
+            Vector2 temp = getIntersection(mainPoint, deltaPoints[i], _lines[j].startPoint, _lines[j].endPoint);
+            if (sq(temp.x) + sq(temp.y) < sq(rays[i].x) + sq(rays[i].y)) {
+                rays[i] = temp;
+            }
+        }
+    }
+
+    for (int i = 0; i < raysAmount; i++) {
+        DrawLineEx(mainPoint, vectorSum(mainPoint, rays[i]), 1, GRAY);
     }
 }
 

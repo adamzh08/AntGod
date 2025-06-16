@@ -106,4 +106,37 @@ inline bool doIntersect(Vector2 mainPoint, Vector2 deltaPoint, Vector2 linePoint
     return false;
 }
 
+inline Vector2 getIntersection(const Vector2 mainPoint, const Vector2 deltaPoint, Vector2 linePoint1, Vector2 linePoint2) {
+    sub(linePoint1, mainPoint);
+    sub(linePoint2, mainPoint);
+
+    // Find the four orientations needed for general and
+    // special cases
+    int o1 = orientation(Vector2{0, 0}, deltaPoint, linePoint1);
+    int o2 = orientation(Vector2{0, 0}, deltaPoint, linePoint2);
+    int o3 = orientation(linePoint1, linePoint2, Vector2{0, 0});
+    int o4 = orientation(linePoint1, linePoint2, deltaPoint);
+
+    // General case: lines intersect if they have different
+    // orientations
+    if (o1 != o2 && o3 != o4) {
+
+        // Compute intersection point
+        double a1 = deltaPoint.y;
+        double b1 = -deltaPoint.x;
+
+        double a2 = linePoint2.y - linePoint1.y;
+        double b2 = linePoint1.x - linePoint2.x;
+        double c2 = a2 * linePoint1.x + b2 * linePoint1.y;
+
+        double determinant = a1 * b2 - a2 * b1;
+
+        if (determinant != 0) {
+            return Vector2{(-c2 * b1) / determinant, (a1 * c2) / determinant};
+        }
+    }
+
+    return deltaPoint;
+}
+
 #endif //LINEINTERSECTION_H
