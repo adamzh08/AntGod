@@ -19,9 +19,6 @@ enum UserMode {
 
 class World {
 private:
-    int _generation_frameDuration{};
-    int _generation_count{};
-    int _frameCount{};
     bool _paused = false;
 
     // drawing
@@ -30,7 +27,7 @@ private:
 
     void drawGame();
 
-    void drawUserInfo() const;
+    void drawUserInfo();
 
     void handleUserInput();
     void handleMouseClicks();
@@ -43,6 +40,10 @@ private:
 public:
     Lines _lines{};
     std::vector<Population> _populations;
+
+    int _generation_frameDuration{};
+    int _generation_count{};
+    int _frameCount{};
 
     int _space_right{};
     int _space_bottom{};

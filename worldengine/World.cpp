@@ -134,7 +134,7 @@ void World::handleMouseClicks() {
     }
 }
 
-void World::drawUserInfo() const {
+void World::drawUserInfo() {
     GuiSetStyle(DEFAULT, TEXT_SIZE, 27);
 
     drawLineOfText(
@@ -154,10 +154,17 @@ void World::drawUserInfo() const {
         3
     );
     for (int i = 0; i < _populations.size(); i++) {
+        if (!_paused) {
+            _populations[i].getAntsHistory();
+        }
+        for (int j = 0; j < GetScreenWidth(); j++) {
+            DrawPixel(j, _populations[i]._ants_amount * 0.2 - (_populations[i]._sizeHistory[_populations[i]._sizeHistory.size() * j / GetScreenWidth()] * 0.2), BLACK);
+        }
         drawLineOfText(
             ("Alive #" + std::to_string(i) + ": " + std::to_string(_populations[i].getAliveCount())).c_str(),
             4 + i
         );
+
     }
     int nextIdx = 4 + _populations.size();
     for (int i = 0; i < _populations.size(); i++) {

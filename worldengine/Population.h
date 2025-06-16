@@ -27,6 +27,8 @@ public:
     int _ants_amount;
     float _elite_percentage;
 
+    std::vector<int> _sizeHistory;
+
     // Ant settings
     Texture2D _entityTexture;
     Vector2 _origin_point;
@@ -67,6 +69,8 @@ public:
     void flood();
 
     [[nodiscard]] int getAliveCount() const;
+
+    std::vector<int> getAntsHistory();
 
     static int tournamentSelectFromPool(const std::vector<Ant*> &pool, int k);
 

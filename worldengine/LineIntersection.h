@@ -77,32 +77,35 @@ inline double IntersectionLength(const Vector2 mainPoint, const Vector2 deltaPoi
     return INFINITY;
 }
 
-inline bool doIntersect(Vector2 mainPoint, Vector2 deltaPoint, Vector2 linePoint1, Vector2 linePoint2) {
-    sub(linePoint1, mainPoint);
-    sub(linePoint2, mainPoint);
+// Function to check if two lines (p1-q1 and p2-q2) intersect
+inline bool doIntersect(Vector2 p1, Vector2 q1, Vector2 p2, Vector2 q2) {
 
     // Find the four orientations needed for general and
     // special cases
-    int o1 = orientation(Vector2{0, 0}, deltaPoint, linePoint1);
-    int o2 = orientation(Vector2{0, 0}, deltaPoint, linePoint2);
-    int o3 = orientation(linePoint1, linePoint2, Vector2{0, 0});
-    int o4 = orientation(linePoint1, linePoint2, deltaPoint);
+    int o1 = orientation(p1, q1, p2);
+    int o2 = orientation(p1, q1, q2);
+    int o3 = orientation(p2, q2, p1);
+    int o4 = orientation(p2, q2, q1);
 
     // General case: lines intersect if they have different
     // orientations
     if (o1 != o2 && o3 != o4) {
 
         // Compute intersection point
-        double a2 = linePoint2.y - linePoint1.y;
-        double b2 = linePoint1.x - linePoint2.x;
+        double a1 = q1.y - p1.y;
+        double b1 = p1.x - q1.x;
 
-        double determinant = deltaPoint.y * b2 + a2 * deltaPoint.x;
+        double a2 = q2.y - p2.y;
+        double b2 = p2.x - q2.x;
+
+        double determinant = a1 * b2 - a2 * b1;
 
         if (determinant != 0) {
             return true;
         }
     }
 
+    // Lines do not intersect in any case
     return false;
 }
 
