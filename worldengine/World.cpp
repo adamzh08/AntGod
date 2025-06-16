@@ -28,12 +28,6 @@ World &World::setGenerationDuration(int duration) {
     return *this;
 }
 
-World &World::setLayout(int space_right, int space_bottom) {
-    _space_right = space_right;
-    _space_bottom = space_bottom;
-    return *this;
-}
-
 void World::act() {
     if (!_paused) {
         _frameCount++;
@@ -105,19 +99,8 @@ void World::handleMouseClicks() {
             break;
         }
         case DRAWING: {
-            const bool isInBounds_x = 0 < GetMousePosition().x && GetMousePosition().x < GetScreenWidth() -
-                                      _space_right;
-            const bool isInBounds_y = 0 < GetMousePosition().y && GetMousePosition().y < GetScreenHeight() -
-                                      _space_bottom;
-
-            if (!isInBounds_x || !isInBounds_y) {
-                _drawVar_borderStartPos.reset();
-            }
-
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                if (isInBounds_x && isInBounds_y) {
-                    _drawVar_borderStartPos = GetMousePosition();
-                }
+                _drawVar_borderStartPos = GetMousePosition();
             } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
                 if (_drawVar_borderStartPos.has_value()) {
                     _lines.addLine(_drawVar_borderStartPos.value(), GetMousePosition());
@@ -188,9 +171,9 @@ void World::drawLineOfText(const char *line, int idx) const {
     GuiDrawText(
         line,
         Rectangle(
-            GetScreenWidth() - (_space_right - 10),
+            GetScreenWidth() - 200,
             10 + idx * GuiGetStyle(DEFAULT, TEXT_SIZE),
-            _space_right - 10,
+            200,
             10
         ),
         TEXT_ALIGN_LEFT | TEXT_ALIGN_TOP,

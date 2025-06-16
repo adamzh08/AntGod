@@ -45,8 +45,6 @@ public:
     int _generation_count{};
     int _frameCount{};
 
-    int _space_right{};
-    int _space_bottom{};
     bool _showRays = false;
 
     World &setLines(const Lines &lines);
@@ -54,8 +52,6 @@ public:
     World &setPopulations(std::vector<Population> &&populations);
 
     World &setGenerationDuration(int duration);
-
-    World& setLayout(int space_right, int space_bottom);
 
     void act();
 

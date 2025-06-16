@@ -28,7 +28,7 @@ Lines lines = Lines()
             .addLine(Vector2{0, SCREEN_HEIGHT}, Vector2{SCREEN_WIDTH, SCREEN_HEIGHT})
             .addLine(Vector2{500, 0}, Vector2{500, 300})
             .addLine(Vector2{600, 450}, Vector2{600, 150})
-            .addLine(Vector2{700, 0}, Vector2{700, 300});
+            .addLine(Vector2{600, 450}, Vector2{600, 150});
 
 // Layers
 std::vector<Layer> layers = {
@@ -89,7 +89,6 @@ int main() {
             .build();
 
     world->setLines(lines)
-            .setLayout(300, 100)
             .setGenerationDuration(10 * 60)
             .setPopulations({
                 beesPopulation,
