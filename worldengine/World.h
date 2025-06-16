@@ -16,10 +16,10 @@ enum UserMode {
 };
 enum DrawAction {
     NONE,
-    DRAW_WALL,
-    DELETE_WALL,
-    MOVE_COLONY_INIT,
-    MOVE_COLONY_TARGET
+    DRAW_WALL, // Done
+    DELETE_WALL, // Todo
+    MOVE_COLONY_INIT, // Todo
+    MOVE_COLONY_TARGET // Todo
 };
 
 class World {
@@ -33,14 +33,20 @@ private:
     int _drawVar_action = NONE;
     int _drawVar_menuOptionsCount = 5;
 
+    // colony movement
+    int _drawVar_popIdxClicked = -1;
 
     void drawGame();
 
     void drawUserInfo();
 
     void handleUserInput();
-    void handleMouseClicks();
+    void handleMapEditing();
     void handleButtons();
+
+    void afterEditOptionSelected();
+
+    [[nodiscard]] bool menuOptionAvailable(int option) const;
 
     void drawLineOfText(const char *str, int idx) const;
 

@@ -8,8 +8,8 @@
 #include "World.h"
 
 #define RAYGUI_IMPLEMENTATION
-#include <cfloat>
-#include <memory>
+
+#include <algorithm>
 
 #include "../raygui.h"
 
@@ -71,11 +71,18 @@ void World::drawGame() {
             // Todo implement
             break;
         }
+        case MOVE_COLONY_INIT:
+        case MOVE_COLONY_TARGET: {
+            DrawCircleV(GetMousePosition(), 10, ORANGE);
+            break;
+        }
     }
 }
 
 void World::handleUserInput() {
-    handleMouseClicks();
+    if (_userMode == EDIT_MAP) {
+        handleMapEditing();
+    }
     handleButtons();
 }
 
@@ -109,15 +116,18 @@ void World::handleButtons() {
             200,
             200
         };
-        for (float i = 0; i < _drawVar_menuOptionsCount; i++) {
-            if (GuiButton({
-                              _drawVar_menuPos.x,
-                              _drawVar_menuPos.y + 200 * i / _drawVar_menuOptionsCount,
-                              200,
-                              30
-                          }, strFromDrawMode(i))) {
-                _drawVar_hasRightClicked = false;
-                _drawVar_action = i;
+        for (int i = 0; i < _drawVar_menuOptionsCount; i++) {
+            if (menuOptionAvailable(i)) {
+                if (GuiButton({
+                                  _drawVar_menuPos.x,
+                                  _drawVar_menuPos.y + 200 * i / _drawVar_menuOptionsCount,
+                                  200,
+                                  30
+                              }, strFromDrawMode(i))) {
+                    _drawVar_hasRightClicked = false;
+                    _drawVar_action = i;
+                    afterEditOptionSelected();
+                }
             }
         }
 
@@ -126,34 +136,114 @@ void World::handleButtons() {
     }
 }
 
-void World::handleMouseClicks() {
-    switch (_userMode) {
-        case OBSERVE: {
+void World::handleMapEditing() {
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+        // trigger menu popup
+        _drawVar_hasRightClicked = true;
+        _drawVar_menuPos = GetMousePosition();
+    }
+    switch (_drawVar_action) {
+        case NONE: break;
+        case DRAW_WALL: {
+            if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+                // adding a new line
+                _lines.addLine(_drawVar_menuPos, GetMousePosition());
+                _drawVar_action = NONE;
+            }
             break;
         }
-        case EDIT_MAP: {
-            if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-                _drawVar_hasRightClicked = true;
-                _drawVar_menuPos = GetMousePosition();
+        case DELETE_WALL: {
+            // Todo implement
+            break;
+        }
+        case MOVE_COLONY_INIT: {
+            if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+                // moving the colony init position
+                _populations[_drawVar_popIdxClicked]._init_position = GetMousePosition();
+                _drawVar_action = NONE;
             }
-            switch (_drawVar_action) {
-                case NONE: break;
-                case DRAW_WALL: {
-                    if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-                        _lines.addLine(_drawVar_menuPos, GetMousePosition());
-                        _drawVar_action = NONE;
-                    }
-                    break;
-                }
-                case DELETE_WALL: {
-                    // Todo implement
-                    break;
-                }
+            break;
+        }
+        case MOVE_COLONY_TARGET: {
+            if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+                // moving the colony target position
+                _populations[_drawVar_popIdxClicked]._target_position = GetMousePosition();
+                _drawVar_action = NONE;
             }
             break;
         }
     }
 }
+
+void World::afterEditOptionSelected() {
+    switch (_drawVar_action) {
+        case NONE:
+        case DRAW_WALL: return;
+        case DELETE_WALL: {
+            // Todo
+            return;
+        }
+        case MOVE_COLONY_INIT: {
+            for (int i = 0; i < _populations.size(); i++) {
+                const bool clicked_x = _populations[i]._init_position.x - 10 < _drawVar_menuPos.x &&
+                                       _drawVar_menuPos.x < _populations[i]._init_position.x + 10;
+                const bool clicked_y = _populations[i]._init_position.y - 10 < _drawVar_menuPos.y &&
+                                       _drawVar_menuPos.y < _populations[i]._init_position.y + 10;
+                if (clicked_x && clicked_y) {
+                    _drawVar_popIdxClicked = i;
+                    return;
+                }
+            }
+        }
+        case MOVE_COLONY_TARGET: {
+            for (int i = 0; i < _populations.size(); i++) {
+                const bool clicked_x = _populations[i]._target_position.x - 10 < _drawVar_menuPos.x &&
+                                       _drawVar_menuPos.x < _populations[i]._target_position.x + 10;
+                const bool clicked_y = _populations[i]._target_position.y - 10 < _drawVar_menuPos.y &&
+                                       _drawVar_menuPos.y < _populations[i]._target_position.y + 10;
+                if (clicked_x && clicked_y) {
+                    _drawVar_popIdxClicked = i;
+                    return;
+                }
+            }
+        }
+    }
+}
+
+
+bool World::menuOptionAvailable(const int option) const {
+    switch (option) {
+        case NONE:
+        case DRAW_WALL: return true; // always available
+        case DELETE_WALL: return false; // Todo
+        case MOVE_COLONY_INIT: {
+            for (const Population &_population: _populations) {
+                const bool clicked_x = _population._init_position.x - 10 < _drawVar_menuPos.x &&
+                                       _drawVar_menuPos.x < _population._init_position.x + 10;
+                const bool clicked_y = _population._init_position.y - 10 < _drawVar_menuPos.y &&
+                                       _drawVar_menuPos.y < _population._init_position.y + 10;
+                if (clicked_x && clicked_y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        case MOVE_COLONY_TARGET: {
+            for (const Population &_population: _populations) {
+                const bool clicked_x = _population._target_position.x - 10 < _drawVar_menuPos.x &&
+                                       _drawVar_menuPos.x < _population._target_position.x + 10;
+                const bool clicked_y = _population._target_position.y - 10 < _drawVar_menuPos.y &&
+                                       _drawVar_menuPos.y < _population._target_position.y + 10;
+                if (clicked_x && clicked_y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        default: return false;
+    }
+}
+
 
 void World::drawUserInfo() {
     GuiSetStyle(DEFAULT, TEXT_SIZE, 27);
