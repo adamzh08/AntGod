@@ -171,9 +171,9 @@ void World::drawLineOfText(const char *line, int idx) const {
     GuiDrawText(
         line,
         Rectangle(
-            GetScreenWidth() - 200,
+            GetScreenWidth() - 300,
             10 + idx * GuiGetStyle(DEFAULT, TEXT_SIZE),
-            200,
+            300,
             10
         ),
         TEXT_ALIGN_LEFT | TEXT_ALIGN_TOP,
