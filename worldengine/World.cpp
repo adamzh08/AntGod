@@ -8,6 +8,8 @@
 #include "World.h"
 
 #define RAYGUI_IMPLEMENTATION
+#include <cfloat>
+
 #include "../raygui.h"
 
 
@@ -55,12 +57,12 @@ void World::draw() {
     drawUserInfo();
 }
 
-void World::drawGame() const {
+void World::drawGame() {
     // obstacles
     _lines.draw();
 
     // colonies
-    for (const Population &population: _populations) {
+    for (Population &population: _populations) {
         population.draw();
     }
 }
@@ -133,20 +135,45 @@ void World::handleMouseClicks() {
 }
 
 void World::drawUserInfo() const {
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 30);
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 27);
 
     drawLineOfText(
         ("user mode: " + std::string(strFromUserMode())).c_str(),
         0
     );
     drawLineOfText(
-        ("frames left: " + std::to_string(_generation_frameDuration - _frameCount)).c_str(),
+        "----- Gen info -----",
         1
     );
     drawLineOfText(
-        ("gen count: " + std::to_string(_generation_count)).c_str(),
+        ("frames left: " + std::to_string(_generation_frameDuration - _frameCount)).c_str(),
         2
     );
+    drawLineOfText(
+        ("gen count: " + std::to_string(_generation_count)).c_str(),
+        3
+    );
+    for (int i = 0; i < _populations.size(); i++) {
+        drawLineOfText(
+            ("Alive #" + std::to_string(i) + ": " + std::to_string(_populations[i].getAliveCount())).c_str(),
+            4 + i
+        );
+    }
+    int nextIdx = 4 + _populations.size();
+    for (int i = 0; i < _populations.size(); i++) {
+        drawLineOfText(
+            std::string("Best #" + std::to_string(i) + ": " +
+                        std::to_string(
+                            static_cast<int>(
+                                _populations[i]._best != nullptr
+                                                 ? _populations[i]._best->calculateReward()
+                                                 : 0
+                            )
+                        )
+            ).c_str(),
+            nextIdx + i
+        );
+    }
 }
 
 

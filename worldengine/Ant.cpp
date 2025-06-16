@@ -22,8 +22,8 @@ Ant::Ant(const Ant &parent1, const Ant &parent2) : _population(parent1._populati
 
 
 void Ant::act() {
-
-    std::vector<float> input = _population._world._lines.getRays(_position, _population._rays_amount, _population._rays_radius);
+    std::vector<float> input = _population._world._lines.getRays(_position, _population._rays_amount,
+                                                                 _population._rays_radius);
 
     const std::vector<float> output = _network.feed_forward(input);
 
@@ -59,16 +59,20 @@ void Ant::act() {
 float Ant::calculateReward() const {
     const float dx = _population._target_position.x - _position.x;
     const float dy = _population._target_position.y - _position.y;
-    return -(dx * dx + dy * dy);
+    // always positive
+    return GetScreenWidth() * GetScreenWidth() + GetScreenHeight() * GetScreenHeight()
+           - (dx * dx + dy * dy);
 }
 
 void Ant::draw() const {
     DrawTexturePro(
         _population._entityTexture,
-        (Rectangle){ 0, 0, _population._entityTexture.width, _population._entityTexture.height },  // Source rectangle
-        (Rectangle){ _position.x, _position.y, _population._entityTexture.width, _population._entityTexture.height }, // Destination rectangle
-        Vector2{_population._entityTexture.width / 2.0f, _population._entityTexture.height / 2.0f},     // Origin point for rotation
-        _rotation * RAD2DEG,   // Rotation angle in degrees
-        WHITE       // Tint color
+        Rectangle(0, 0, _population._entityTexture.width, _population._entityTexture.height), // Source rectangle
+        Rectangle(_position.x, _position.y, _population._entityTexture.width, _population._entityTexture.height),
+        // Destination rectangle
+        Vector2(_population._entityTexture.width / 2.0f, _population._entityTexture.height / 2.0f),
+        // Origin point for rotation
+        _rotation * RAD2DEG, // Rotation angle in degrees
+        WHITE // Tint color
     );
 }

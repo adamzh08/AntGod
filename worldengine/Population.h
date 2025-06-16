@@ -16,11 +16,14 @@
 class World;
 
 class Population {
+private:
+    void setBest();
 public:
     World &_world;
 
     // -------- Population ---------
     std::vector<Ant> _ants;
+    Ant* _best = nullptr;
     int _ants_amount;
     float _elite_percentage;
 
@@ -63,9 +66,11 @@ public:
 
     void flood();
 
+    [[nodiscard]] int getAliveCount() const;
+
     static int tournamentSelectFromPool(const std::vector<Ant*> &pool, int k);
 
-    void draw() const;
+    void draw();
 };
 
 #endif //POPULATION_H

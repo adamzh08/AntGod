@@ -28,7 +28,7 @@ private:
     UserMode _userMode = OBSERVE;
     std::optional<Vector2> _drawVar_borderStartPos;
 
-    void drawGame() const;
+    void drawGame();
 
     void drawUserInfo() const;
 
@@ -38,7 +38,7 @@ private:
 
     void drawLineOfText(const char *str, int idx) const;
 
-    char *strFromUserMode() const;
+    [[nodiscard]] char *strFromUserMode() const;
 
 public:
     Lines _lines{};

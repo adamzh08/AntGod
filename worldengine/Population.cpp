@@ -138,31 +138,52 @@ int Population::tournamentSelectFromPool(const std::vector<Ant *> &pool, const i
     return best;
 }
 
-void Population::draw() const {
+void Population::draw() {
     DrawCircleV(_init_position, 10, GREEN);
     DrawCircleV(_target_position, 10, RED);
 
-    const Ant *best = nullptr;
-    float highestReward = -FLT_MAX;
-
-    for (const Ant &ant: this->_ants) {
+    for (const Ant& ant: _ants) {
         if (ant._alive) {
-            float reward = ant.calculateReward();
-            if (reward > highestReward) {
-                highestReward = reward;
-                best = &ant;
-            }
             ant.draw();
         }
     }
 
-    if (best != nullptr) {
+    setBest();
+
+
+    if (_best != nullptr) {
         if (_world._showRays) {
-            _world._lines.drawRays(best->_position, _rays_amount, _rays_radius);
+            _world._lines.drawRays(_best->_position, _rays_amount, _rays_radius);
         }
         // drawing a blue circle on the best ant
-        DrawEllipse(best->_position.x, best->_position.y, 10, 10, Color(0, 0, 255, 150));
+        DrawEllipse(_best->_position.x, _best->_position.y, 10, 10, Color(0, 0, 255, 150));
     } else {
         std::cerr << "[Warning] No more ants alive in population " << this << std::endl;
     }
+}
+
+
+void Population::setBest() {
+    float highestReward = -FLT_MAX;
+
+    for (Ant &ant: this->_ants) {
+        if (ant._alive) {
+            float reward = ant.calculateReward();
+            if (reward > highestReward) {
+                highestReward = reward;
+                _best = &ant;
+            }
+        }
+    }
+}
+
+
+int Population::getAliveCount() const {
+    int counter = 0;
+    for (const Ant &ant: _ants) {
+        if (ant._alive) {
+            counter++;
+        }
+    }
+    return counter;
 }
