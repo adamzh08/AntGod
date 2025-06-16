@@ -106,31 +106,38 @@ void World::handleButtons() {
     // text size
     GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
     // button
-    const Color niceButtonBlue = Fade((Color){100, 100, 255}, 0.5f);
-    GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(niceButtonBlue));
-    GuiSetStyle(BUTTON, BORDER_COLOR_NORMAL, ColorToInt(niceButtonBlue));
+    const Color buttonBlue = Fade((Color){100, 100, 255}, 0.5f);
+    const Color buttonGreen = Fade((Color){0, 255, 0}, 0.5f);
+
+    // GuiSetStyle(BUTTON, BORDER_COLOR_NORMAL, ColorToInt(buttonBlue));
     GuiSetStyle(BUTTON, TEXT_COLOR_NORMAL, ColorToInt(Fade(WHITE, 0.8f)));
 
+    auto toggleButton = [buttonBlue, buttonGreen](const Rectangle rect, const char *label, const bool active) {
+        GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(active ? buttonGreen : buttonBlue));
+        return GuiButton(rect, label);
+    };
 
     // switch to normal mode button
-    if (GuiButton(Rectangle(0, GetScreenHeight() - 60, 100, 50), "Observe")) {
+    if (toggleButton(Rectangle(0, GetScreenHeight() - 60, 100, 50), "Observe", _userMode == OBSERVE)) {
         _drawVar_action = NONE;
         _drawVar_hasRightClicked = false;
         _userMode = OBSERVE;
     }
     // switch to draw mode button
-    if (GuiButton(Rectangle(125, GetScreenHeight() - 60, 100, 50), "Edit")) {
+    if (toggleButton(Rectangle(125, GetScreenHeight() - 60, 100, 50), "Edit", _userMode == EDIT_MAP)) {
         _userMode = EDIT_MAP;
     }
 
     // info for RayGui icons: in raygui.h, look at enum 'GuiIconName' with ctrl + f to find the icon ids fast
     // pause button
-    if (GuiButton(Rectangle(375, GetScreenHeight() - 60, 50, 50), _paused ? "#131#" : "#132#")) {
+    if (toggleButton(Rectangle(375, GetScreenHeight() - 60, 50, 50), _paused ? "#131#" : "#132#", _paused)) {
         _paused = !_paused;
     }
-    if (GuiButton(Rectangle(450, GetScreenHeight() - 60, 50, 50), "#64#")) {
+    if (toggleButton(Rectangle(450, GetScreenHeight() - 60, 50, 50), "#64#", _showRays)) {
         _showRays = !_showRays;
     }
+
+    GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(buttonBlue));
     if (GuiButton(Rectangle(GetScreenWidth() - (_showInfo ? 450 : 50), 0, 50, 50), _showInfo ? "#115#" : "#114#")) {
         _showInfo = !_showInfo;
     }
