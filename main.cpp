@@ -4,6 +4,7 @@
 #include <vector>
 #include <thread>
 
+#include "raygui.h"
 #include "raylib.h"
 #include "raymath.h"
 #include "neuralengine/Layer.h"
@@ -15,10 +16,11 @@
 #include "worldengine/World.h"
 #include "worldengine/Lines.h"
 
-#define SCREEN_WIDTH 1080
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 1500
+#define SCREEN_HEIGHT 1000
 
 void draw();
+void setGuiStyles();
 
 // Initializing Obstacles
 Lines lines = Lines()
@@ -53,6 +55,9 @@ int main() {
 
     // Init the window
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window");
+
+    // raygui
+    setGuiStyles();
 
     InitAudioDevice();              // Initialize audio device
     Music music = LoadMusicStream("assets/main_theme.wav");
@@ -120,4 +125,7 @@ void draw() {
     DrawFPS(GetScreenWidth() - 100, GetScreenHeight() - 25);
 
     EndDrawing();
+}
+
+void setGuiStyles() {
 }

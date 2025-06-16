@@ -12,10 +12,13 @@
 
 enum UserMode {
     OBSERVE,
-    DRAWING,
-    MOVE_OBJECTS
+    EDIT_MAP
 };
-
+enum DrawAction {
+    NONE,
+    DRAW_WALL,
+    DELETE_WALL
+};
 
 class World {
 private:
@@ -24,6 +27,10 @@ private:
     // drawing
     UserMode _userMode = OBSERVE;
     std::optional<Vector2> _drawVar_borderStartPos;
+    bool _drawVar_hasRightClicked = false;
+    Vector2 _drawVar_menuPos{};
+    DrawAction _drawVar_action = NONE;
+
 
     void drawGame();
 

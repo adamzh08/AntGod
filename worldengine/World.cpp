@@ -59,6 +59,18 @@ void World::drawGame() {
     for (Population &population: _populations) {
         population.draw();
     }
+
+    switch (_drawVar_action) {
+        case NONE: break; // nothing is edited currently
+        case DRAW_WALL: {
+            DrawLineV(_drawVar_borderStartPos.value(), GetMousePosition(), BLUE);
+            break;
+        }
+        case DELETE_WALL: {
+            // Todo implement
+            break;
+        }
+    }
 }
 
 void World::handleUserInput() {
@@ -75,12 +87,8 @@ void World::handleButtons() {
         _userMode = OBSERVE;
     }
     // switch to draw mode button
-    if (GuiButton(Rectangle(125, GetScreenHeight() - 60, 100, 50), "Draw")) {
-        _userMode = DRAWING;
-    }
-    // switch to normal mode button
-    if (GuiButton(Rectangle(250, GetScreenHeight() - 60, 100, 50), "Move")) {
-        _userMode = MOVE_OBJECTS;
+    if (GuiButton(Rectangle(125, GetScreenHeight() - 60, 100, 50), "Edit")) {
+        _userMode = EDIT_MAP;
     }
 
     // info for RayGui icons: in raygui.h, look at enum 'GuiIconName' with ctrl + f to find the icon ids fast
@@ -91,6 +99,39 @@ void World::handleButtons() {
     if (GuiButton(Rectangle(450, GetScreenHeight() - 60, 50, 50), "#64#")) {
         _showRays = !_showRays;
     }
+
+    if (_drawVar_hasRightClicked) {
+        Rectangle menuRect{
+            _drawVar_menuPos.x,
+            _drawVar_menuPos.y,
+            200,
+            100
+        };
+        Rectangle drawWallButton{
+            _drawVar_menuPos.x,
+            _drawVar_menuPos.y,
+            200,
+            30
+        };
+        Rectangle deleteWallButton{
+            _drawVar_menuPos.x,
+            _drawVar_menuPos.y + 50,
+            200,
+            30
+        };
+        DrawRectangleRec(menuRect, Fade(DARKGRAY, 0.5f));
+        DrawRectangleLinesEx(menuRect, 1, GRAY);
+
+        if (GuiButton(drawWallButton, "Draw Wall")) {
+            _drawVar_hasRightClicked = false;
+            _drawVar_action = DRAW_WALL;
+            _drawVar_borderStartPos = _drawVar_menuPos;
+        }
+        if (GuiButton(deleteWallButton, "Delete Wall")) {
+            _drawVar_hasRightClicked = false;
+            _drawVar_action = DELETE_WALL;
+        }
+    }
 }
 
 void World::handleMouseClicks() {
@@ -98,20 +139,26 @@ void World::handleMouseClicks() {
         case OBSERVE: {
             break;
         }
-        case DRAWING: {
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                _drawVar_borderStartPos = GetMousePosition();
-            } else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-                if (_drawVar_borderStartPos.has_value()) {
-                    _lines.addLine(_drawVar_borderStartPos.value(), GetMousePosition());
-                }
-                _drawVar_borderStartPos.reset();
+        case EDIT_MAP: {
+            if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+                _drawVar_hasRightClicked = true;
+                _drawVar_menuPos = GetMousePosition();
             }
-
-            break;
-        }
-        case MOVE_OBJECTS: {
-            // Todo
+            switch (_drawVar_action) {
+                case NONE: break;
+                case DRAW_WALL: {
+                    if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+                        _lines.addLine(_drawVar_borderStartPos.value(), GetMousePosition());
+                        _drawVar_borderStartPos.reset();
+                        _drawVar_action = NONE;
+                    }
+                    break;
+                }
+                case DELETE_WALL: {
+                    // Todo implement
+                    break;
+                }
+            }
             break;
         }
     }
@@ -141,13 +188,15 @@ void World::drawUserInfo() {
             _populations[i].getAntsHistory();
         }
         for (int j = 0; j < GetScreenWidth(); j++) {
-            DrawPixel(j, _populations[i]._ants_amount * 0.2 - (_populations[i]._sizeHistory[_populations[i]._sizeHistory.size() * j / GetScreenWidth()] * 0.2), BLACK);
+            DrawPixel(
+                j, _populations[i]._ants_amount * 0.2 - (
+                       _populations[i]._sizeHistory[_populations[i]._sizeHistory.size() * j / GetScreenWidth()] * 0.2),
+                BLACK);
         }
         drawLineOfText(
             ("Alive #" + std::to_string(i) + ": " + std::to_string(_populations[i].getAliveCount())).c_str(),
             4 + i
         );
-
     }
     int nextIdx = 4 + _populations.size();
     for (int i = 0; i < _populations.size(); i++) {
@@ -156,8 +205,8 @@ void World::drawUserInfo() {
                         std::to_string(
                             static_cast<int>(
                                 _populations[i]._best != nullptr
-                                                 ? _populations[i]._best->calculateReward()
-                                                 : 0
+                                    ? _populations[i]._best->calculateReward()
+                                    : 0
                             )
                         )
             ).c_str(),
@@ -185,8 +234,7 @@ void World::drawLineOfText(const char *line, int idx) const {
 char *World::strFromUserMode() const {
     switch (_userMode) {
         case OBSERVE: return "observe";
-        case DRAWING: return "draw";
-        case MOVE_OBJECTS: return "move";
+        case EDIT_MAP: return "edit";
         default: return "?";
     }
 }
