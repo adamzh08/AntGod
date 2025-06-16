@@ -2,6 +2,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <thread>
 
 #include "raylib.h"
 #include "raymath.h"
@@ -16,7 +17,6 @@
 
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
-
 
 void draw();
 
@@ -35,6 +35,12 @@ std::vector<Layer> layers = {
 };
 
 World *world = nullptr;
+
+void gameLoop(std::stop_token stoken) {
+    while (!stoken.stop_requested()) {
+        world->act();
+    }
+}
 
 int main() {
     // Setting random seed by the CPU time
@@ -86,12 +92,14 @@ int main() {
                 antsPopulation,
             });
 
+    std::jthread t(gameLoop);
+
     while (!WindowShouldClose()) {
         UpdateMusicStream(music);   // Update music buffer with new stream data
-        world->act();
         draw();
     }
 
+    t.request_stop();
     UnloadMusicStream(music);   // Unload music stream buffers from RAM
     CloseAudioDevice();         // Close audio device (music streaming is automatically stopped)
     // free all
