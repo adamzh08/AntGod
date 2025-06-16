@@ -18,13 +18,14 @@ enum DrawAction {
     NONE,
     DRAW_WALL, // Done
     DELETE_WALL, // Todo
-    MOVE_COLONY_INIT, // Todo
-    MOVE_COLONY_TARGET // Todo
+    MOVE_COLONY_INIT, // Done
+    MOVE_COLONY_TARGET // Done
 };
 
 class World {
 private:
     bool _paused = false;
+    bool _showInfo = true;
 
     // drawing
     UserMode _userMode = OBSERVE;
@@ -48,7 +49,7 @@ private:
 
     [[nodiscard]] bool menuOptionAvailable(int option) const;
 
-    void drawLineOfText(const char *str, int idx) const;
+    static void drawLineOfText(const char *str, int idx) ;
 
     [[nodiscard]] char *strFromUserMode() const;
     [[nodiscard]] char *strFromDrawMode(int action) const;

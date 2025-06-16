@@ -49,7 +49,9 @@ void World::act() {
 void World::draw() {
     drawGame();
     handleUserInput();
-    drawUserInfo();
+    if (_showInfo) {
+        drawUserInfo();
+    }
 }
 
 void World::drawGame() {
@@ -88,10 +90,19 @@ void World::handleUserInput() {
 
 
 void World::handleButtons() {
+    // text size
     GuiSetStyle(DEFAULT, TEXT_SIZE, 20);
+    // button
+    const Color niceButtonBlue = Fade((Color){100, 100, 255}, 0.5f);
+    GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(niceButtonBlue));
+    GuiSetStyle(BUTTON, BORDER_COLOR_NORMAL, ColorToInt(niceButtonBlue));
+    GuiSetStyle(BUTTON, TEXT_COLOR_NORMAL, ColorToInt(Fade(WHITE, 0.8f)));
+
 
     // switch to normal mode button
     if (GuiButton(Rectangle(0, GetScreenHeight() - 60, 100, 50), "Observe")) {
+        _drawVar_action = NONE;
+        _drawVar_hasRightClicked = false;
         _userMode = OBSERVE;
     }
     // switch to draw mode button
@@ -107,9 +118,19 @@ void World::handleButtons() {
     if (GuiButton(Rectangle(450, GetScreenHeight() - 60, 50, 50), "#64#")) {
         _showRays = !_showRays;
     }
+    if (GuiButton(Rectangle(GetScreenWidth() - (_showInfo? 450 : 50), 0, 50, 50), _showInfo? "#115#" : "#114#")) { // 113 121 122
+        _showInfo = !_showInfo;
+    }
 
     // the edit menu
     if (_drawVar_hasRightClicked) {
+        // button
+        const Color niceButtonGreen = Fade((Color){0, 0, 0}, 0.75f);
+        GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(niceButtonGreen));
+        GuiSetStyle(BUTTON, BORDER_COLOR_NORMAL, ColorToInt(niceButtonGreen));
+        GuiSetStyle(BUTTON, TEXT_COLOR_NORMAL, ColorToInt(Fade(WHITE, 0.8f)));
+
+
         Rectangle menuRect{
             _drawVar_menuPos.x,
             _drawVar_menuPos.y,
@@ -253,7 +274,7 @@ void World::drawUserInfo() {
         0
     );
     drawLineOfText(
-        "----- Gen info -----",
+        "----- Generation -----",
         1
     );
     drawLineOfText(
@@ -294,16 +315,34 @@ void World::drawUserInfo() {
             nextIdx + i
         );
     }
+    nextIdx += _populations.size();
+
+    drawLineOfText(
+        "----- General -----",
+        nextIdx
+    );
+    drawLineOfText(
+        "Green dots: initial positions",
+        nextIdx + 1
+    );
+    drawLineOfText(
+        "Red dots: target positions",
+        nextIdx + 2
+    );
+    drawLineOfText(
+        "Edit mode + right click = menu",
+        nextIdx + 3
+    );
 }
 
 
-void World::drawLineOfText(const char *line, int idx) const {
+void World::drawLineOfText(const char *line, int idx) {
     GuiDrawText(
         line,
         Rectangle(
-            GetScreenWidth() - 300,
+            GetScreenWidth() - 400,
             10 + idx * GuiGetStyle(DEFAULT, TEXT_SIZE),
-            300,
+            400,
             10
         ),
         TEXT_ALIGN_LEFT | TEXT_ALIGN_TOP,
