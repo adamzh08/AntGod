@@ -9,6 +9,7 @@
 
 #define RAYGUI_IMPLEMENTATION
 #include <cfloat>
+#include <memory>
 
 #include "../raygui.h"
 
@@ -63,7 +64,7 @@ void World::drawGame() {
     switch (_drawVar_action) {
         case NONE: break; // nothing is edited currently
         case DRAW_WALL: {
-            DrawLineV(_drawVar_borderStartPos.value(), GetMousePosition(), BLUE);
+            DrawLineV(_drawVar_menuPos, GetMousePosition(), BLUE);
             break;
         }
         case DELETE_WALL: {
@@ -100,37 +101,28 @@ void World::handleButtons() {
         _showRays = !_showRays;
     }
 
+    // the edit menu
     if (_drawVar_hasRightClicked) {
         Rectangle menuRect{
             _drawVar_menuPos.x,
             _drawVar_menuPos.y,
             200,
-            100
+            200
         };
-        Rectangle drawWallButton{
-            _drawVar_menuPos.x,
-            _drawVar_menuPos.y,
-            200,
-            30
-        };
-        Rectangle deleteWallButton{
-            _drawVar_menuPos.x,
-            _drawVar_menuPos.y + 50,
-            200,
-            30
-        };
+        for (float i = 0; i < _drawVar_menuOptionsCount; i++) {
+            if (GuiButton({
+                              _drawVar_menuPos.x,
+                              _drawVar_menuPos.y + 200 * i / _drawVar_menuOptionsCount,
+                              200,
+                              30
+                          }, strFromDrawMode(i))) {
+                _drawVar_hasRightClicked = false;
+                _drawVar_action = i;
+            }
+        }
+
         DrawRectangleRec(menuRect, Fade(DARKGRAY, 0.5f));
         DrawRectangleLinesEx(menuRect, 1, GRAY);
-
-        if (GuiButton(drawWallButton, "Draw Wall")) {
-            _drawVar_hasRightClicked = false;
-            _drawVar_action = DRAW_WALL;
-            _drawVar_borderStartPos = _drawVar_menuPos;
-        }
-        if (GuiButton(deleteWallButton, "Delete Wall")) {
-            _drawVar_hasRightClicked = false;
-            _drawVar_action = DELETE_WALL;
-        }
     }
 }
 
@@ -148,8 +140,7 @@ void World::handleMouseClicks() {
                 case NONE: break;
                 case DRAW_WALL: {
                     if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-                        _lines.addLine(_drawVar_borderStartPos.value(), GetMousePosition());
-                        _drawVar_borderStartPos.reset();
+                        _lines.addLine(_drawVar_menuPos, GetMousePosition());
                         _drawVar_action = NONE;
                     }
                     break;
@@ -236,5 +227,15 @@ char *World::strFromUserMode() const {
         case OBSERVE: return "observe";
         case EDIT_MAP: return "edit";
         default: return "?";
+    }
+}
+
+char *World::strFromDrawMode(int action) const {
+    switch (action) {
+        case NONE: return "None";
+        case DRAW_WALL: return "Draw Wall";
+        case DELETE_WALL: return "Delete Wall";
+        case MOVE_COLONY_INIT: return "Move Colony Init";
+        case MOVE_COLONY_TARGET: return "Move Colony Target";
     }
 }

@@ -17,7 +17,9 @@ enum UserMode {
 enum DrawAction {
     NONE,
     DRAW_WALL,
-    DELETE_WALL
+    DELETE_WALL,
+    MOVE_COLONY_INIT,
+    MOVE_COLONY_TARGET
 };
 
 class World {
@@ -26,10 +28,10 @@ private:
 
     // drawing
     UserMode _userMode = OBSERVE;
-    std::optional<Vector2> _drawVar_borderStartPos;
     bool _drawVar_hasRightClicked = false;
     Vector2 _drawVar_menuPos{};
-    DrawAction _drawVar_action = NONE;
+    int _drawVar_action = NONE;
+    int _drawVar_menuOptionsCount = 5;
 
 
     void drawGame();
@@ -43,9 +45,10 @@ private:
     void drawLineOfText(const char *str, int idx) const;
 
     [[nodiscard]] char *strFromUserMode() const;
+    [[nodiscard]] char *strFromDrawMode(int action) const;
 
 public:
-    Lines _lines{};
+    Lines _lines;
     std::vector<Population> _populations;
 
     int _generation_frameDuration{};
