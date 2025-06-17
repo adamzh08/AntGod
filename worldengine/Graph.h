@@ -5,15 +5,16 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 #include <cfloat>
-#include <set>
-#include <vector>
+#include <deque>
 
 #include "raylib.h"
 
 
 class Graph {
 private:
-    std::vector<Vector2> _data{};
+    std::deque<Vector2> _data{};
+    int _maxAmountOfPoints = 10000;
+
     Rectangle _rect{};
 
     Color _graphColor{};
@@ -30,7 +31,7 @@ public:
 
     void reset();
 
-    void draw();
+    void draw() const;
 
     void addPoint(int, int);
     void addPointV(Vector2);

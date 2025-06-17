@@ -63,12 +63,20 @@ void World::act() {
 }
 
 void World::draw() {
+    _frameCounter_graphUpdate++;
+
     drawGame();
     handleUserInput();
-    updateGraphs();
+
     if (_showInfo) {
         drawUserInfo();
         displayGraphs();
+    }
+
+    // graphs
+    if (_frameCounter_graphUpdate == _framesPerGraphUpdate) {
+        _frameCounter_graphUpdate = 0;
+        updateGraphs();
     }
 }
 

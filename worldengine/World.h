@@ -33,8 +33,10 @@ private:
         "How many entities alive?",
         "Reward of best entity?",
     };
+    int _framesPerGraphUpdate = 3;
+    int _frameCounter_graphUpdate{};
 
-    int _shownGraphTypeIdx = 0;
+    int _shownGraphTypeIdx{};
 
     bool _showInfo = true;
     bool _paused = false;

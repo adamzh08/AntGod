@@ -75,7 +75,7 @@ int main() {
     world = new World();
 
     // Populations
-    Population beesPopulation = PopulationBuilder(*world)
+    Population yellowPopulation = PopulationBuilder(*world)
             .setCount(1000)
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
@@ -85,17 +85,17 @@ int main() {
             .setRays(30, 100)
             .setEntityTexture(TextureCollection::whiteAnt, DARKYELLOW)
             .build();
-    Population antsPopulation = PopulationBuilder(*world)
+    Population redPopulation = PopulationBuilder(*world)
             .setCount(1000)
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutationProbability(0.3)
-            .setPositions(Vector2{550, 400}, Vector2{50, 400})
+            .setPositions(Vector2{450, 700}, Vector2{50, 400})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 200)
             .setEntityTexture(TextureCollection::whiteAnt, RED)
             .build();
-    Population antsPopulation2 = PopulationBuilder(*world)
+    Population purplePopulation = PopulationBuilder(*world)
             .setCount(1000)
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
@@ -105,13 +105,24 @@ int main() {
             .setRays(30, 200)
             .setEntityTexture(TextureCollection::whiteAnt, DARKPURPLE)
             .build();
+    Population greenPopulation = PopulationBuilder(*world)
+            .setCount(1000)
+            .setElitePercentage(0.3)
+            .setNetwork(layers, "")
+            .setMutationProbability(0.3)
+            .setPositions(Vector2{900, 200}, Vector2{50, 600})
+            .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
+            .setRays(30, 200)
+            .setEntityTexture(TextureCollection::whiteAnt, DARKGREEN)
+            .build();
 
     world->setLines(lines)
-            .setGenerationDuration(10 * 60)
+            .setGenerationDuration(20 * 60)
             .setPopulations({
-                beesPopulation,
-                antsPopulation,
-                antsPopulation2,
+                yellowPopulation,
+                redPopulation,
+                purplePopulation,
+                greenPopulation
             });
 
     std::jthread t(gameLoop);

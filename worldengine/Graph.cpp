@@ -6,19 +6,29 @@
 
 #include <cfloat>
 #include <iostream>
-#include <ostream>
 
 
-Graph::Graph(const Rectangle rect, const Color graphColor, const Color axisColor) : _rect(rect), _graphColor(graphColor),
-                                                                  _axisColor(axisColor) {
+Graph::Graph(const Rectangle rect, const Color graphColor, const Color axisColor) : _rect(rect),
+    _graphColor(graphColor),
+    _axisColor(axisColor) {
 }
 
 void Graph::addPointV(const Vector2 newPoint) {
     _data.push_back(newPoint);
-    _smallestX = std::min(_smallestX, newPoint.x);
-    _biggestX = std::max(_biggestX, newPoint.x);
-    _smallestY = std::min(_smallestY, newPoint.y);
-    _biggestY = std::max(_biggestY, newPoint.y);
+
+    if (_data.size() > _maxAmountOfPoints) {
+        _data.pop_front();
+    }
+
+    _smallestX = _biggestX = _data.front().x;
+    _smallestY = _biggestY = _data.front().y;
+
+    for (const auto &point: _data) {
+        _smallestX = std::min(_smallestX, point.x);
+        _biggestX = std::max(_biggestX, point.x);
+        _smallestY = std::min(_smallestY, point.y);
+        _biggestY = std::max(_biggestY, point.y);
+    }
 }
 
 void Graph::addPoint(int x, int y) {
@@ -33,7 +43,7 @@ void Graph::reset() {
     _biggestY = -FLT_MAX;
 }
 
-void Graph::draw() {
+void Graph::draw() const {
     // graph
     for (int i = 1; i < _data.size(); i++) {
         double x1 = _rect.x + _rect.width * (_data[i - 1].x - _smallestX) / (_biggestX - _smallestX);
