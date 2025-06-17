@@ -27,8 +27,6 @@ public:
     int _ants_amount;
     float _elite_percentage;
 
-    std::vector<int> _sizeHistory;
-
     // Ant settings
     Texture2D _entityTexture;
     Vector2 _origin_point;

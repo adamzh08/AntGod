@@ -26,13 +26,18 @@ World &World::setPopulations(std::vector<Population> &&populations) {
 
     // graphs
     for (int i = 0; i < _populations.size(); i++) {
-        _graphs.emplace_back(Rectangle(
+        Rectangle graphPos = Rectangle(
             GetScreenWidth() - 400,
             GetScreenHeight() / 2 * (1 + static_cast<float>(i) / _populations.size()),
             400,
             GetScreenHeight() / 2 / _populations.size() - 15
-        ));
+        );
+        _aliveGraphs.emplace_back(graphPos);
+        _bestRewardGraphs.emplace_back(graphPos);
     }
+
+    _allGraphs.push_back(&_aliveGraphs);
+    _allGraphs.push_back(&_bestRewardGraphs);
 
     return *this;
 }
@@ -91,6 +96,7 @@ void World::drawGame() {
             DrawCircleV(GetMousePosition(), 10, ORANGE);
             break;
         }
+        default: std::cerr << "invalid action" << std::endl;
     }
 }
 
@@ -140,6 +146,16 @@ void World::handleButtons() {
     GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, ColorToInt(buttonBlue));
     if (GuiButton(Rectangle(GetScreenWidth() - (_showInfo ? 450 : 50), 0, 50, 50), _showInfo ? "#115#" : "#114#")) {
         _showInfo = !_showInfo;
+    }
+    if (_showInfo) {
+        if (GuiButton(Rectangle(GetScreenWidth() - 300, GetScreenHeight() / 2 - 60, 50, 50), "#114#")) {
+            _shownGraphTypeIdx++;
+            _shownGraphTypeIdx %= _allGraphs.size();
+        }
+        if (GuiButton(Rectangle(GetScreenWidth() - 200, GetScreenHeight() / 2 - 60, 50, 50), "#115#")) {
+            _shownGraphTypeIdx--;
+            _shownGraphTypeIdx %= _allGraphs.size();
+        }
     }
 
     // the edit menu
@@ -218,6 +234,7 @@ void World::handleMapEditing() {
             }
             break;
         }
+        default: std::cerr << "invailid action" << std::endl;
     }
 }
 
@@ -263,28 +280,22 @@ bool World::menuOptionAvailable(const int option) const {
         case DRAW_WALL: return true; // always available
         case DELETE_WALL: return false; // Todo
         case MOVE_COLONY_INIT: {
-            for (const Population &_population: _populations) {
-                const bool clicked_x = _population._init_position.x - 10 < _drawVar_menuPos.x &&
-                                       _drawVar_menuPos.x < _population._init_position.x + 10;
-                const bool clicked_y = _population._init_position.y - 10 < _drawVar_menuPos.y &&
-                                       _drawVar_menuPos.y < _population._init_position.y + 10;
-                if (clicked_x && clicked_y) {
-                    return true;
-                }
-            }
-            return false;
+            return std::ranges::any_of(_populations, [this](const Population &pop) {
+                const bool clicked_x = pop._init_position.x - 10 < _drawVar_menuPos.x &&
+                                       _drawVar_menuPos.x < pop._init_position.x + 10;
+                const bool clicked_y = pop._init_position.y - 10 < _drawVar_menuPos.y &&
+                                       _drawVar_menuPos.y < pop._init_position.y + 10;
+                return clicked_x && clicked_y;
+            });
         }
         case MOVE_COLONY_TARGET: {
-            for (const Population &_population: _populations) {
-                const bool clicked_x = _population._target_position.x - 10 < _drawVar_menuPos.x &&
-                                       _drawVar_menuPos.x < _population._target_position.x + 10;
-                const bool clicked_y = _population._target_position.y - 10 < _drawVar_menuPos.y &&
-                                       _drawVar_menuPos.y < _population._target_position.y + 10;
-                if (clicked_x && clicked_y) {
-                    return true;
-                }
-            }
-            return false;
+            return std::ranges::any_of(_populations, [this](const Population &pop) {
+                const bool clicked_x = pop._target_position.x - 10 < _drawVar_menuPos.x &&
+                                       _drawVar_menuPos.x < pop._target_position.x + 10;
+                const bool clicked_y = pop._target_position.y - 10 < _drawVar_menuPos.y &&
+                                       _drawVar_menuPos.y < pop._target_position.y + 10;
+                return clicked_x && clicked_y;
+            });
         }
         default: return false;
     }
@@ -310,30 +321,7 @@ void World::drawUserInfo() {
         ("gen count: " + std::to_string(_generation_count)).c_str(),
         3
     );
-    for (int i = 0; i < _populations.size(); i++) {
-        /*
-        if (!_paused) {
-            _populations[i].getAntsHistory();
-        }
-        for (int j = 0; j < GetScreenWidth(); j++) {
-            DrawPixel(
-                j, _populations[i]._ants_amount * 0.2 - (
-                       _populations[i]._sizeHistory[_populations[i]._sizeHistory.size() * j / GetScreenWidth()] * 0.2),
-                BLACK);
 
-        drawLineOfText(
-            ("Alive #" + std::to_string(i) + ": " + std::to_string(_populations[i].getAliveCount())).c_str(),
-            4 + i
-        );
-        }*/
-        _graphs[i].addPoint(
-            _generation_frameDuration * _generation_count + _frameCount,
-            _populations[i].getAliveCount()
-        );
-        _graphs[i].draw();
-    }
-
-    int nextIdx = 4; // + _populations.size();
     for (int i = 0; i < _populations.size(); i++) {
         drawLineOfText(
             std::string("Best #" + std::to_string(i) + ": " +
@@ -345,10 +333,10 @@ void World::drawUserInfo() {
                             )
                         )
             ).c_str(),
-            nextIdx + i
+            4 + i
         );
     }
-    nextIdx += _populations.size();
+    const int nextIdx = 4 + _populations.size();
 
     drawLineOfText(
         "----- General -----",
@@ -366,6 +354,19 @@ void World::drawUserInfo() {
         "Edit mode + right click = menu",
         nextIdx + 3
     );
+
+    // graphs
+    for (int i = 0; i < _populations.size(); i++) {
+        _aliveGraphs[i].addPoint(
+            _generation_frameDuration * _generation_count + _frameCount,
+            _populations[i].getAliveCount()
+        );
+        _bestRewardGraphs[i].addPoint(
+            _generation_frameDuration * _generation_count + _frameCount,
+            _populations[i]._best != nullptr ? _populations[i]._best->calculateReward() : 0
+        );
+        _allGraphs[_shownGraphTypeIdx]->at(i).draw();
+    }
 }
 
 

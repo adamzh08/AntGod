@@ -188,10 +188,3 @@ int Population::getAliveCount() const {
     }
     return counter;
 }
-
-std::vector<int> Population::getAntsHistory() {
-    _sizeHistory.push_back(getAliveCount());
-
-    //std::vector<int> temp(_sizeHistory.begin(), _sizeHistory.begin() + _world._frameCount);
-    return _sizeHistory;
-}

@@ -25,8 +25,11 @@ enum DrawAction {
 
 class World {
 private:
+    std::vector<std::vector<Graph>*> _allGraphs;
+    std::vector<Graph> _aliveGraphs{};
+    std::vector<Graph> _bestRewardGraphs{};
 
-    std::vector<Graph> _graphs{};
+    int _shownGraphTypeIdx = 0;
 
     bool _showInfo = true;
     bool _paused = false;
