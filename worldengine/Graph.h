@@ -14,8 +14,10 @@
 class Graph {
 private:
     std::vector<Vector2> _data{};
-    Rectangle _rect;
+    Rectangle _rect{};
 
+    Color _graphColor{};
+    Color _axisColor{};
 
     float _smallestX = FLT_MAX;
     float _biggestX = -FLT_MAX;
@@ -24,7 +26,7 @@ private:
 
 public:
 
-    explicit Graph(Rectangle);
+    explicit Graph(Rectangle, Color, Color);
 
     void reset();
 

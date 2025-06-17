@@ -18,6 +18,7 @@ public:
 
     // Ant settings
     std::optional<Texture2D> _entityTexture;
+    std::optional<Color> _entityColor;
     std::optional<Vector2> _origin_point;
 
     // Neural network
@@ -42,7 +43,7 @@ public:
 
     PopulationBuilder(World& world);
 
-    PopulationBuilder& setEntityTexture(const Texture2D &texture);
+    PopulationBuilder& setEntityTexture(const Texture2D &texture, const Color color);
     PopulationBuilder& setCount(int ants_amount);
     PopulationBuilder& setNetwork(std::vector<Layer> &layers, const std::string &filename);
     PopulationBuilder& setPositions(Vector2 init_position, Vector2 target_position);

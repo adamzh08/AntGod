@@ -17,6 +17,7 @@ Population PopulationBuilder::build() {
     REQUIRE_NOT_EMPTY(_entityCount, "count");
     REQUIRE_NOT_EMPTY(_elite_percentage, "elite percentage");
     REQUIRE_NOT_EMPTY(_entityTexture, "texture");
+    REQUIRE_NOT_EMPTY(_entityColor, "color");
     REQUIRE_NOT_EMPTY(_layers, "layers");
     REQUIRE_NOT_EMPTY(_filename, "file name");
     REQUIRE_NOT_EMPTY(_mutation_probability, "mutation probability");
@@ -27,21 +28,22 @@ Population PopulationBuilder::build() {
     REQUIRE_NOT_EMPTY(_max_angle, "max angle");
     REQUIRE_NOT_EMPTY(_rays_amount, "ray amount");
     REQUIRE_NOT_EMPTY(_rays_radius, "ray radius");
-    return Population(
+    return {
         _world,
         _entityCount.value(),
         _elite_percentage.value(),
-        _entityTexture.value(),
+        _entityTexture.value(), _entityColor.value(),
         _layers.value(), _filename.value(), _mutation_probability.value(),
         _init_position.value(), _target_position.value(),
         _move_method.value(), _max_speed.value(), _max_angle.value(),
         _rays_amount.value(), _rays_radius.value()
-    );
+    };
 }
 
 
-PopulationBuilder &PopulationBuilder::setEntityTexture(const Texture2D &texture) {
+PopulationBuilder &PopulationBuilder::setEntityTexture(const Texture2D &texture, const Color color) {
     _entityTexture = texture;
+    _entityColor = color;
     return *this;
 }
 

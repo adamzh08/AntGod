@@ -13,8 +13,6 @@
 
 #include "../raygui.h"
 
-World::World() {
-}
 
 World &World::setLines(const Lines &lines) {
     _lines = lines;
@@ -32,8 +30,8 @@ World &World::setPopulations(std::vector<Population> &&populations) {
             400,
             GetScreenHeight() / 2 / _populations.size() - 15
         );
-        _aliveGraphs.emplace_back(graphPos);
-        _bestRewardGraphs.emplace_back(graphPos);
+        _aliveGraphs.emplace_back(graphPos, _populations[i]._entityColor, _populations[i]._entityColor);
+        _bestRewardGraphs.emplace_back(graphPos, _populations[i]._entityColor, _populations[i]._entityColor);
     }
 
     _allGraphs.push_back(&_aliveGraphs);
@@ -325,37 +323,21 @@ void World::drawUserInfo() const {
         3
     );
 
-    for (int i = 0; i < _populations.size(); i++) {
-        drawLineOfText(
-            std::string("Best #" + std::to_string(i) + ": " +
-                        std::to_string(
-                            static_cast<int>(
-                                _populations[i]._best != nullptr
-                                    ? _populations[i]._best->calculateReward()
-                                    : 0
-                            )
-                        )
-            ).c_str(),
-            4 + i
-        );
-    }
-    const int nextIdx = 4 + _populations.size();
-
     drawLineOfText(
         "----- General -----",
-        nextIdx
+        4
     );
     drawLineOfText(
         "Green dots: initial positions",
-        nextIdx + 1
+        5
     );
     drawLineOfText(
         "Red dots: target positions",
-        nextIdx + 2
+        6
     );
     drawLineOfText(
         "Edit mode + right click = menu",
-        nextIdx + 3
+        7
     );
 
     GuiDrawText(

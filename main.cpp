@@ -19,6 +19,8 @@
 #define SCREEN_WIDTH 1500
 #define SCREEN_HEIGHT 1000
 
+#define DARKYELLOW Color(174, 184, 0, 255)
+
 void draw();
 
 void setGuiStyles();
@@ -81,7 +83,7 @@ int main() {
             .setPositions(Vector2{400, 300}, Vector2{50, 300})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 100)
-            .setEntityTexture(TextureCollection::bee)
+            .setEntityTexture(TextureCollection::whiteAnt, DARKYELLOW)
             .build();
     Population antsPopulation = PopulationBuilder(*world)
             .setCount(1000)
@@ -91,7 +93,7 @@ int main() {
             .setPositions(Vector2{550, 400}, Vector2{50, 400})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 200)
-            .setEntityTexture(TextureCollection::ant)
+            .setEntityTexture(TextureCollection::whiteAnt, RED)
             .build();
     Population antsPopulation2 = PopulationBuilder(*world)
             .setCount(1000)
@@ -101,7 +103,7 @@ int main() {
             .setPositions(Vector2{700, 500}, Vector2{50, 500})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 200)
-            .setEntityTexture(TextureCollection::ant)
+            .setEntityTexture(TextureCollection::whiteAnt, DARKPURPLE)
             .build();
 
     world->setLines(lines)

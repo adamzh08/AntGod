@@ -30,7 +30,7 @@ private:
     std::vector<Graph> _aliveGraphs{};
     std::vector<Graph> _bestRewardGraphs{};
     std::vector<const char*> _graphDescriptions{
-        "How many alive?",
+        "How many entities alive?",
         "Reward of best entity?",
     };
 
@@ -79,7 +79,7 @@ public:
 
     bool _showRays = false;
 
-    World();
+    World() = default;
 
     World &setLines(const Lines &lines);
 

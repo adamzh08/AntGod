@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "Population.h"
+#include "TextureCollection.h"
 #include "World.h"
 
 Ant::Ant(Population &population, const std::vector<Layer> &layers): _population(population), _network(layers),
@@ -59,9 +60,7 @@ void Ant::act() {
 float Ant::calculateReward() const {
     const float dx = _population._target_position.x - _position.x;
     const float dy = _population._target_position.y - _position.y;
-    // always positive
-    return GetScreenWidth() * GetScreenWidth() + GetScreenHeight() * GetScreenHeight()
-           - (dx * dx + dy * dy);
+    return - (dx * dx + dy * dy);
 }
 
 void Ant::draw() const {
@@ -73,6 +72,6 @@ void Ant::draw() const {
         Vector2(_population._entityTexture.width / 2.0f, _population._entityTexture.height / 2.0f),
         // Origin point for rotation
         _rotation * RAD2DEG, // Rotation angle in degrees
-        WHITE // Tint color
+        _population._entityColor // Tint color
     );
 }
