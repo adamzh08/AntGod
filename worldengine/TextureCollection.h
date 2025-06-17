@@ -12,6 +12,8 @@ namespace TextureCollection {
     inline Texture2D ant;
     inline Texture2D bee;
     inline Texture2D whiteAnt;
+    inline Texture2D finishFlag;
+    inline Texture2D whiteX;
 
     // ---- loaders ----
     void LoadAll();

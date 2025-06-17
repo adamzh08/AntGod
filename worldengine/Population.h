@@ -69,11 +69,12 @@ public:
 
     [[nodiscard]] int getAliveCount() const;
 
-    std::vector<int> getAntsHistory();
-
     static int tournamentSelectFromPool(const std::vector<Ant*> &pool, int k);
 
     void draw();
+
+    void drawXAt(Vector2) const;
+    void drawFlagAt(Vector2);
 };
 
 #endif //POPULATION_H

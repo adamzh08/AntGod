@@ -91,9 +91,12 @@ void World::drawGame() {
             // Todo implement
             break;
         }
-        case MOVE_COLONY_INIT:
+        case MOVE_COLONY_INIT: {
+            _populations[_drawVar_popIdxClicked].drawXAt(GetMousePosition());
+            break;
+        }
         case MOVE_COLONY_TARGET: {
-            DrawCircleV(GetMousePosition(), 10, ORANGE);
+            _populations[_drawVar_popIdxClicked].drawFlagAt(GetMousePosition());
             break;
         }
         default: std::cerr << "invalid action" << std::endl;
@@ -248,10 +251,10 @@ void World::afterEditOptionSelected() {
         }
         case MOVE_COLONY_INIT: {
             for (int i = 0; i < _populations.size(); i++) {
-                const bool clicked_x = _populations[i]._init_position.x - 10 < _drawVar_menuPos.x &&
-                                       _drawVar_menuPos.x < _populations[i]._init_position.x + 10;
-                const bool clicked_y = _populations[i]._init_position.y - 10 < _drawVar_menuPos.y &&
-                                       _drawVar_menuPos.y < _populations[i]._init_position.y + 10;
+                const bool clicked_x = _populations[i]._init_position.x - _pickRadius < _drawVar_menuPos.x &&
+                                       _drawVar_menuPos.x < _populations[i]._init_position.x + _pickRadius;
+                const bool clicked_y = _populations[i]._init_position.y - _pickRadius < _drawVar_menuPos.y &&
+                                       _drawVar_menuPos.y < _populations[i]._init_position.y + _pickRadius;
                 if (clicked_x && clicked_y) {
                     _drawVar_popIdxClicked = i;
                     return;
@@ -260,10 +263,10 @@ void World::afterEditOptionSelected() {
         }
         case MOVE_COLONY_TARGET: {
             for (int i = 0; i < _populations.size(); i++) {
-                const bool clicked_x = _populations[i]._target_position.x - 10 < _drawVar_menuPos.x &&
-                                       _drawVar_menuPos.x < _populations[i]._target_position.x + 10;
-                const bool clicked_y = _populations[i]._target_position.y - 10 < _drawVar_menuPos.y &&
-                                       _drawVar_menuPos.y < _populations[i]._target_position.y + 10;
+                const bool clicked_x = _populations[i]._target_position.x - _pickRadius < _drawVar_menuPos.x &&
+                                       _drawVar_menuPos.x < _populations[i]._target_position.x + _pickRadius;
+                const bool clicked_y = _populations[i]._target_position.y - _pickRadius < _drawVar_menuPos.y &&
+                                       _drawVar_menuPos.y < _populations[i]._target_position.y + _pickRadius;
                 if (clicked_x && clicked_y) {
                     _drawVar_popIdxClicked = i;
                     return;
@@ -282,19 +285,19 @@ bool World::menuOptionAvailable(const int option) const {
         case DELETE_WALL: return false; // Todo
         case MOVE_COLONY_INIT: {
             return std::ranges::any_of(_populations, [this](const Population &pop) {
-                const bool clicked_x = pop._init_position.x - 10 < _drawVar_menuPos.x &&
-                                       _drawVar_menuPos.x < pop._init_position.x + 10;
-                const bool clicked_y = pop._init_position.y - 10 < _drawVar_menuPos.y &&
-                                       _drawVar_menuPos.y < pop._init_position.y + 10;
+                const bool clicked_x = pop._init_position.x - _pickRadius < _drawVar_menuPos.x &&
+                                       _drawVar_menuPos.x < pop._init_position.x + _pickRadius;
+                const bool clicked_y = pop._init_position.y - _pickRadius < _drawVar_menuPos.y &&
+                                       _drawVar_menuPos.y < pop._init_position.y + _pickRadius;
                 return clicked_x && clicked_y;
             });
         }
         case MOVE_COLONY_TARGET: {
             return std::ranges::any_of(_populations, [this](const Population &pop) {
-                const bool clicked_x = pop._target_position.x - 10 < _drawVar_menuPos.x &&
-                                       _drawVar_menuPos.x < pop._target_position.x + 10;
-                const bool clicked_y = pop._target_position.y - 10 < _drawVar_menuPos.y &&
-                                       _drawVar_menuPos.y < pop._target_position.y + 10;
+                const bool clicked_x = pop._target_position.x - _pickRadius < _drawVar_menuPos.x &&
+                                       _drawVar_menuPos.x < pop._target_position.x + _pickRadius;
+                const bool clicked_y = pop._target_position.y - _pickRadius < _drawVar_menuPos.y &&
+                                       _drawVar_menuPos.y < pop._target_position.y + _pickRadius;
                 return clicked_x && clicked_y;
             });
         }
@@ -328,16 +331,8 @@ void World::drawUserInfo() const {
         4
     );
     drawLineOfText(
-        "Green dots: initial positions",
-        5
-    );
-    drawLineOfText(
-        "Red dots: target positions",
-        6
-    );
-    drawLineOfText(
         "Edit mode + right click = menu",
-        7
+        5
     );
 
     GuiDrawText(

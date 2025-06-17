@@ -11,6 +11,7 @@
 #include <ranges>
 #include <set>
 
+#include "TextureCollection.h"
 #include "World.h"
 
 Population::Population(
@@ -26,7 +27,8 @@ Population::Population(
                                        _elite_percentage(elite_percentage),
                                        _entityTexture(texture), _entityColor(color),
                                        _layers(layers), _filename(filename),
-                                       _init_position(init_position), _target_position(target_position), _mutation_probability(mutation_probability),
+                                       _init_position(init_position), _target_position(target_position),
+                                       _mutation_probability(mutation_probability),
                                        _move_method(move_method), _max_speed(max_speed), _max_angle(max_angle),
                                        _rays_amount(rays_amount), _rays_radius(rays_radius) {
     // ants
@@ -139,7 +141,7 @@ int Population::tournamentSelectFromPool(const std::vector<Ant *> &pool, const i
 }
 
 void Population::draw() {
-    for (const Ant& ant: _ants) {
+    for (const Ant &ant: _ants) {
         if (ant._alive) {
             ant.draw();
         }
@@ -158,9 +160,57 @@ void Population::draw() {
         std::cerr << "[Warning] No more ants alive in population " << this << std::endl;
     }
 
-    // both positions
-    DrawCircleV(_init_position, 10, GREEN);
-    DrawCircleV(_target_position, 10, RED);
+    // init position
+    drawXAt(_init_position);
+
+    // target position
+    drawFlagAt(_target_position);
+}
+
+void Population::drawXAt(const Vector2 pos) const {
+    const Rectangle dest(
+        pos.x,
+        pos.y,
+        TextureCollection::whiteX.width * 0.5,
+        TextureCollection::whiteX.height * 0.5
+    );
+    DrawTexturePro(
+        TextureCollection::whiteX,
+        Rectangle(
+            0,
+            0,
+            TextureCollection::whiteX.width,
+            TextureCollection::whiteX.height
+        ),
+        dest,
+        Vector2(dest.width / 2, dest.height / 2),
+        0,
+        _entityColor
+    );
+}
+
+void Population::drawFlagAt(Vector2 pos) {
+    const Rectangle dest(
+        pos.x,
+        pos.y,
+        TextureCollection::finishFlag.width * 0.15,
+        TextureCollection::finishFlag.height * 0.15
+    );
+    DrawTexturePro(
+        TextureCollection::finishFlag,
+        Rectangle(
+            0,
+            0,
+            TextureCollection::finishFlag.width,
+            TextureCollection::finishFlag.height
+        ),
+        dest,
+        Vector2(
+            0, dest.height
+        ),
+        0,
+        _entityColor
+    );
 }
 
 
