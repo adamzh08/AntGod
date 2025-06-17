@@ -25,9 +25,14 @@ enum DrawAction {
 
 class World {
 private:
+    // graphs
     std::vector<std::vector<Graph>*> _allGraphs;
     std::vector<Graph> _aliveGraphs{};
     std::vector<Graph> _bestRewardGraphs{};
+    std::vector<const char*> _graphDescriptions{
+        "How many alive?",
+        "Reward of best entity?",
+    };
 
     int _shownGraphTypeIdx = 0;
 
@@ -46,7 +51,10 @@ private:
 
     void drawGame();
 
-    void drawUserInfo();
+    void drawUserInfo() const;
+
+    void updateGraphs();
+    void displayGraphs() const;
 
     void handleUserInput();
     void handleMapEditing();

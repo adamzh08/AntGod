@@ -67,8 +67,10 @@ void World::act() {
 void World::draw() {
     drawGame();
     handleUserInput();
+    updateGraphs();
     if (_showInfo) {
         drawUserInfo();
+        displayGraphs();
     }
 }
 
@@ -148,11 +150,11 @@ void World::handleButtons() {
         _showInfo = !_showInfo;
     }
     if (_showInfo) {
-        if (GuiButton(Rectangle(GetScreenWidth() - 300, GetScreenHeight() / 2 - 60, 50, 50), "#114#")) {
+        if (GuiButton(Rectangle(GetScreenWidth() - 400, GetScreenHeight() / 2 - 60, 50, 50), "#114#")) {
             _shownGraphTypeIdx++;
             _shownGraphTypeIdx %= _allGraphs.size();
         }
-        if (GuiButton(Rectangle(GetScreenWidth() - 200, GetScreenHeight() / 2 - 60, 50, 50), "#115#")) {
+        if (GuiButton(Rectangle(GetScreenWidth() - 50, GetScreenHeight() / 2 - 60, 50, 50), "#115#")) {
             _shownGraphTypeIdx--;
             _shownGraphTypeIdx %= _allGraphs.size();
         }
@@ -270,6 +272,7 @@ void World::afterEditOptionSelected() {
                 }
             }
         }
+        default: std::cerr << "invailid action" << std::endl;
     }
 }
 
@@ -302,7 +305,7 @@ bool World::menuOptionAvailable(const int option) const {
 }
 
 
-void World::drawUserInfo() {
+void World::drawUserInfo() const {
     GuiSetStyle(DEFAULT, TEXT_SIZE, 27);
 
     drawLineOfText(
@@ -355,7 +358,15 @@ void World::drawUserInfo() {
         nextIdx + 3
     );
 
-    // graphs
+    GuiDrawText(
+        _graphDescriptions[_shownGraphTypeIdx],
+        Rectangle(GetScreenWidth() - 350, GetScreenHeight() / 2 - 50, 300, 50),
+        TEXT_ALIGN_CENTER,
+        BLACK
+    );
+}
+
+void World::updateGraphs() {
     for (int i = 0; i < _populations.size(); i++) {
         _aliveGraphs[i].addPoint(
             _generation_frameDuration * _generation_count + _frameCount,
@@ -365,10 +376,13 @@ void World::drawUserInfo() {
             _generation_frameDuration * _generation_count + _frameCount,
             _populations[i]._best != nullptr ? _populations[i]._best->calculateReward() : 0
         );
+    }
+}
+void World::displayGraphs() const {
+    for (int i = 0; i < _populations.size(); i++) {
         _allGraphs[_shownGraphTypeIdx]->at(i).draw();
     }
 }
-
 
 void World::drawLineOfText(const char *line, int idx) {
     GuiDrawText(
