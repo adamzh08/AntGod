@@ -23,13 +23,15 @@ Ant::Ant(const Ant &parent1, const Ant &parent2) : _population(parent1._populati
 
 
 void Ant::act() {
-    std::vector<float> input = _population._world._lines.getRays(_position, _population._rays_amount,
-                                                                 _population._rays_radius);
-
+    const std::vector<float> input = _population._world._lines.getRays(
+        _position,
+        _population._rays_amount,
+        _population._rays_radius
+    );
     const std::vector<float> output = _network.feed_forward(input);
 
-    Vector2 temp = _position;
-    float rot_temp = _rotation;
+    const Vector2 temp = _position;
+    const float rot_temp = _rotation;
 
     switch (_population._move_method) {
         case CARTESIAN_MOVE: {
@@ -60,7 +62,7 @@ void Ant::act() {
 float Ant::calculateReward() const {
     const float dx = _population._target_position.x - _position.x;
     const float dy = _population._target_position.y - _position.y;
-    return - (dx * dx + dy * dy);
+    return -(dx * dx + dy * dy);
 }
 
 void Ant::draw() const {

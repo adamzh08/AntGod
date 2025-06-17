@@ -9,7 +9,6 @@
 #include <iostream>
 #include <random>
 #include <ranges>
-#include <set>
 
 #include "TextureCollection.h"
 #include "World.h"
@@ -76,6 +75,10 @@ void Population::flood() {
         if (ant._alive) {
             selectedAnts.push_back(&ant);
         }
+    }
+    if (selectedAnts.empty()) {
+        std::cerr << "Population " << this << " went extinct" << std::endl;
+        return;
     }
     std::ranges::sort(selectedAnts, [](const Ant *ant1, const Ant *ant2) {
         return ant1->calculateReward() > ant2->calculateReward();
@@ -189,7 +192,7 @@ void Population::drawXAt(const Vector2 pos) const {
     );
 }
 
-void Population::drawFlagAt(Vector2 pos) {
+void Population::drawFlagAt(const Vector2 pos) const {
     const Rectangle dest(
         pos.x,
         pos.y,
@@ -237,4 +240,23 @@ int Population::getAliveCount() const {
         }
     }
     return counter;
+}
+
+float Population::getAvgDist() const {
+    float sum = 0;
+    for (const Ant &ant: _ants) {
+        if (ant._alive) {
+            const float dx = ant._position.x - _target_position.x;
+            const float dy = ant._position.y - _target_position.y;
+            sum += std::sqrt(dx * dx + dy * dy);
+        }
+    }
+    return sum / getAliveCount();
+}
+
+float Population::getBestDist() const {
+    if (_best == nullptr) return FLT_MAX;
+    const float dx = _best->_position.x - _target_position.x;
+    const float dy = _best->_position.y - _target_position.y;
+    return std::sqrt(dx * dx + dy * dy);
 }

@@ -16,7 +16,7 @@ public:
     Network _network;
 
     Vector2 _position;
-    float _rotation = 0.0;
+    float _rotation{};
     bool _alive = true;
 
     Ant(Population &population, const std::vector<Layer> &layers);

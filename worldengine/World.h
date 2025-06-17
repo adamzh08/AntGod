@@ -15,6 +15,7 @@ enum UserMode {
     OBSERVE,
     EDIT_MAP
 };
+
 enum DrawAction {
     NONE,
     DRAW_WALL, // Done
@@ -26,12 +27,14 @@ enum DrawAction {
 class World {
 private:
     // graphs
-    std::vector<std::vector<Graph>*> _allGraphs;
+    std::vector<std::vector<Graph> *> _allGraphs;
     std::vector<Graph> _aliveGraphs{};
     std::vector<Graph> _bestRewardGraphs{};
-    std::vector<const char*> _graphDescriptions{
+    std::vector<Graph> _avgDistGraphs{};
+    std::vector<const char *> _graphDescriptions{
         "How many entities alive?",
-        "Reward of best entity?",
+        "Best dist to goal?",
+        "Average dist to goal?"
     };
     int _framesPerGraphUpdate = 3;
     int _frameCounter_graphUpdate{};
@@ -52,24 +55,29 @@ private:
     // colony movement
     int _drawVar_popIdxClicked = -1;
 
+
     void drawGame();
 
     void drawUserInfo() const;
 
     void updateGraphs();
+
     void displayGraphs() const;
 
     void handleUserInput();
+
     void handleMapEditing();
+
     void handleButtons();
 
     void afterEditOptionSelected();
 
     [[nodiscard]] bool menuOptionAvailable(int option) const;
 
-    static void drawLineOfText(const char *str, int idx) ;
+    static void drawLineOfText(const char *str, int idx);
 
     [[nodiscard]] const char *strFromUserMode() const;
+
     [[nodiscard]] const char *strFromDrawMode(int action) const;
 
 public:

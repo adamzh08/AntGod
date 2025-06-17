@@ -11,6 +11,7 @@
 
 #include <algorithm>
 
+#include "LineIntersection.h"
 #include "../raygui.h"
 
 
@@ -24,7 +25,7 @@ World &World::setPopulations(std::vector<Population> &&populations) {
 
     // graphs
     for (int i = 0; i < _populations.size(); i++) {
-        Rectangle graphPos = Rectangle(
+        Rectangle graphPos(
             GetScreenWidth() - 400,
             GetScreenHeight() / 2 * (1 + static_cast<float>(i) / _populations.size()),
             400,
@@ -32,10 +33,12 @@ World &World::setPopulations(std::vector<Population> &&populations) {
         );
         _aliveGraphs.emplace_back(graphPos, _populations[i]._entityColor, _populations[i]._entityColor);
         _bestRewardGraphs.emplace_back(graphPos, _populations[i]._entityColor, _populations[i]._entityColor);
+        _avgDistGraphs.emplace_back(graphPos, _populations[i]._entityColor, _populations[i]._entityColor);
     }
 
     _allGraphs.push_back(&_aliveGraphs);
     _allGraphs.push_back(&_bestRewardGraphs);
+    _allGraphs.push_back(&_avgDistGraphs);
 
     return *this;
 }
@@ -90,13 +93,11 @@ void World::drawGame() {
     }
 
     switch (_drawVar_action) {
-        case NONE: break; // nothing is edited currently
+        case NONE:
+        case DELETE_WALL: break;
+
         case DRAW_WALL: {
             DrawLineV(_drawVar_menuPos, GetMousePosition(), BLUE);
-            break;
-        }
-        case DELETE_WALL: {
-            // Todo implement
             break;
         }
         case MOVE_COLONY_INIT: {
@@ -160,11 +161,11 @@ void World::handleButtons() {
     }
     if (_showInfo) {
         if (GuiButton(Rectangle(GetScreenWidth() - 400, GetScreenHeight() / 2 - 60, 50, 50), "#114#")) {
-            _shownGraphTypeIdx++;
-            _shownGraphTypeIdx %= _allGraphs.size();
+            _shownGraphTypeIdx--;
+            _shownGraphTypeIdx = (_shownGraphTypeIdx + _allGraphs.size()) % _allGraphs.size();
         }
         if (GuiButton(Rectangle(GetScreenWidth() - 50, GetScreenHeight() / 2 - 60, 50, 50), "#115#")) {
-            _shownGraphTypeIdx--;
+            _shownGraphTypeIdx++;
             _shownGraphTypeIdx %= _allGraphs.size();
         }
     }
@@ -214,19 +215,18 @@ void World::handleMapEditing() {
         // trigger menu popup
         _drawVar_hasRightClicked = true;
         _drawVar_menuPos = GetMousePosition();
+        _drawVar_action = NONE;
     }
     switch (_drawVar_action) {
-        case NONE: break;
+        case NONE:
+        case DELETE_WALL: break;
+
         case DRAW_WALL: {
             if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
                 // adding a new line
                 _lines.addLine(_drawVar_menuPos, GetMousePosition());
                 _drawVar_action = NONE;
             }
-            break;
-        }
-        case DELETE_WALL: {
-            // Todo implement
             break;
         }
         case MOVE_COLONY_INIT: {
@@ -254,8 +254,29 @@ void World::afterEditOptionSelected() {
         case NONE:
         case DRAW_WALL: return;
         case DELETE_WALL: {
-            // Todo
-            return;
+            const std::vector<float> dists = _lines.getRays(_drawVar_menuPos, 8, _pickRadius);
+
+            int smallestIdx = 0;
+            float bestDist = dists[0];
+            for (int i = 1; i < dists.size(); i++) {
+                if (dists[i] > bestDist) {
+                    bestDist = dists[i];
+                    smallestIdx = i;
+                }
+            }
+            const float angle = 2 * PI * smallestIdx / 8;
+            const Vector2 pointOnLine(
+                _drawVar_menuPos.x + std::cos(angle) * _pickRadius,
+                _drawVar_menuPos.y + std::sin(angle) * _pickRadius
+            );
+
+            for (int i = 0; i < _lines._lines.size(); i++) {
+                Line l = _lines._lines[i];
+                if (doIntersect(l.startPoint, l.endPoint, _drawVar_menuPos, pointOnLine)) {
+                    _lines._lines.erase(_lines._lines.begin() + i);
+                    return;
+                }
+            }
         }
         case MOVE_COLONY_INIT: {
             for (int i = 0; i < _populations.size(); i++) {
@@ -290,7 +311,32 @@ bool World::menuOptionAvailable(const int option) const {
     switch (option) {
         case NONE:
         case DRAW_WALL: return true; // always available
-        case DELETE_WALL: return false; // Todo
+        case DELETE_WALL: {
+            std::vector<float> dists = _lines.getRays(_drawVar_menuPos, 8, _pickRadius);
+
+            int bestIdx = 0;
+            float bestDist = dists[0];
+            for (int i = 1; i < dists.size(); i++) {
+                if (dists[i] > bestDist) {
+                    bestDist = dists[i];
+                    bestIdx = i;
+                }
+            }
+            if (bestDist == 0) return false;
+            const float angle = 2 * PI * bestIdx / 8;
+            const Vector2 pointOnLine(_drawVar_menuPos.x + std::cos(angle) * _pickRadius,
+                                      _drawVar_menuPos.y + std::sin(angle) * _pickRadius);
+
+            for (int i = 0; i < _lines._lines.size(); i++) {
+                Line l = _lines._lines[i];
+                if (doIntersect(l.startPoint, l.endPoint, _drawVar_menuPos, pointOnLine)) {
+                    std::cout << "found" << std::endl;
+                    return true;
+                }
+            }
+            std::cout << "not found" << std::endl;
+            return false;
+        }
         case MOVE_COLONY_INIT: {
             return std::ranges::any_of(_populations, [this](const Population &pop) {
                 const bool clicked_x = pop._init_position.x - _pickRadius < _drawVar_menuPos.x &&
@@ -359,10 +405,15 @@ void World::updateGraphs() {
         );
         _bestRewardGraphs[i].addPoint(
             _generation_frameDuration * _generation_count + _frameCount,
-            _populations[i]._best != nullptr ? _populations[i]._best->calculateReward() : 0
+            _populations[i].getBestDist()
+        );
+        _avgDistGraphs[i].addPoint(
+            _generation_frameDuration * _generation_count + _frameCount,
+            _populations[i].getAvgDist()
         );
     }
 }
+
 void World::displayGraphs() const {
     for (int i = 0; i < _populations.size(); i++) {
         _allGraphs[_shownGraphTypeIdx]->at(i).draw();

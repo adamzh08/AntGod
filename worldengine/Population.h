@@ -68,13 +68,15 @@ public:
     void flood();
 
     [[nodiscard]] int getAliveCount() const;
+    [[nodiscard]] float getAvgDist() const;
+    [[nodiscard]] float getBestDist() const;
 
-    static int tournamentSelectFromPool(const std::vector<Ant*> &pool, int k);
+    int tournamentSelectFromPool(const std::vector<Ant*> &pool, int k);
 
     void draw();
 
     void drawXAt(Vector2) const;
-    void drawFlagAt(Vector2);
+    void drawFlagAt(Vector2) const;
 };
 
 #endif //POPULATION_H

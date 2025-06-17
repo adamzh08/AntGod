@@ -23,7 +23,6 @@ struct RaysDB {
 
 class Lines {
 private:
-    std::vector<Line> _lines; // MKL allocator?
     int _linesAmount = 0;
 
     static std::vector<RaysDB> _raysDB;
@@ -31,6 +30,8 @@ private:
 
     static std::vector<Vector2> _searchRaysDB(int raysAmount, float raysRadius);
 public:
+    std::vector<Line> _lines; // MKL allocator?
+
     Lines();
     Lines addLine(Vector2 startPoint, Vector2 endPoint);
 

@@ -13,7 +13,7 @@
 class Graph {
 private:
     std::deque<Vector2> _data{};
-    int _maxAmountOfPoints = 10000;
+    int _maxAmountOfPoints = 3000;
 
     Rectangle _rect{};
 

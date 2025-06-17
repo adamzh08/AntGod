@@ -4,7 +4,6 @@
 #include <vector>
 #include <thread>
 
-#include "raygui.h"
 #include "raylib.h"
 #include "raymath.h"
 #include "neuralengine/Layer.h"
@@ -32,7 +31,6 @@ Lines lines = Lines()
         .addLine(Vector2{SCREEN_WIDTH, 0}, Vector2{SCREEN_WIDTH, SCREEN_HEIGHT})
         .addLine(Vector2{0, SCREEN_HEIGHT}, Vector2{SCREEN_WIDTH, SCREEN_HEIGHT})
         .addLine(Vector2{500, 0}, Vector2{500, 300})
-        .addLine(Vector2{600, 450}, Vector2{600, 150})
         .addLine(Vector2{600, 450}, Vector2{600, 150});
 
 // Layers
@@ -135,7 +133,6 @@ int main() {
     t.request_stop();
     UnloadMusicStream(music); // Unload music stream buffers from RAM
     CloseAudioDevice(); // Close audio device (music streaming is automatically stopped)
-    // free all
     TextureCollection::FreeAll();
     delete world;
     CloseWindow();
