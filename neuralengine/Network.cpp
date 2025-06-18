@@ -26,7 +26,7 @@ Network::Network(const std::vector<Layer> &layers, const std::string &filename) 
 }
 
 Network::Network(const Network &other) {
-    this->_layers = other._layers;
+    _init(other._layers);
     this->_weights = other._weights;
 }
 

@@ -27,7 +27,6 @@ public:
     void act();
 
     void draw() const;
-
     [[nodiscard]] float calculateReward() const;
 };
 

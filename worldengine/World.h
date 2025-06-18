@@ -4,10 +4,12 @@
 
 #ifndef WORLD_H
 #define WORLD_H
-#include <optional>
+
+#include <atomic>
 
 #include "Graph.h"
 #include "Lines.h"
+#include "NeuroBox.h"
 #include "Population.h"
 #include "World.h"
 
@@ -26,15 +28,17 @@ enum DrawAction {
 
 class World {
 private:
-    // graphs
-    std::vector<std::vector<Graph> *> _allGraphs;
-    std::vector<Graph> _aliveGraphs{};
-    std::vector<Graph> _bestRewardGraphs{};
-    std::vector<Graph> _avgDistGraphs{};
-    std::vector<const char *> _graphDescriptions{
+    // infoboxes
+    std::vector<std::vector<InfoBox *> *> _allInfoBoxes{};
+    std::vector<InfoBox *> _neuroBoxes{};
+    std::vector<InfoBox *> _aliveGraphs{};
+    std::vector<InfoBox *> _bestRewardGraphs{};
+    std::vector<InfoBox *> _avgDistGraphs{};
+    std::vector<const char *> _infoBoxDescriptions{
         "How many entities alive?",
         "Best dist to goal?",
-        "Average dist to goal?"
+        "Average dist to goal?",
+        "Brain of the best?"
     };
     int _framesPerGraphUpdate = 3;
     int _frameCounter_graphUpdate{};
@@ -60,9 +64,9 @@ private:
 
     void drawUserInfo() const;
 
-    void updateGraphs();
+    void updateInfoBoxes();
 
-    void displayGraphs() const;
+    void displayInfoBoxes() const;
 
     void handleUserInput();
 
@@ -78,7 +82,7 @@ private:
 
     [[nodiscard]] const char *strFromUserMode() const;
 
-    [[nodiscard]] const char *strFromDrawMode(int action) const;
+    [[nodiscard]] static const char *strFromDrawMode(int action) ;
 
 public:
     Lines _lines;

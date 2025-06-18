@@ -14,8 +14,6 @@
 
 class Network {
 private:
-    std::vector<Layer> _layers;
-    std::vector<std::vector<std::vector<float> > > _weights;
 
     void _randomize_weights();
 
@@ -26,6 +24,9 @@ private:
     void _init(const std::vector<Layer> &layers);
 
 public:
+    std::vector<Layer> _layers;
+    std::vector<std::vector<std::vector<float> > > _weights;
+
     explicit Network(const std::vector<Layer> &layers);
 
     Network(const std::vector<Layer> &layers, const std::string &filename);

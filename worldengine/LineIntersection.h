@@ -135,7 +135,7 @@ inline Vector2 getIntersection(const Vector2 mainPoint, const Vector2 deltaPoint
         double determinant = a1 * b2 - a2 * b1;
 
         if (determinant != 0) {
-            return Vector2{(-c2 * b1) / determinant, (a1 * c2) / determinant};
+            return Vector2(-c2 * b1 / determinant, a1 * c2 / determinant);
         }
     }
 

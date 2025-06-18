@@ -10,6 +10,7 @@
 #define RAYGUI_IMPLEMENTATION
 
 #include <algorithm>
+#include <thread>
 
 #include "LineIntersection.h"
 #include "../raygui.h"
@@ -25,20 +26,36 @@ World &World::setPopulations(std::vector<Population> &&populations) {
 
     // graphs
     for (int i = 0; i < _populations.size(); i++) {
-        Rectangle graphPos(
+        const Rectangle boxPos(
             GetScreenWidth() - 400,
             GetScreenHeight() / 2 * (1 + static_cast<float>(i) / _populations.size()),
             400,
             GetScreenHeight() / 2 / _populations.size() - 15
         );
-        _aliveGraphs.emplace_back(graphPos, _populations[i]._entityColor, _populations[i]._entityColor);
-        _bestRewardGraphs.emplace_back(graphPos, _populations[i]._entityColor, _populations[i]._entityColor);
-        _avgDistGraphs.emplace_back(graphPos, _populations[i]._entityColor, _populations[i]._entityColor);
+        // graphs
+        _aliveGraphs.push_back(new Graph(
+            boxPos,
+            _populations[i]._entityColor
+        ));
+        _bestRewardGraphs.push_back(new Graph(
+            boxPos,
+            _populations[i]._entityColor
+        ));
+        _avgDistGraphs.push_back(new Graph(
+            boxPos,
+            _populations[i]._entityColor
+        ));
+        // brains
+        _neuroBoxes.push_back(new NeuroBox(
+            boxPos,
+            _populations[i]._entityColor
+        ));
     }
 
-    _allGraphs.push_back(&_aliveGraphs);
-    _allGraphs.push_back(&_bestRewardGraphs);
-    _allGraphs.push_back(&_avgDistGraphs);
+    _allInfoBoxes.push_back(&_aliveGraphs);
+    _allInfoBoxes.push_back(&_bestRewardGraphs);
+    _allInfoBoxes.push_back(&_avgDistGraphs);
+    _allInfoBoxes.push_back(&_neuroBoxes);
 
     return *this;
 }
@@ -73,13 +90,13 @@ void World::draw() {
 
     if (_showInfo) {
         drawUserInfo();
-        displayGraphs();
+        displayInfoBoxes();
     }
 
     // graphs
     if (_frameCounter_graphUpdate == _framesPerGraphUpdate) {
         _frameCounter_graphUpdate = 0;
-        updateGraphs();
+        updateInfoBoxes();
     }
 }
 
@@ -162,11 +179,11 @@ void World::handleButtons() {
     if (_showInfo) {
         if (GuiButton(Rectangle(GetScreenWidth() - 400, GetScreenHeight() / 2 - 60, 50, 50), "#114#")) {
             _shownGraphTypeIdx--;
-            _shownGraphTypeIdx = (_shownGraphTypeIdx + _allGraphs.size()) % _allGraphs.size();
+            _shownGraphTypeIdx = (_shownGraphTypeIdx + _allInfoBoxes.size()) % _allInfoBoxes.size();
         }
         if (GuiButton(Rectangle(GetScreenWidth() - 50, GetScreenHeight() / 2 - 60, 50, 50), "#115#")) {
             _shownGraphTypeIdx++;
-            _shownGraphTypeIdx %= _allGraphs.size();
+            _shownGraphTypeIdx %= _allInfoBoxes.size();
         }
     }
 
@@ -330,11 +347,9 @@ bool World::menuOptionAvailable(const int option) const {
             for (int i = 0; i < _lines._lines.size(); i++) {
                 Line l = _lines._lines[i];
                 if (doIntersect(l.startPoint, l.endPoint, _drawVar_menuPos, pointOnLine)) {
-                    std::cout << "found" << std::endl;
                     return true;
                 }
             }
-            std::cout << "not found" << std::endl;
             return false;
         }
         case MOVE_COLONY_INIT: {
@@ -390,39 +405,46 @@ void World::drawUserInfo() const {
     );
 
     GuiDrawText(
-        _graphDescriptions[_shownGraphTypeIdx],
+        _infoBoxDescriptions[_shownGraphTypeIdx],
         Rectangle(GetScreenWidth() - 350, GetScreenHeight() / 2 - 50, 300, 50),
         TEXT_ALIGN_CENTER,
         BLACK
     );
 }
 
-void World::updateGraphs() {
+void World::updateInfoBoxes() {
     for (int i = 0; i < _populations.size(); i++) {
-        _aliveGraphs[i].addPoint(
+        // graphs
+        dynamic_cast<Graph *>(_aliveGraphs[i])->addPoint(
             _generation_frameDuration * _generation_count + _frameCount,
             _populations[i].getAliveCount()
         );
-        _bestRewardGraphs[i].addPoint(
+        dynamic_cast<Graph *>(_bestRewardGraphs[i])->addPoint(
             _generation_frameDuration * _generation_count + _frameCount,
             _populations[i].getBestDist()
         );
-        _avgDistGraphs[i].addPoint(
+        dynamic_cast<Graph *>(_avgDistGraphs[i])->addPoint(
             _generation_frameDuration * _generation_count + _frameCount,
             _populations[i].getAvgDist()
+        );
+
+        // neuroboxes
+        dynamic_cast<NeuroBox *>(_neuroBoxes[i])->setEntity(
+            _populations[i]._best
         );
     }
 }
 
-void World::displayGraphs() const {
+void World::displayInfoBoxes() const {
+
     for (int i = 0; i < _populations.size(); i++) {
-        _allGraphs[_shownGraphTypeIdx]->at(i).draw();
+        _allInfoBoxes[_shownGraphTypeIdx]->at(i)->draw();
     }
 }
 
-void World::drawLineOfText(const char *line, int idx) {
+void World::drawLineOfText(const char *str, const int idx) {
     GuiDrawText(
-        line,
+        str,
         Rectangle(
             GetScreenWidth() - 400,
             10 + idx * GuiGetStyle(DEFAULT, TEXT_SIZE),
@@ -443,7 +465,7 @@ const char *World::strFromUserMode() const {
     }
 }
 
-const char *World::strFromDrawMode(int action) const {
+const char *World::strFromDrawMode(const int action) {
     switch (action) {
         case NONE: return "None";
         case DRAW_WALL: return "Draw Wall";
@@ -452,4 +474,5 @@ const char *World::strFromDrawMode(int action) const {
         case MOVE_COLONY_TARGET: return "Move Colony Target";
         default: std::cerr << "undefined action" << std::endl;
     }
+    return "?";
 }

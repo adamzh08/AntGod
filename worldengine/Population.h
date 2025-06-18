@@ -5,6 +5,7 @@
 #ifndef POPULATION_H
 #define POPULATION_H
 
+#include <memory>
 #include <vector>
 
 #include "Ant.h"
@@ -18,12 +19,13 @@ class World;
 class Population {
 private:
     void setBest();
+
 public:
     World &_world;
 
     // -------- Population ---------
-    std::vector<Ant> _ants;
-    Ant* _best = nullptr;
+    std::vector<std::shared_ptr<Ant> > _ants;
+    std::shared_ptr<Ant> _best = nullptr;
     int _ants_amount;
     float _elite_percentage;
 
@@ -68,14 +70,17 @@ public:
     void flood();
 
     [[nodiscard]] int getAliveCount() const;
+
     [[nodiscard]] float getAvgDist() const;
+
     [[nodiscard]] float getBestDist() const;
 
-    int tournamentSelectFromPool(const std::vector<Ant*> &pool, int k);
+    static int tournamentSelectFromPool(const std::vector<std::shared_ptr<Ant> > &pool, int k);
 
     void draw();
 
     void drawXAt(Vector2) const;
+
     void drawFlagAt(Vector2) const;
 };
 

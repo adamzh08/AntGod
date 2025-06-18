@@ -89,6 +89,9 @@ add_executable(AntGod main.cpp
         worldengine/LineIntersection.h
         worldengine/Graph.cpp
         worldengine/Graph.h
+        worldengine/InfoBox.h
+        worldengine/NeuroBox.cpp
+        worldengine/NeuroBox.h
 )
 
 target_compile_options(AntGod PRIVATE

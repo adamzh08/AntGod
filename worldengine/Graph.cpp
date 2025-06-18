@@ -8,11 +8,6 @@
 #include <iostream>
 
 
-Graph::Graph(const Rectangle rect, const Color graphColor, const Color axisColor) : _rect(rect),
-    _graphColor(graphColor),
-    _axisColor(axisColor) {
-}
-
 void Graph::addPointV(const Vector2 newPoint) {
     _data.push_back(newPoint);
 
@@ -50,12 +45,12 @@ void Graph::draw() const {
         double x2 = _rect.x + _rect.width * (_data[i].x - _smallestX) / (_biggestX - _smallestX);
         double y1 = _rect.y + _rect.height * (1 - (_data[i - 1].y - _smallestY) / (_biggestY - _smallestY));
         double y2 = _rect.y + _rect.height * (1 - (_data[i].y - _smallestY) / (_biggestY - _smallestY));
-        DrawLineEx(Vector2(x1, y1), Vector2(x2, y2), 3, _graphColor);
+        DrawLineEx(Vector2(x1, y1), Vector2(x2, y2), 3, _color);
     }
-    DrawRectangleLines(_rect.x, _rect.y, _rect.width, _rect.height, _axisColor);
+    drawBounds();
 
     // y axis
-    float amplitude = _biggestY - _smallestY;
+    const float amplitude = _biggestY - _smallestY;
     for (int i = 0; i < 5; i++) {
         DrawLineEx(
             Vector2(_rect.x - 5, _rect.y + 0.2 * i * _rect.height),

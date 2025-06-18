@@ -7,18 +7,15 @@
 #include <cfloat>
 #include <deque>
 
+#include "InfoBox.h"
 #include "raylib.h"
 
 
-class Graph {
+class Graph : public InfoBox {
 private:
     std::deque<Vector2> _data{};
     int _maxAmountOfPoints = 3000;
 
-    Rectangle _rect{};
-
-    Color _graphColor{};
-    Color _axisColor{};
 
     float _smallestX = FLT_MAX;
     float _biggestX = -FLT_MAX;
@@ -26,12 +23,11 @@ private:
     float _biggestY = -FLT_MAX;
 
 public:
-
-    explicit Graph(Rectangle, Color, Color);
+    Graph(const Rectangle rect, const Color color): InfoBox(rect, color) {};
 
     void reset();
 
-    void draw() const;
+    void draw() const override;
 
     void addPoint(int, int);
     void addPointV(Vector2);

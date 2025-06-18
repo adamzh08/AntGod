@@ -36,17 +36,17 @@ Population::Population(
     if (filename.empty()) {
         // completely random
         for (int i = 0; i < _ants_amount; i++) {
-            _ants.emplace_back(*this, layers);
+            _ants.push_back(std::make_shared<Ant>(*this, layers));
         }
     } else {
         // from file
         Ant defaultAnt(*this, layers);
         for (int i = 0; i < _ants_amount; i++) {
-            _ants.emplace_back(defaultAnt);
+            _ants.push_back(std::make_shared<Ant>(defaultAnt));
         }
 
-        for (Ant &ant: this->_ants) {
-            ant._network.mutate_weights(0.05, 0.1);
+        for (auto &ant: this->_ants) {
+            ant->_network.mutate_weights(0.05, 0.1);
         }
     }
 
@@ -62,36 +62,38 @@ Population::Population(
 void Population::act() {
 #pragma omp parallel for
     for (auto &ant: this->_ants) {
-        if (ant._alive) {
-            ant.act();
+        if (ant->_alive) {
+            ant->act();
         }
     }
 }
 
 void Population::flood() {
-    std::vector<Ant *> selectedAnts;
+    _best = nullptr;
 
-    for (Ant &ant: _ants) {
-        if (ant._alive) {
-            selectedAnts.push_back(&ant);
+    std::vector<std::shared_ptr<Ant> > selectedAnts;
+
+    for (auto &ant: _ants) {
+        if (ant->_alive) {
+            selectedAnts.push_back(ant);
         }
     }
     if (selectedAnts.empty()) {
         std::cerr << "Population " << this << " went extinct" << std::endl;
         return;
     }
-    std::ranges::sort(selectedAnts, [](const Ant *ant1, const Ant *ant2) {
-        return ant1->calculateReward() > ant2->calculateReward();
+    std::ranges::sort(selectedAnts, [](const std::shared_ptr<Ant> &a, const std::shared_ptr<Ant> &b) {
+        return a->calculateReward() > b->calculateReward();
     });
 
-    std::vector<Ant> nextGen;
+    std::vector<std::shared_ptr<Ant>> nextGen;
     nextGen.reserve(_ants_amount);
 
 
     // top X percent pass to the next gen without modification
     const int topX = static_cast<int>(_elite_percentage * selectedAnts.size());
     for (int i = 0; i < topX; ++i) {
-        nextGen.push_back(Ant(*selectedAnts[i]));
+        nextGen.push_back(std::make_shared<Ant>(*selectedAnts[i]));
     }
 
     // the other part are combinations of 2 parent ants
@@ -110,17 +112,17 @@ void Population::flood() {
             child._network.mutate_weights(0.01, 0.3);
         }
 
-        nextGen.push_back(child);
+        nextGen.push_back(std::make_shared<Ant>(std::move(child)));
     }
     // reset position and life status of all children
-    for (Ant &child: nextGen) {
-        child._alive = true;
-        child._position = _init_position;
+    for (auto &child: nextGen) {
+        child->_alive = true;
+        child->_position = _init_position;
     }
     _ants = std::move(nextGen);
 }
 
-int Population::tournamentSelectFromPool(const std::vector<Ant *> &pool, const int k) {
+int Population::tournamentSelectFromPool(const std::vector<std::shared_ptr<Ant>> &pool, const int k) {
     std::vector<int> indices(pool.size());
     std::iota(indices.begin(), indices.end(), 0); // Fill with 0..n-1
     std::ranges::shuffle(indices, std::mt19937{std::random_device{}()});
@@ -132,7 +134,7 @@ int Population::tournamentSelectFromPool(const std::vector<Ant *> &pool, const i
     float highestReward = -FLT_MAX;
 
     for (int i = 0; i < k; i++) {
-        const Ant *random = pool[selectedIndexes[i]];
+        const std::shared_ptr<Ant> random = pool[selectedIndexes[i]];
 
         float reward = random->calculateReward();
         if (reward > highestReward) {
@@ -144,9 +146,9 @@ int Population::tournamentSelectFromPool(const std::vector<Ant *> &pool, const i
 }
 
 void Population::draw() {
-    for (const Ant &ant: _ants) {
-        if (ant._alive) {
-            ant.draw();
+    for (const auto &ant: _ants) {
+        if (ant->_alive) {
+            ant->draw();
         }
     }
 
@@ -220,12 +222,12 @@ void Population::drawFlagAt(const Vector2 pos) const {
 void Population::setBest() {
     float highestReward = -FLT_MAX;
 
-    for (Ant &ant: this->_ants) {
-        if (ant._alive) {
-            float reward = ant.calculateReward();
+    for (auto &ant: this->_ants) {
+        if (ant->_alive) {
+            float reward = ant->calculateReward();
             if (reward > highestReward) {
                 highestReward = reward;
-                _best = &ant;
+                _best = ant;
             }
         }
     }
@@ -234,8 +236,8 @@ void Population::setBest() {
 
 int Population::getAliveCount() const {
     int counter = 0;
-    for (const Ant &ant: _ants) {
-        if (ant._alive) {
+    for (auto &ant: _ants) {
+        if (ant->_alive) {
             counter++;
         }
     }
@@ -244,10 +246,10 @@ int Population::getAliveCount() const {
 
 float Population::getAvgDist() const {
     float sum = 0;
-    for (const Ant &ant: _ants) {
-        if (ant._alive) {
-            const float dx = ant._position.x - _target_position.x;
-            const float dy = ant._position.y - _target_position.y;
+    for (auto &ant: _ants) {
+        if (ant->_alive) {
+            const float dx = ant->_position.x - _target_position.x;
+            const float dy = ant->_position.y - _target_position.y;
             sum += std::sqrt(dx * dx + dy * dy);
         }
     }

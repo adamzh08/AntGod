@@ -53,7 +53,6 @@ int main() {
     // Setting random seed by the CPU time
     srand(time(nullptr));
 
-
     // Init the window
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window");
 
@@ -115,7 +114,7 @@ int main() {
             .build();
 
     world->setLines(lines)
-            .setGenerationDuration(20 * 60)
+            .setGenerationDuration(10 * 60)
             .setPopulations({
                 yellowPopulation,
                 redPopulation,
