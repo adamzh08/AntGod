@@ -33,32 +33,40 @@ void Ant::act() {
     );
     const std::vector<float> output = _network.feed_forward(input);
 
-    const Vector2 temp = _position;
-    const float rot_temp = _rotation;
+    Vector2 temp = _position;
+    float rot_temp = _rotation;
 
     switch (_population._move_method) {
         case CARTESIAN_MOVE: {
-            _position.x += output[0] * _population._max_speed;
-            _position.y += output[1] * _population._max_speed;
-            _rotation = std::atan2(output[1], output[0]);
+            temp.x += output[0] * _population._max_speed;
+            temp.y += output[1] * _population._max_speed;
+            rot_temp = std::atan2(output[1], output[0]);
             break;
         }
         case RADIAL_MOVE: {
             const float speedOutput = output[0] * _population._max_speed;
             const float rotationOutput = output[1] * _population._max_angle;
-            _rotation += rotationOutput;
-            _position.x += cos(_rotation) * speedOutput;
-            _position.y += sin(_rotation) * speedOutput;
+            rot_temp += rotationOutput;
+
+            if (rot_temp < 0) {
+                rot_temp += 2 * PI;
+            } else if (rot_temp >= 2 * PI) {
+                rot_temp -= 2 * PI;
+            }
+
+            temp.x += cos(rot_temp) * speedOutput;
+            temp.y += sin(rot_temp) * speedOutput;
             break;
         }
         default:
             std::cerr << "Invalid movement mode" << std::endl;
     }
 
-    if (!_population._world._lines.validMove(temp, _position)) {
+    if (_population._world._lines.validMove(_position, temp)) {
         _position = temp;
         _rotation = rot_temp;
-        _alive = false;
+}   else {
+    _alive = false;
     }
 }
 
