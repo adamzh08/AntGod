@@ -29,7 +29,7 @@ void Ant::act() {
         _population._rays_radius,
         _population._rays_amount,
         _rotation + PI,
-        1
+        _population._rays_fov
     );
     const std::vector<float> output = _network.feed_forward(input);
 

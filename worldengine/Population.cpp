@@ -22,14 +22,17 @@ Population::Population(
     Vector2 init_position, Vector2 target_position,
     int move_method, float max_speed, float max_angle,
     int rays_amount, int rays_radius, float rays_fov): _world(world),
-                                       _ants_amount(ants_amount),
-                                       _elite_percentage(elite_percentage),
-                                       _entityTexture(texture), _entityColor(color),
-                                       _layers(layers), _filename(filename),
-                                       _init_position(init_position), _target_position(target_position),
-                                       _mutation_probability(mutation_probability), _mutation_strength(mutation_strength),
-                                       _move_method(move_method), _max_speed(max_speed), _max_angle(max_angle),
-                                       _rays_amount(rays_amount), _rays_radius(rays_radius), _rays_fov(rays_fov) {
+                                                       _ants_amount(ants_amount),
+                                                       _elite_percentage(elite_percentage),
+                                                       _entityTexture(texture), _entityColor(color),
+                                                       _layers(layers), _filename(filename),
+                                                       _init_position(init_position), _target_position(target_position),
+                                                       _mutation_probability(mutation_probability),
+                                                       _mutation_strength(mutation_strength),
+                                                       _move_method(move_method), _max_speed(max_speed),
+                                                       _max_angle(max_angle),
+                                                       _rays_amount(rays_amount), _rays_radius(rays_radius),
+                                                       _rays_fov(rays_fov) {
     // ants
     _ants.reserve(_ants_amount);
 
@@ -78,7 +81,7 @@ void Population::flood() {
         return a->calculateReward() > b->calculateReward();
     });
 
-    std::vector<std::shared_ptr<Ant>> nextGen;
+    std::vector<std::shared_ptr<Ant> > nextGen;
     nextGen.reserve(_ants_amount);
 
 
@@ -109,7 +112,7 @@ void Population::flood() {
     _ants = std::move(nextGen);
 }
 
-int Population::tournamentSelectFromPool(const std::vector<std::shared_ptr<Ant>> &pool, const int k) {
+int Population::tournamentSelectFromPool(const std::vector<std::shared_ptr<Ant> > &pool, const int k) {
     std::vector<int> indices(pool.size());
     std::iota(indices.begin(), indices.end(), 0); // Fill with 0..n-1
     std::ranges::shuffle(indices, std::mt19937{std::random_device{}()});
@@ -145,10 +148,11 @@ void Population::draw() {
     if (_best != nullptr) {
         if (_world._showRays) {
             _world._lines.drawRays(_best->_position,
-        _rays_radius,
-        _rays_amount,
-        _best->_rotation + PI,
-        1);
+                                   _rays_radius,
+                                   _rays_amount,
+                                   _best->_rotation + PI,
+                                   _rays_fov
+            );
         }
         // drawing a blue circle on the best ant
         DrawEllipse(_best->_position.x, _best->_position.y, 10, 10, Color(0, 0, 255, 150));
