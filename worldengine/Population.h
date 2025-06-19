@@ -38,6 +38,7 @@ public:
     std::vector<Layer> _layers;
     std::string _filename;
     float _mutation_probability;
+    float _mutation_strength;
 
     // Positions
     Vector2 _init_position;
@@ -52,6 +53,7 @@ public:
     std::vector<Vector2> _rays_deltas;
     int _rays_amount;
     int _rays_radius;
+    float _rays_fov;
 
 
     Population(
@@ -59,10 +61,10 @@ public:
         int ants_amount,
         float elite_percentage,
         const Texture2D &texture, Color color,
-        std::vector<Layer> &layers, const std::string &filename, float mutation_probability,
+        std::vector<Layer> &layers, const std::string &filename, float mutation_probability, float _mutation_strength,
         Vector2 init_position, Vector2 target_position,
         int move_method, float max_speed, float max_angle,
-        int rays_amount, int rays_radius
+        int rays_amount, int rays_radius, float rays_fov
     );
 
     void act();

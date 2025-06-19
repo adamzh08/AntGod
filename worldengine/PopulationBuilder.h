@@ -19,12 +19,12 @@ public:
     // Ant settings
     std::optional<Texture2D> _entityTexture;
     std::optional<Color> _entityColor;
-    std::optional<Vector2> _origin_point;
 
     // Neural network
     std::optional<std::vector<Layer>> _layers;
     std::optional<std::string> _filename;
     std::optional<float> _mutation_probability;
+    std::optional<float> _mutation_strength;
 
     // Positions
     std::optional<Vector2> _init_position;
@@ -38,6 +38,7 @@ public:
     // Rays
     std::optional<int> _rays_amount;
     std::optional<int> _rays_radius;
+    std::optional<int> _rays_fov;
 
 
 
@@ -48,9 +49,9 @@ public:
     PopulationBuilder& setNetwork(std::vector<Layer> &layers, const std::string &filename);
     PopulationBuilder& setPositions(Vector2 init_position, Vector2 target_position);
     PopulationBuilder& setMovement(int move_method, float max_speed, float max_angle);
-    PopulationBuilder& setRays(int rays_amount, int rays_radius);
+    PopulationBuilder& setRays(int rays_amount, int rays_radius, float rays_fov);
     PopulationBuilder& setElitePercentage(float elite_percentage);
-    PopulationBuilder& setMutationProbability(float probability);
+    PopulationBuilder& setMutation(float probability, float _mutation_strength);
 
 
     Population build();

@@ -14,6 +14,8 @@
 
 #include "LineIntersection.h"
 #include "../raygui.h"
+#include "UI/EvolutionEditBox.h"
+#include "UI/RaysEditBox.h"
 
 
 World &World::setLines(const Lines &lines) {
@@ -37,13 +39,22 @@ World &World::setPopulations(std::vector<Population> &&populations) {
             boxPos,
             _populations[i]._entityColor
         ));
-        _bestRewardGraphs.push_back(new Graph(
+        _bestDistGraphs.push_back(new Graph(
             boxPos,
             _populations[i]._entityColor
         ));
         _avgDistGraphs.push_back(new Graph(
             boxPos,
             _populations[i]._entityColor
+        ));
+        // parameters
+        _sensorBoxes.push_back(new RaysEditBox(
+            _populations[i],
+            boxPos
+        ));
+        _evolutionBoxes.push_back(new EvolutionEditBox(
+            _populations[i],
+            boxPos
         ));
         // brains
         _neuroBoxes.push_back(new NeuroBox(
@@ -53,8 +64,10 @@ World &World::setPopulations(std::vector<Population> &&populations) {
     }
 
     _allInfoBoxes.push_back(&_aliveGraphs);
-    _allInfoBoxes.push_back(&_bestRewardGraphs);
+    _allInfoBoxes.push_back(&_bestDistGraphs);
     _allInfoBoxes.push_back(&_avgDistGraphs);
+    _allInfoBoxes.push_back(&_sensorBoxes);
+    _allInfoBoxes.push_back(&_evolutionBoxes);
     _allInfoBoxes.push_back(&_neuroBoxes);
 
     return *this;
@@ -419,7 +432,7 @@ void World::updateInfoBoxes() {
             _generation_frameDuration * _generation_count + _frameCount,
             _populations[i].getAliveCount()
         );
-        dynamic_cast<Graph *>(_bestRewardGraphs[i])->addPoint(
+        dynamic_cast<Graph *>(_bestDistGraphs[i])->addPoint(
             _generation_frameDuration * _generation_count + _frameCount,
             _populations[i].getBestDist()
         );
@@ -427,7 +440,6 @@ void World::updateInfoBoxes() {
             _generation_frameDuration * _generation_count + _frameCount,
             _populations[i].getAvgDist()
         );
-
         // neuroboxes
         dynamic_cast<NeuroBox *>(_neuroBoxes[i])->setEntity(
             _populations[i]._best
@@ -436,7 +448,6 @@ void World::updateInfoBoxes() {
 }
 
 void World::displayInfoBoxes() const {
-
     for (int i = 0; i < _populations.size(); i++) {
         _allInfoBoxes[_shownGraphTypeIdx]->at(i)->draw();
     }

@@ -7,9 +7,9 @@
 
 #include <atomic>
 
-#include "Graph.h"
+#include "UI/Graph.h"
 #include "Lines.h"
-#include "NeuroBox.h"
+#include "UI/NeuroBox.h"
 #include "Population.h"
 #include "World.h"
 
@@ -30,14 +30,18 @@ class World {
 private:
     // infoboxes
     std::vector<std::vector<InfoBox *> *> _allInfoBoxes{};
-    std::vector<InfoBox *> _neuroBoxes{};
     std::vector<InfoBox *> _aliveGraphs{};
-    std::vector<InfoBox *> _bestRewardGraphs{};
+    std::vector<InfoBox *> _bestDistGraphs{};
     std::vector<InfoBox *> _avgDistGraphs{};
+    std::vector<InfoBox *> _sensorBoxes{};
+    std::vector<InfoBox *> _evolutionBoxes{};
+    std::vector<InfoBox *> _neuroBoxes{};
     std::vector<const char *> _infoBoxDescriptions{
         "How many entities alive?",
         "Best dist to goal?",
         "Average dist to goal?",
+        "Environment Sensors?",
+        "Evolutionary Parameters?",
         "Brain of the best?"
     };
     int _framesPerGraphUpdate = 3;

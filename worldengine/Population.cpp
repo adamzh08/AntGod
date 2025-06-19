@@ -18,18 +18,18 @@ Population::Population(
     int ants_amount,
     float elite_percentage,
     const Texture2D &texture, const Color color,
-    std::vector<Layer> &layers, const std::string &filename, float mutation_probability,
+    std::vector<Layer> &layers, const std::string &filename, float mutation_probability, float mutation_strength,
     Vector2 init_position, Vector2 target_position,
     int move_method, float max_speed, float max_angle,
-    int rays_amount, int rays_radius): _world(world),
+    int rays_amount, int rays_radius, float rays_fov): _world(world),
                                        _ants_amount(ants_amount),
                                        _elite_percentage(elite_percentage),
                                        _entityTexture(texture), _entityColor(color),
                                        _layers(layers), _filename(filename),
                                        _init_position(init_position), _target_position(target_position),
-                                       _mutation_probability(mutation_probability),
+                                       _mutation_probability(mutation_probability), _mutation_strength(mutation_strength),
                                        _move_method(move_method), _max_speed(max_speed), _max_angle(max_angle),
-                                       _rays_amount(rays_amount), _rays_radius(rays_radius) {
+                                       _rays_amount(rays_amount), _rays_radius(rays_radius), _rays_fov(rays_fov) {
     // ants
     _ants.reserve(_ants_amount);
 
@@ -109,7 +109,7 @@ void Population::flood() {
 
         Ant child(*selectedAnts[parentIndex1], *selectedAnts[parentIndex2]);
         if (static_cast<double>(rand()) / RAND_MAX < _mutation_probability) {
-            child._network.mutate_weights(0.01, 0.3);
+            child._network.mutate_weights(0.01, _mutation_strength);
         }
 
         nextGen.push_back(std::make_shared<Ant>(std::move(child)));
