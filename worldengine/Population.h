@@ -49,7 +49,6 @@ public:
     float _max_angle;
 
     // Rays
-    std::vector<Vector2> _rays_deltas;
     int _rays_amount;
     int _rays_radius;
 

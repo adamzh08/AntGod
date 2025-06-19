@@ -49,14 +49,6 @@ Population::Population(
             ant->_network.mutate_weights(0.05, 0.1);
         }
     }
-
-    // rays
-    _rays_deltas.resize(_rays_amount);
-    const float k = 2.0f * M_PI / _rays_amount;
-    for (int i = 0; i < _rays_amount; i++) {
-        _rays_deltas[i].x = std::cos(i * k) * _rays_radius;
-        _rays_deltas[i].y = std::sin(i * k) * _rays_radius;
-    }
 }
 
 void Population::act() {
@@ -157,7 +149,11 @@ void Population::draw() {
 
     if (_best != nullptr) {
         if (_world._showRays) {
-            _world._lines.drawRays(_best->_position, _rays_amount, _rays_radius);
+            _world._lines.drawRays(_best->_position,
+        _rays_radius,
+        _rays_amount,
+        _best->_rotation + PI,
+        1);
         }
         // drawing a blue circle on the best ant
         DrawEllipse(_best->_position.x, _best->_position.y, 10, 10, Color(0, 0, 255, 150));

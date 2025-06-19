@@ -1,5 +1,5 @@
 //
-// Created by adam on 6/15/2025.
+// Created by adam on 6/19/2025.
 //
 
 #ifndef LINES_H
@@ -15,7 +15,6 @@ struct Line {
 };
 
 struct RaysDB {
-    int raysAmount;
     float raysRadius;
 
     std::vector<Vector2> deltaPoints;
@@ -23,23 +22,23 @@ struct RaysDB {
 
 class Lines {
 private:
-    int _linesAmount = 0;
-
     static std::vector<RaysDB> _raysDB;
     static int _raysDBAmount;
 
-    static std::vector<Vector2> _searchRaysDB(int raysAmount, float raysRadius);
+    static std::vector<Vector2> _searchRaysDB(float raysRadius);
+    static std::vector<Vector2> _getRaysPoints(float raysRadius, int rays_count, float main_angle, float area_angle);
+
 public:
-    std::vector<Line> _lines; // MKL allocator?
+    std::vector<Line> _lines;
 
     Lines();
     Lines addLine(Vector2 startPoint, Vector2 endPoint);
 
+    std::vector<float> getRays(Vector2 mainPoint, float raysRadius, int rays_count, float main_angle, float area_angle) const;
+
     void draw() const;
+    void drawRays(Vector2 mainPoint, float raysRadius, int rays_count, float main_angle, float area_angle);
 
-    std::vector<float> getRays(Vector2 mainPoint, int raysAmount, float raysRadius) const;
-
-    void drawRays(Vector2 mainPoint, int raysAmount, float raysRadius);
     bool validMove(Vector2 startPoint, Vector2 deltaPoint) const;
 };
 

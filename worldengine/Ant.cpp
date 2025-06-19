@@ -25,8 +25,10 @@ Ant::Ant(const Ant &parent1, const Ant &parent2) : _population(parent1._populati
 void Ant::act() {
     const std::vector<float> input = _population._world._lines.getRays(
         _position,
+        _population._rays_radius,
         _population._rays_amount,
-        _population._rays_radius
+        _rotation + PI,
+        1
     );
     const std::vector<float> output = _network.feed_forward(input);
 

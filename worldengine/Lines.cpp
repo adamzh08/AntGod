@@ -1,25 +1,40 @@
 //
-// Created by adam on 6/15/2025.
+// Created by adam on 6/19/2025.
 //
 
 #include "Lines.h"
+#include "LineIntersection.h"
 
 #include <iostream>
 
-#include "LineIntersection.h"
-
 std::vector<RaysDB> Lines::_raysDB;
-int Lines::_raysDBAmount = 0;
+int Lines::_raysDBAmount;
 
 Lines::Lines() {}
 
 Lines Lines::addLine(Vector2 startPoint, Vector2 endPoint) {
-    _linesAmount += 1;
-    _lines.resize(_linesAmount);
-    _lines.back().startPoint = startPoint;
-    _lines.back().endPoint = endPoint;
+    _lines.push_back(Line{startPoint, endPoint});
 
     return *this;
+}
+
+std::vector<float> Lines::getRays(Vector2 mainPoint, float raysRadius, int rays_count, float main_angle,
+    float area_angle) const {
+    const std::vector<Vector2> deltaPoints = _getRaysPoints(raysRadius, rays_count, main_angle, area_angle);
+
+    std::vector rays(rays_count, raysRadius);
+
+    for (int i = 0; i < rays_count; i++) {
+        for (int j = 0; j < _lines.size(); j++) {
+            rays[i] = fmin(rays[i], IntersectionLength(mainPoint, deltaPoints[i], _lines[j].startPoint, _lines[j].endPoint));
+        }
+    }
+
+    for (int i = 0; i < rays_count; i++) {
+        rays[i] = 1.0 - (rays[i] / raysRadius);
+    }
+
+    return rays;
 }
 
 void Lines::draw() const {
@@ -28,10 +43,10 @@ void Lines::draw() const {
     }
 }
 
-std::vector<Vector2> Lines::_searchRaysDB(const int raysAmount, const float raysRadius) {
+std::vector<Vector2> Lines::_searchRaysDB(float raysRadius) {
     // ReSharper disable once CppUseStructuredBinding
     for (auto raysRec: _raysDB) {
-        if (raysAmount == raysRec.raysAmount && raysRadius == raysRec.raysRadius) {
+        if (raysRadius == raysRec.raysRadius) {
             return raysRec.deltaPoints;
         }
     }
@@ -41,52 +56,51 @@ std::vector<Vector2> Lines::_searchRaysDB(const int raysAmount, const float rays
         _raysDBAmount += 1;
         _raysDB.resize(_raysDBAmount);
 
-        _raysDB.back().raysAmount = raysAmount;
         _raysDB.back().raysRadius = raysRadius;
-        _raysDB.back().deltaPoints.resize(raysAmount);
+        _raysDB.back().deltaPoints.resize(2*PI*raysRadius);
 
-        const float angle = 2*PI/raysAmount;
-        for (int i = 0; i < raysAmount; i++) {
+        const float angle = 1/raysRadius;
+        for (int i = 0; i < 2*PI*raysRadius; i++) {
             _raysDB.back().deltaPoints[i].x = cos(angle*i) * raysRadius;
             _raysDB.back().deltaPoints[i].y = sin(angle*i) * raysRadius;
         }
 
         std::cout << "Returned... " << std::endl;
     }
+
     return _raysDB.back().deltaPoints;
+}
+
+std::vector<Vector2> Lines::_getRaysPoints(float raysRadius, int rays_count, float main_angle, float area_angle) {
+    std::vector<Vector2> ray_points_source = _searchRaysDB(raysRadius);
+
+    int start_index = static_cast<int>((main_angle - (area_angle / 2)) * raysRadius);
+
+    std::vector<Vector2> ray_points_result;
+    for (float i = 0; i < rays_count; i++) {
+        int index = start_index + static_cast<int>(i * (area_angle * raysRadius) / (rays_count - 1));
+        if (index < 0) {
+            index += ray_points_source.size();
+        } else if (index >= ray_points_source.size()) {
+            index -= ray_points_source.size();
+        }
+        ray_points_result.push_back(ray_points_source[index]);
+    }
+
+    return ray_points_result;
 }
 
 Vector2 vectorSum(const Vector2 point1, const Vector2 point2) {
     return Vector2{point1.x + point2.x, point1.y + point2.y};
 }
 
-std::vector<float> Lines::getRays(const Vector2 mainPoint, const int raysAmount, const float raysRadius) const {
-    const std::vector<Vector2> deltaPoints = _searchRaysDB(raysAmount, raysRadius);
+void Lines::drawRays(Vector2 mainPoint, float raysRadius, int rays_count, float main_angle, float area_angle) {
+    const std::vector<Vector2> deltaPoints = _getRaysPoints(raysRadius, rays_count, main_angle, area_angle);
 
-    std::vector rays(raysAmount, raysRadius);
+    std::vector<Vector2> rays(rays_count, Vector2{1000, 1000});
 
-    for (int i = 0; i < raysAmount; i++) {
-        for (int j = 0; j < _linesAmount; j++) {
-            rays[i] = fmin(rays[i], IntersectionLength(mainPoint, deltaPoints[i], _lines[j].startPoint, _lines[j].endPoint));
-        }
-    }
-
-    for (int i = 0; i < raysAmount; i++) {
-        rays[i] = 1.0 - (rays[i] / raysRadius);
-    }
-
-    return rays;
-}
-
-void Lines::drawRays(Vector2 mainPoint, int raysAmount, float raysRadius) {
-    //DrawLineEx(mainPoint, vectorSum(mainPoint, getIntersection(mainPoint, deltaPoints[i], _lines[j].startPoint, _lines[j].endPoint)), 1, GRAY);
-
-    const std::vector<Vector2> deltaPoints = _searchRaysDB(raysAmount, raysRadius);
-
-    std::vector<Vector2> rays(raysAmount, Vector2{1000, 1000});
-
-    for (int i = 0; i < raysAmount; i++) {
-        for (int j = 0; j < _linesAmount; j++) {
+    for (int i = 0; i < rays_count; i++) {
+        for (int j = 0; j < _lines.size(); j++) {
             Vector2 temp = getIntersection(mainPoint, deltaPoints[i], _lines[j].startPoint, _lines[j].endPoint);
             if (sq(temp.x) + sq(temp.y) < sq(rays[i].x) + sq(rays[i].y)) {
                 rays[i] = temp;
@@ -94,7 +108,7 @@ void Lines::drawRays(Vector2 mainPoint, int raysAmount, float raysRadius) {
         }
     }
 
-    for (int i = 0; i < raysAmount; i++) {
+    for (int i = 0; i < rays_count; i++) {
         DrawLineEx(mainPoint, vectorSum(mainPoint, rays[i]), 1, GRAY);
     }
 }

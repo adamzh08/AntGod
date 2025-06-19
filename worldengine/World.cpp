@@ -271,7 +271,7 @@ void World::afterEditOptionSelected() {
         case NONE:
         case DRAW_WALL: return;
         case DELETE_WALL: {
-            const std::vector<float> dists = _lines.getRays(_drawVar_menuPos, 8, _pickRadius);
+            const std::vector<float> dists = _lines.getRays(_drawVar_menuPos, _pickRadius, 8, 0, PI / 2);
 
             int smallestIdx = 0;
             float bestDist = dists[0];
@@ -329,7 +329,7 @@ bool World::menuOptionAvailable(const int option) const {
         case NONE:
         case DRAW_WALL: return true; // always available
         case DELETE_WALL: {
-            std::vector<float> dists = _lines.getRays(_drawVar_menuPos, 8, _pickRadius);
+            std::vector<float> dists = _lines.getRays(_drawVar_menuPos, _pickRadius, 8, 0, PI / 2);
 
             int bestIdx = 0;
             float bestDist = dists[0];
