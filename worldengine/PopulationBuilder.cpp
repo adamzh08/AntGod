@@ -28,15 +28,16 @@ Population PopulationBuilder::build() {
     REQUIRE_NOT_EMPTY(_max_angle, "max angle");
     REQUIRE_NOT_EMPTY(_rays_amount, "ray amount");
     REQUIRE_NOT_EMPTY(_rays_radius, "ray radius");
+    REQUIRE_NOT_EMPTY(_rays_fov, "ray fov");
     return {
         _world,
         _entityCount.value(),
         _elite_percentage.value(),
         _entityTexture.value(), _entityColor.value(),
-        _layers.value(), _filename.value(), _mutation_probability.value(),
+        _layers.value(), _filename.value(), _mutation_probability.value(), _mutation_strength.value(),
         _init_position.value(), _target_position.value(),
         _move_method.value(), _max_speed.value(), _max_angle.value(),
-        _rays_amount.value(), _rays_radius.value()
+        _rays_amount.value(), _rays_radius.value(), _rays_fov.value(),
     };
 }
 
@@ -76,13 +77,15 @@ PopulationBuilder &PopulationBuilder::setMovement(const int move_method, const f
     return *this;
 }
 
-PopulationBuilder &PopulationBuilder::setRays(const int rays_amount, const int rays_radius) {
+PopulationBuilder &PopulationBuilder::setRays(const int rays_amount, const int rays_radius, const float rays_fov) {
     _rays_amount = rays_amount;
     _rays_radius = rays_radius;
+    _rays_fov = rays_fov;
     return *this;
 }
 
-PopulationBuilder &PopulationBuilder::setMutationProbability(const float mutation_probability) {
+PopulationBuilder &PopulationBuilder::setMutation(const float mutation_probability, const float mutation_strength) {
     _mutation_probability = mutation_probability;
+    _mutation_strength = mutation_strength;
     return *this;
 }

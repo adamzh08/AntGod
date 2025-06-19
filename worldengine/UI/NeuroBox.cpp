@@ -7,7 +7,7 @@
 #include <csignal>
 #include <iostream>
 
-#include "Ant.h"
+#include "../Ant.h"
 
 
 class Network;
@@ -36,7 +36,7 @@ void NeuroBox::draw() const {
                 const float posY_in = _rect.y + spaceY_in * (inputIdx + 0.5);
 
                 // input neuron
-                DrawCircle(posX_in, posY_in, 3, _color);
+                DrawCircle(posX_in, posY_in, 3, BLACK);
 
                 // not last layer
                 if (l < network._layers.size() - 1) {
@@ -45,11 +45,11 @@ void NeuroBox::draw() const {
 
                         const float weight = network._weights[l][outPutIdx][inputIdx + 1];
                         const float weight_abs = std::abs(weight);
-                        const float weight_clamped = std::clamp(weight_abs, 1.f, 20.f);
+                        const float weight_line = std::clamp(weight_abs, 0.1f, 5.f) * 5;
                         DrawLineEx(
                             Vector2(posX_in, posY_in),
                             Vector2(posX_out, posY_out),
-                            weight_clamped,
+                            weight_line,
                             weight == weight_abs ? BLUE : RED
                         );
                     }
@@ -58,7 +58,7 @@ void NeuroBox::draw() const {
         }
         drawBounds();
     } else {
-        DrawText("Colony went extinct or ant is gone!", _rect.x, _rect.y, 20, BLACK);
+        DrawText("Ant not available currently!", _rect.x, _rect.y, 20, RED);
     }
 }
 

@@ -87,11 +87,15 @@ add_executable(AntGod main.cpp
         worldengine/Lines.cpp
         worldengine/Lines.h
         worldengine/LineIntersection.h
-        worldengine/Graph.cpp
-        worldengine/Graph.h
-        worldengine/InfoBox.h
-        worldengine/NeuroBox.cpp
-        worldengine/NeuroBox.h
+        worldengine/UI/Graph.cpp
+        worldengine/UI/Graph.h
+        worldengine/UI/InfoBox.h
+        worldengine/UI/NeuroBox.cpp
+        worldengine/UI/NeuroBox.h
+        worldengine/UI/RaysEditBox.cpp
+        worldengine/UI/RaysEditBox.h
+        worldengine/UI/EvolutionEditBox.cpp
+        worldengine/UI/EvolutionEditBox.h
 )
 
 target_compile_options(AntGod PRIVATE
