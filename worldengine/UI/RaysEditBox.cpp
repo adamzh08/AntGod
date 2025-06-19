@@ -20,7 +20,7 @@ void RaysEditBox::draw() const {
         },
         ("Ray length: " + std::to_string(_pop._rays_radius)).c_str()
     );
-    Rectangle iconRect(_rect.x + _rect.width * 0.6, _rect.y + _rect.height / 4 - _iconSize / 2, _iconSize, _iconSize);
+    Rectangle iconRect(_rect.x + _rect.width * 0.65, _rect.y + _rect.height / 4 - _iconSize / 2, _iconSize, _iconSize);
     if (clickedMinus(iconRect)) {
         _pop._rays_radius = std::max(5, _pop._rays_radius - _length_steps);
     }

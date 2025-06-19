@@ -17,7 +17,7 @@ class RaysEditBox : public InfoBox {
     float _fov_steps = 5 * DEG2RAD;
 
 public:
-    RaysEditBox(Population& pop, const Rectangle rect): InfoBox(rect, pop._entityColor), _pop(pop), _iconSize(std::min(70.f, rect.height / 4.f)) {
+    RaysEditBox(Population& pop, const Rectangle rect): InfoBox(rect, pop._entityColor), _pop(pop), _iconSize(std::min(46.f, rect.height * 0.4f)) {
     }
 
     static bool clickedMinus(Rectangle rect);

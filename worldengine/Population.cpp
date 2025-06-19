@@ -72,7 +72,7 @@ void Population::flood() {
     _best = nullptr;
 
     std::vector<std::shared_ptr<Ant> > selectedAnts;
-
+    selectedAnts.reserve(_ants_amount);
     for (auto &ant: _ants) {
         if (ant->_alive) {
             selectedAnts.push_back(ant);
@@ -113,11 +113,6 @@ void Population::flood() {
         }
 
         nextGen.push_back(std::make_shared<Ant>(std::move(child)));
-    }
-    // reset position and life status of all children
-    for (auto &child: nextGen) {
-        child->_alive = true;
-        child->_position = _init_position;
     }
     _ants = std::move(nextGen);
 }
