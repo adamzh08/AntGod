@@ -41,7 +41,7 @@ private:
         "Best dist to goal?",
         "Average dist to goal?",
         "Environment Sensors?",
-        "Evolutionary Parameters?",
+        "Evolutionary Params?",
         "Brain of the best?"
     };
     int _framesPerGraphUpdate = 3;

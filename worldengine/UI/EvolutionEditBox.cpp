@@ -20,10 +20,12 @@ void EvolutionEditBox::draw() const {
         ),
         ("P(Mutation): " + std::to_string(static_cast<int>(_pop._mutation_probability * 100)) + "%").c_str()
     );
-    if (RaysEditBox::clickedMinus(Rectangle(_rect.x + _rect.width * 0.6, _rect.y, 50, 50))) {
+    Rectangle iconRect(_rect.x + _rect.width * 0.6, _rect.y + _rect.height / 4 - _iconSize / 2, _iconSize, _iconSize);
+    if (RaysEditBox::clickedMinus(iconRect)) {
         _pop._mutation_probability = std::max(0.f, _pop._mutation_probability - _mutationP_steps);
     }
-    if (RaysEditBox::clickedPlus(Rectangle(_rect.x + _rect.width * 0.6 + 60, _rect.y, 50, 50))) {
+    iconRect.x += _iconSize * 1.1;
+    if (RaysEditBox::clickedPlus(iconRect)) {
         _pop._mutation_probability = std::min(1.f, _pop._mutation_probability + _mutationP_steps);
     }
     GuiLabel(
@@ -35,10 +37,13 @@ void EvolutionEditBox::draw() const {
         ),
         ("Strength(Mut): " + std::format("{:.2f}", _pop._mutation_strength)).c_str()
     );
-    if (RaysEditBox::clickedMinus(Rectangle(_rect.x + _rect.width * 0.6, _rect.y + _rect.height / 2, 50, 50))) {
+    iconRect.x -= _iconSize * 1.1;
+    iconRect.y += _rect.height / 2;
+    if (RaysEditBox::clickedMinus(iconRect)) {
         _pop._mutation_strength = std::max(0.f, _pop._mutation_strength - _mutationS_steps);
     }
-    if (RaysEditBox::clickedPlus(Rectangle(_rect.x + _rect.width * 0.6 + 60, _rect.y + _rect.height / 2, 50, 50))) {
+    iconRect.x += _iconSize * 1.1;
+    if (RaysEditBox::clickedPlus(iconRect)) {
         _pop._mutation_strength += _mutationS_steps;
     }
     drawBounds();

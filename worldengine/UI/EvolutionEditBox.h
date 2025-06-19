@@ -12,11 +12,13 @@ class EvolutionEditBox : public InfoBox {
 private:
     Population &_pop;
 
+    float _iconSize;
+
     float _mutationP_steps = 0.05;
     float _mutationS_steps = 0.05;
 
 public:
-    EvolutionEditBox(Population &pop, const Rectangle rect): InfoBox(rect, pop._entityColor), _pop(pop) {
+    EvolutionEditBox(Population &pop, const Rectangle rect): InfoBox(rect, pop._entityColor), _pop(pop), _iconSize(std::min(70.f, rect.height / 4.f)) {
     }
 
     void draw() const override;

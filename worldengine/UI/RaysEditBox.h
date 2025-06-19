@@ -11,11 +11,13 @@
 class RaysEditBox : public InfoBox {
     Population& _pop;
 
+    float _iconSize;
+
     int _length_steps = 5;
     float _fov_steps = 5 * DEG2RAD;
 
 public:
-    RaysEditBox(Population& pop, const Rectangle rect): InfoBox(rect, pop._entityColor), _pop(pop) {
+    RaysEditBox(Population& pop, const Rectangle rect): InfoBox(rect, pop._entityColor), _pop(pop), _iconSize(std::min(70.f, rect.height / 4.f)) {
     }
 
     static bool clickedMinus(Rectangle rect);

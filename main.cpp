@@ -119,8 +119,8 @@ int main() {
             .setPopulations({
                 yellowPopulation,
                 redPopulation,
-                purplePopulation,
-                greenPopulation
+                // purplePopulation,
+                // greenPopulation
             });
 
     std::jthread t(gameLoop);
