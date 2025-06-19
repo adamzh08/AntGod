@@ -8,9 +8,9 @@
 #include <iostream>
 
 std::vector<RaysDB> Lines::_raysDB;
-int Lines::_raysDBAmount;
 
-Lines::Lines() {}
+Lines::Lines() {
+}
 
 Lines Lines::addLine(Vector2 startPoint, Vector2 endPoint) {
     _lines.push_back(Line{startPoint, endPoint});
@@ -19,14 +19,15 @@ Lines Lines::addLine(Vector2 startPoint, Vector2 endPoint) {
 }
 
 std::vector<float> Lines::getRays(Vector2 mainPoint, float raysRadius, int rays_count, float main_angle,
-    float area_angle) const {
+                                  float area_angle) const {
     const std::vector<Vector2> deltaPoints = _getRaysPoints(raysRadius, rays_count, main_angle, area_angle);
 
     std::vector rays(rays_count, raysRadius);
 
     for (int i = 0; i < rays_count; i++) {
         for (int j = 0; j < _lines.size(); j++) {
-            rays[i] = fmin(rays[i], IntersectionLength(mainPoint, deltaPoints[i], _lines[j].startPoint, _lines[j].endPoint));
+            rays[i] = fmin(
+                rays[i], IntersectionLength(mainPoint, deltaPoints[i], _lines[j].startPoint, _lines[j].endPoint));
         }
     }
 
@@ -38,7 +39,7 @@ std::vector<float> Lines::getRays(Vector2 mainPoint, float raysRadius, int rays_
 }
 
 void Lines::draw() const {
-    for (auto [startPoint, endPoint] : _lines) {
+    for (auto [startPoint, endPoint]: _lines) {
         DrawLineEx(startPoint, endPoint, 1.5, BLACK);
     }
 }
@@ -53,16 +54,17 @@ std::vector<Vector2> Lines::_searchRaysDB(float raysRadius) {
 #pragma omp critical
     {
         std::cout << "Adding a record... " << std::endl;
-        _raysDBAmount += 1;
-        _raysDB.resize(_raysDBAmount);
+        _raysDB.emplace_back();
 
         _raysDB.back().raysRadius = raysRadius;
-        _raysDB.back().deltaPoints.resize(2*PI*raysRadius);
 
-        const float angle = 1/raysRadius;
-        for (int i = 0; i < 2*PI*raysRadius; i++) {
-            _raysDB.back().deltaPoints[i].x = cos(angle*i) * raysRadius;
-            _raysDB.back().deltaPoints[i].y = sin(angle*i) * raysRadius;
+        int pointCount = static_cast<int>(std::round(2 * PI * raysRadius));
+        _raysDB.back().deltaPoints.resize(pointCount);
+
+        const float angle = 1 / raysRadius;
+        for (int i = 0; i < pointCount; i++) {
+            _raysDB.back().deltaPoints[i].x = cos(angle * i) * raysRadius;
+            _raysDB.back().deltaPoints[i].y = sin(angle * i) * raysRadius;
         }
 
         std::cout << "Returned... " << std::endl;
@@ -72,18 +74,15 @@ std::vector<Vector2> Lines::_searchRaysDB(float raysRadius) {
 }
 
 std::vector<Vector2> Lines::_getRaysPoints(float raysRadius, int rays_count, float main_angle, float area_angle) {
-    std::vector<Vector2> ray_points_source = _searchRaysDB(raysRadius);
+    if (rays_count <= 1) return {};
 
+    std::vector<Vector2> ray_points_source = _searchRaysDB(raysRadius);
     int start_index = static_cast<int>((main_angle - (area_angle / 2)) * raysRadius);
 
     std::vector<Vector2> ray_points_result;
-    for (float i = 0; i < rays_count; i++) {
+    for (int i = 0; i < rays_count; i++) {
         int index = start_index + static_cast<int>(i * (area_angle * raysRadius) / (rays_count - 1));
-        if (index < 0) {
-            index += ray_points_source.size();
-        } else if (index >= ray_points_source.size()) {
-            index -= ray_points_source.size();
-        }
+        index = (index + ray_points_source.size()) % ray_points_source.size();
         ray_points_result.push_back(ray_points_source[index]);
     }
 
@@ -115,7 +114,7 @@ void Lines::drawRays(Vector2 mainPoint, float raysRadius, int rays_count, float 
 
 bool Lines::validMove(const Vector2 startPoint, const Vector2 deltaPoint) const {
     // ReSharper disable once CppUseStructuredBinding
-    for (const auto line : _lines) {
+    for (const auto line: _lines) {
         if (doIntersect(startPoint, deltaPoint, line.startPoint, line.endPoint)) {
             return false;
         }

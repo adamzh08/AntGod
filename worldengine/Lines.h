@@ -23,7 +23,6 @@ struct RaysDB {
 class Lines {
 private:
     static std::vector<RaysDB> _raysDB;
-    static int _raysDBAmount;
 
     static std::vector<Vector2> _searchRaysDB(float raysRadius);
     static std::vector<Vector2> _getRaysPoints(float raysRadius, int rays_count, float main_angle, float area_angle);

@@ -109,6 +109,9 @@ void Population::flood() {
 
         nextGen.push_back(std::make_shared<Ant>(std::move(child)));
     }
+    for (auto& ant: nextGen) {
+        ant->_position = _init_position;
+    }
     _ants = std::move(nextGen);
 }
 
