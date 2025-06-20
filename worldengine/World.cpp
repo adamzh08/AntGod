@@ -287,28 +287,11 @@ void World::afterEditOptionSelected() {
         case NONE:
         case DRAW_WALL: return;
         case DELETE_WALL: {
-            const std::vector<float> dists = _lines.getRays(_drawVar_menuPos, _pickRadius, 8, 0, 2 * PI);
-
-            int smallestIdx = 0;
-            float bestDist = dists[0];
-            for (int i = 1; i < dists.size(); i++) {
-                if (dists[i] > bestDist) {
-                    bestDist = dists[i];
-                    smallestIdx = i;
-                }
-            }
-            const float angle = 2 * PI * smallestIdx / 8;
-            const Vector2 pointOnLine(
-                _drawVar_menuPos.x + std::cos(angle) * _pickRadius,
-                _drawVar_menuPos.y + std::sin(angle) * _pickRadius
-            );
-
-            for (int i = 0; i < _lines._lines.size(); i++) {
-                Line l = _lines._lines[i];
-                if (doIntersect(l.startPoint, l.endPoint, _drawVar_menuPos, pointOnLine)) {
-                    _lines._lines.erase(_lines._lines.begin() + i);
-                    return;
-                }
+            const std::optional<int> lineIdx = findIntersectingWallRayIndex(_drawVar_menuPos, _pickRadius, 16);
+            if (lineIdx.has_value()) {
+                _lines._lines.erase(_lines._lines.begin() + lineIdx.value());
+            } else {
+                std::cerr << "wall not found" << std::endl;
             }
         }
         case MOVE_COLONY_INIT: {
@@ -345,28 +328,7 @@ bool World::menuOptionAvailable(const int option) const {
         case NONE:
         case DRAW_WALL: return true; // always available
         case DELETE_WALL: {
-            std::vector<float> dists = _lines.getRays(_drawVar_menuPos, _pickRadius, 8, 0, 2 * PI);
-
-            int bestIdx = 0;
-            float bestDist = dists[0];
-            for (int i = 1; i < dists.size(); i++) {
-                if (dists[i] > bestDist) {
-                    bestDist = dists[i];
-                    bestIdx = i;
-                }
-            }
-            if (bestDist == 0) return false;
-            const float angle = 2 * PI * bestIdx / 8;
-            const Vector2 pointOnLine(_drawVar_menuPos.x + std::cos(angle) * _pickRadius,
-                                      _drawVar_menuPos.y + std::sin(angle) * _pickRadius);
-
-            for (int i = 0; i < _lines._lines.size(); i++) {
-                Line l = _lines._lines[i];
-                if (doIntersect(l.startPoint, l.endPoint, _drawVar_menuPos, pointOnLine)) {
-                    return true;
-                }
-            }
-            return false;
+            return findIntersectingWallRayIndex(_drawVar_menuPos, _pickRadius, 16).has_value();
         }
         case MOVE_COLONY_INIT: {
             return std::ranges::any_of(_populations, [this](const Population &pop) {
@@ -456,6 +418,39 @@ void World::displayInfoBoxes() const {
     }
 }
 
+std::optional<int> World::findIntersectingWallRayIndex(Vector2 origin, float radius, int rayCount) const {
+    const std::vector<Vector2> deltas = _lines._getRaysPoints(radius, rayCount, 0, 2 * PI);
+    const std::vector<float> dists = _lines.getRays(origin, radius, rayCount, 0, 2 * PI);
+
+    int bestIdx = -1;
+    float bestValue = -1;
+
+    for (int i = 0; i < rayCount; i++) {
+        if (dists[i] > bestValue) {
+            bestValue = dists[i];
+            bestIdx = i;
+        }
+    }
+
+    if (bestValue > 0 && bestIdx >= 0) {
+        const Vector2 rayEnd = Vector2{
+            origin.x + deltas[bestIdx].x,
+            origin.y + deltas[bestIdx].y
+        };
+
+        for (int j = 0; j < _lines._lines.size(); j++) {
+            const Line &line = _lines._lines[j];
+
+            if (doIntersect(origin, rayEnd, line.startPoint, line.endPoint)) {
+                return j;
+            }
+        }
+        std::cerr << "Warning: best ray had value > 0, but no intersection was found." << std::endl;
+    }
+
+    return std::nullopt;
+}
+
 void World::drawLineOfText(const char *str, const int idx) {
     GuiDrawText(
         str,
@@ -469,7 +464,6 @@ void World::drawLineOfText(const char *str, const int idx) {
         BLACK
     );
 }
-
 
 const char *World::strFromUserMode() const {
     switch (_userMode) {

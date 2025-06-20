@@ -25,15 +25,17 @@ private:
     static std::vector<RaysDB> _raysDB;
 
     static std::vector<Vector2> _searchRaysDB(float raysRadius);
-    static std::vector<Vector2> _getRaysPoints(float raysRadius, int rays_count, float main_angle, float area_angle);
 
 public:
     std::vector<Line> _lines;
+
+
 
     Lines();
     Lines addLine(Vector2 startPoint, Vector2 endPoint);
 
     std::vector<float> getRays(Vector2 mainPoint, float raysRadius, int rays_count, float main_angle, float area_angle) const;
+    static std::vector<Vector2> _getRaysPoints(float raysRadius, int rays_count, float main_angle, float area_angle);
 
     void draw() const;
     void drawRays(Vector2 mainPoint, float raysRadius, int rays_count, float main_angle, float area_angle);

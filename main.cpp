@@ -118,6 +118,9 @@ int main() {
             .setGenerationDuration(20 * 60)
             .setPopulations({
                 yellowPopulation,
+                redPopulation,
+                purplePopulation,
+                greenPopulation,
             });
 
     std::jthread t(gameLoop);

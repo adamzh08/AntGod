@@ -6,6 +6,7 @@
 #define WORLD_H
 
 #include <atomic>
+#include <optional>
 
 #include "UI/Graph.h"
 #include "Lines.h"
@@ -58,7 +59,7 @@ private:
     Vector2 _drawVar_menuPos{};
     int _drawVar_action = NONE;
     int _drawVar_menuOptionsCount = 5;
-    float _pickRadius = 40;
+    float _pickRadius = 30;
 
     // colony movement
     int _drawVar_popIdxClicked = -1;
@@ -79,6 +80,8 @@ private:
     void handleButtons();
 
     void afterEditOptionSelected();
+
+    std::optional<int> findIntersectingWallRayIndex(Vector2 origin, float radius, int rayCount) const;
 
     [[nodiscard]] bool menuOptionAvailable(int option) const;
 
