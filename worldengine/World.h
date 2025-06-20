@@ -58,7 +58,7 @@ private:
     Vector2 _drawVar_menuPos{};
     int _drawVar_action = NONE;
     int _drawVar_menuOptionsCount = 5;
-    float _pickRadius = 20;
+    float _pickRadius = 40;
 
     // colony movement
     int _drawVar_popIdxClicked = -1;

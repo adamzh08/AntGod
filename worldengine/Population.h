@@ -66,6 +66,8 @@ public:
         int rays_amount, int rays_radius, float rays_fov
     );
 
+    void initAnts();
+
     void act();
 
     void flood();

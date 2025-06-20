@@ -26,8 +26,10 @@ World &World::setLines(const Lines &lines) {
 World &World::setPopulations(std::vector<Population> &&populations) {
     _populations = std::move(populations);
 
-    // graphs
+
     for (int i = 0; i < _populations.size(); i++) {
+        _populations[i].initAnts();
+
         const Rectangle boxPos(
             GetScreenWidth() - 400,
             GetScreenHeight() / 2 * (1 + static_cast<float>(i) / _populations.size()),
@@ -56,6 +58,7 @@ World &World::setPopulations(std::vector<Population> &&populations) {
             _populations[i],
             boxPos
         ));
+
         // brains
         _neuroBoxes.push_back(new NeuroBox(
             boxPos,

@@ -33,17 +33,19 @@ Population::Population(
                                                        _max_angle(max_angle),
                                                        _rays_amount(rays_amount), _rays_radius(rays_radius),
                                                        _rays_fov(rays_fov) {
-    // ants
+}
+
+void Population::initAnts() {
     _ants.reserve(_ants_amount);
 
-    if (filename.empty()) {
+    if (_filename.empty()) {
         // completely random
         for (int i = 0; i < _ants_amount; i++) {
-            _ants.push_back(std::make_shared<Ant>(*this, layers));
+            _ants.push_back(std::make_shared<Ant>(*this, _layers));
         }
     } else {
         // from file
-        Ant defaultAnt(*this, layers);
+        Ant defaultAnt(*this, _layers);
         for (int i = 0; i < _ants_amount; i++) {
             _ants.push_back(std::make_shared<Ant>(defaultAnt));
         }
@@ -144,9 +146,7 @@ void Population::draw() {
             ant->draw();
         }
     }
-
     setBest();
-
 
     if (_best != nullptr) {
         if (_world._showRays) {
