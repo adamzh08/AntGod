@@ -73,7 +73,7 @@ int main() {
 
     // Populations
     std::unique_ptr<Population> yellowPopulation = PopulationBuilder(*world)
-            .setCount(1000)
+            .setCount(100)
             .setElitePercentage(0.3)
             .setNetwork(layers, "")
             .setMutation(0.1, 0.2)
@@ -84,7 +84,7 @@ int main() {
             .build();
     std::unique_ptr<Population> redPopulation(
         PopulationBuilder(*world)
-        .setCount(1000)
+        .setCount(100)
         .setElitePercentage(0.3)
         .setNetwork(layers, "")
         .setMutation(0.1, 0.2)
@@ -95,7 +95,7 @@ int main() {
         .build()
     );
     std::unique_ptr<Population> purplePopulation(PopulationBuilder(*world)
-        .setCount(1000)
+        .setCount(100)
         .setElitePercentage(0.3)
         .setNetwork(layers, "")
         .setMutation(0.1, 0.2)
@@ -107,7 +107,7 @@ int main() {
     );
     std::unique_ptr<Population> greenPopulation(
         PopulationBuilder(*world)
-        .setCount(1000)
+        .setCount(100)
         .setElitePercentage(0.1)
         .setNetwork(layers, "")
         .setMutation(0.3, 0.2)

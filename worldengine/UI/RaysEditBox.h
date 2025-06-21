@@ -13,7 +13,9 @@ class RaysEditBox : public InfoBox {
 
     float _iconSize;
 
-    int _length_steps = 5;
+    float _length_steps = 5;
+    float _length_min = 50;
+    float _length_max = 500;
     float _fov_steps = 5 * DEG2RAD;
 
 public:
