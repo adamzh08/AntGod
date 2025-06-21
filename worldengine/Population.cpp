@@ -165,13 +165,13 @@ void Population::draw() {
     }
 
     // init position
-    drawXAt(_init_position);
+    drawXAt(_init_position, _entityColor);
 
     // target position
-    drawFlagAt(_target_position);
+    drawFlagAt(_target_position, _entityColor);
 }
 
-void Population::drawXAt(const Vector2 pos) const {
+void Population::drawXAt(const Vector2 pos, const Color tint) {
     const Rectangle dest(
         pos.x,
         pos.y,
@@ -189,11 +189,11 @@ void Population::drawXAt(const Vector2 pos) const {
         dest,
         Vector2(dest.width / 2, dest.height / 2),
         0,
-        _entityColor
+        tint
     );
 }
 
-void Population::drawFlagAt(const Vector2 pos) const {
+void Population::drawFlagAt(const Vector2 pos, const Color tint) {
     const Rectangle dest(
         pos.x,
         pos.y,
@@ -213,7 +213,7 @@ void Population::drawFlagAt(const Vector2 pos) const {
             0, dest.height
         ),
         0,
-        _entityColor
+        tint
     );
 }
 

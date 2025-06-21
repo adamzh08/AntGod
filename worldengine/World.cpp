@@ -13,6 +13,8 @@
 #include <thread>
 
 #include "LineIntersection.h"
+#include "PopulationBuilder.h"
+#include "TextureCollection.h"
 #include "../raygui.h"
 #include "UI/EvolutionEditBox.h"
 #include "UI/RaysEditBox.h"
@@ -25,7 +27,7 @@ World &World::setLines(const Lines &lines) {
 
 World &World::setPopulations(std::vector<std::unique_ptr<Population> > &&populations) {
     _populations = std::move(populations);
-    for (auto& pop : _populations) {
+    for (auto &pop: _populations) {
         pop->initAnts();
     }
     reconstructInfoBoxes();
@@ -96,11 +98,16 @@ void World::drawGame() {
             break;
         }
         case MOVE_COLONY_INIT: {
-            _populations[findClickedColonyIndex().value()]->drawXAt(GetMousePosition());
+            Population::drawXAt(GetMousePosition(), _populations[findClickedColonyIndex().value()]->_entityColor);
             break;
         }
         case MOVE_COLONY_TARGET: {
-            _populations[findClickedTargetIndex().value()]->drawFlagAt(GetMousePosition());
+            Population::drawFlagAt(GetMousePosition(), _populations[findClickedTargetIndex().value()]->_entityColor);
+            break;
+        }
+        case CREATE_COLONY: {
+            Population::drawXAt(_drawVar_menuPos, WHITE);
+            Population::drawFlagAt(GetMousePosition(), WHITE);
             break;
         }
         default: std::cerr << "invalid action" << std::endl;
@@ -169,11 +176,11 @@ void World::handleButtons() {
     if (_drawVar_hasRightClicked) {
         const Color niceButtonGreen = Fade((Color){0, 0, 0}, 0.75f);
 
-        Rectangle menuRect{
+        const Rectangle menuRect{
             _drawVar_menuPos.x,
             _drawVar_menuPos.y,
             200,
-            200
+            1.2f * _drawVar_editMenuButtonHeight * _drawVar_menuOptionsCount
         };
         for (int i = 0; i < _drawVar_menuOptionsCount; i++) {
             bool available = menuOptionAvailable(i);
@@ -189,9 +196,9 @@ void World::handleButtons() {
             if (!available) GuiDisable();
             if (GuiButton({
                               _drawVar_menuPos.x,
-                              _drawVar_menuPos.y + 200 * i / _drawVar_menuOptionsCount,
+                              _drawVar_menuPos.y + menuRect.height * i / _drawVar_menuOptionsCount,
                               200,
-                              30
+                              _drawVar_editMenuButtonHeight
                           }, strFromDrawMode(i))) {
                 _drawVar_hasRightClicked = false;
                 _drawVar_action = i;
@@ -241,6 +248,35 @@ void World::handleMapEditing() {
             }
             break;
         }
+        case CREATE_COLONY: {
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                auto randC = []() {
+                    return static_cast<unsigned char>(static_cast<float>(rand()) / RAND_MAX * 255);
+                };
+                const Color randomColor{randC(), randC(), randC(), 255};
+
+                // default config
+                auto newPop = PopulationBuilder(*this)
+                        .setCount(100)
+                        .setElitePercentage(0.3)
+                        .setNetwork(_populations[0]->_layers, "")
+                        .setMutation(0.1, 0.2)
+                        .setPositions(_drawVar_menuPos, GetMousePosition())
+                        .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
+                        .setRays(30, 100, 60 * DEG2RAD) // 60°
+                        .setEntityTexture(TextureCollection::whiteAnt, randomColor)
+                        .build();
+
+                std::lock_guard<std::mutex> lock(_populationMutex);
+
+                _populations.push_back(std::move(newPop));
+                _populations.back()->initAnts();
+
+                reconstructInfoBoxes();
+                _drawVar_action = NONE;
+            }
+            break;
+        }
         default: std::cerr << "invalid action" << std::endl;
     }
 }
@@ -250,7 +286,8 @@ void World::afterEditOptionSelected() {
         case NONE:
         case DRAW_WALL:
         case MOVE_COLONY_INIT:
-        case MOVE_COLONY_TARGET: return;
+        case MOVE_COLONY_TARGET:
+        case CREATE_COLONY: return;
         case DELETE_WALL: {
             const int lineIdx = findIntersectingWallRayIndex(_drawVar_menuPos, _pickRadius, 16).value();
             _lines._lines.erase(_lines._lines.begin() + lineIdx);
@@ -258,10 +295,8 @@ void World::afterEditOptionSelected() {
         }
         case DELETE_COLONY: {
             const int popIdx = findClickedColonyIndex().value();
-            {
-                std::lock_guard<std::mutex> lock(_populationMutex);
-                _populations.erase(_populations.begin() + popIdx);
-            }
+            std::lock_guard<std::mutex> lock(_populationMutex);
+            _populations.erase(_populations.begin() + popIdx);
             reconstructInfoBoxes();
             break;
         }
@@ -273,7 +308,8 @@ void World::afterEditOptionSelected() {
 bool World::menuOptionAvailable(const int option) const {
     switch (option) {
         case NONE:
-        case DRAW_WALL: return true; // always available
+        case DRAW_WALL:
+        case CREATE_COLONY: return true; // always available
         case DELETE_WALL: {
             return findIntersectingWallRayIndex(_drawVar_menuPos, _pickRadius, 16).has_value();
         }
@@ -500,6 +536,7 @@ const char *World::strFromDrawMode(const int action) {
         case DELETE_WALL: return "Delete Wall";
         case MOVE_COLONY_INIT: return "Move Origin";
         case MOVE_COLONY_TARGET: return "Move Target";
+        case CREATE_COLONY: return "Create Colony";
         case DELETE_COLONY: return "Delete Colony";
         default: std::cerr << "undefined action" << std::endl;
     }

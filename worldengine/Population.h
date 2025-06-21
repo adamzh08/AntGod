@@ -82,9 +82,8 @@ public:
 
     void draw();
 
-    void drawXAt(Vector2) const;
-
-    void drawFlagAt(Vector2) const;
+    static void drawXAt(Vector2, Color);
+    static void drawFlagAt(Vector2, Color);
 };
 
 #endif //POPULATION_H

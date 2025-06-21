@@ -25,6 +25,7 @@ enum DrawAction {
     DELETE_WALL,
     MOVE_COLONY_INIT,
     MOVE_COLONY_TARGET,
+    CREATE_COLONY,
     DELETE_COLONY,
 };
 
@@ -59,7 +60,9 @@ private:
     bool _drawVar_hasRightClicked = false;
     Vector2 _drawVar_menuPos{};
     int _drawVar_action = NONE;
-    int _drawVar_menuOptionsCount = 6;
+    int _drawVar_menuOptionsCount = 7;
+    float _drawVar_editMenuButtonHeight = 30;
+
     float _pickRadius = 30;
 
 
