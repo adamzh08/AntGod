@@ -21,10 +21,11 @@ enum UserMode {
 
 enum DrawAction {
     NONE,
-    DRAW_WALL, // Done
-    DELETE_WALL, // Todo
-    MOVE_COLONY_INIT, // Done
-    MOVE_COLONY_TARGET // Done
+    DRAW_WALL,
+    DELETE_WALL,
+    MOVE_COLONY_INIT,
+    MOVE_COLONY_TARGET,
+    DELETE_COLONY,
 };
 
 class World {
@@ -58,11 +59,8 @@ private:
     bool _drawVar_hasRightClicked = false;
     Vector2 _drawVar_menuPos{};
     int _drawVar_action = NONE;
-    int _drawVar_menuOptionsCount = 5;
+    int _drawVar_menuOptionsCount = 6;
     float _pickRadius = 30;
-
-    // colony movement
-    int _drawVar_popIdxClicked = -1;
 
 
     void drawGame();
@@ -81,7 +79,11 @@ private:
 
     void afterEditOptionSelected();
 
+    void reconstructInfoBoxes();
+
     std::optional<int> findIntersectingWallRayIndex(Vector2 origin, float radius, int rayCount) const;
+    std::optional<int> findClickedColonyIndex() const;
+    std::optional<int> findClickedTargetIndex() const;
 
     [[nodiscard]] bool menuOptionAvailable(int option) const;
 
@@ -93,7 +95,8 @@ private:
 
 public:
     Lines _lines;
-    std::vector<Population> _populations;
+    std::vector<std::unique_ptr<Population>> _populations;
+    mutable std::mutex _populationMutex;
 
     int _generation_frameDuration{};
     int _generation_count{};
@@ -105,7 +108,7 @@ public:
 
     World &setLines(const Lines &lines);
 
-    World &setPopulations(std::vector<Population> &&populations);
+    World &setPopulations(std::vector<std::unique_ptr<Population>>&& populations);
 
     World &setGenerationDuration(int duration);
 

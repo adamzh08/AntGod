@@ -13,7 +13,7 @@ PopulationBuilder::PopulationBuilder(World &world): _world(world) {
  * @throws std::runtime_error if not all fields are set
  * @return a Population with the specified settings
  */
-Population PopulationBuilder::build() {
+std::unique_ptr<Population> PopulationBuilder::build() {
     REQUIRE_NOT_EMPTY(_entityCount, "count");
     REQUIRE_NOT_EMPTY(_elite_percentage, "elite percentage");
     REQUIRE_NOT_EMPTY(_entityTexture, "texture");
@@ -29,16 +29,18 @@ Population PopulationBuilder::build() {
     REQUIRE_NOT_EMPTY(_rays_amount, "ray amount");
     REQUIRE_NOT_EMPTY(_rays_radius, "ray radius");
     REQUIRE_NOT_EMPTY(_rays_fov, "ray fov");
-    return {
-        _world,
-        _entityCount.value(),
-        _elite_percentage.value(),
-        _entityTexture.value(), _entityColor.value(),
-        _layers.value(), _filename.value(), _mutation_probability.value(), _mutation_strength.value(),
-        _init_position.value(), _target_position.value(),
-        _move_method.value(), _max_speed.value(), _max_angle.value(),
-        _rays_amount.value(), _rays_radius.value(), _rays_fov.value(),
-    };
+    return std::make_unique<Population>(
+        Population(
+            _world,
+            _entityCount.value(),
+            _elite_percentage.value(),
+            _entityTexture.value(), _entityColor.value(),
+            _layers.value(), _filename.value(), _mutation_probability.value(), _mutation_strength.value(),
+            _init_position.value(), _target_position.value(),
+            _move_method.value(), _max_speed.value(), _max_angle.value(),
+            _rays_amount.value(), _rays_radius.value(), _rays_fov.value()
+        )
+    );
 }
 
 

@@ -23,56 +23,9 @@ World &World::setLines(const Lines &lines) {
     return *this;
 }
 
-World &World::setPopulations(std::vector<Population> &&populations) {
+World &World::setPopulations(std::vector<std::unique_ptr<Population> > &&populations) {
     _populations = std::move(populations);
-
-
-    for (int i = 0; i < _populations.size(); i++) {
-        _populations[i].initAnts();
-
-        const Rectangle boxPos(
-            GetScreenWidth() - 400,
-            GetScreenHeight() / 2 * (1 + static_cast<float>(i) / _populations.size()),
-            400,
-            GetScreenHeight() / 2 / _populations.size() - 15
-        );
-        // graphs
-        _aliveGraphs.push_back(new Graph(
-            boxPos,
-            _populations[i]._entityColor
-        ));
-        _bestDistGraphs.push_back(new Graph(
-            boxPos,
-            _populations[i]._entityColor
-        ));
-        _avgDistGraphs.push_back(new Graph(
-            boxPos,
-            _populations[i]._entityColor
-        ));
-        // parameters
-        _sensorBoxes.push_back(new RaysEditBox(
-            _populations[i],
-            boxPos
-        ));
-        _evolutionBoxes.push_back(new EvolutionEditBox(
-            _populations[i],
-            boxPos
-        ));
-
-        // brains
-        _neuroBoxes.push_back(new NeuroBox(
-            boxPos,
-            _populations[i]._entityColor
-        ));
-    }
-
-    _allInfoBoxes.push_back(&_aliveGraphs);
-    _allInfoBoxes.push_back(&_bestDistGraphs);
-    _allInfoBoxes.push_back(&_avgDistGraphs);
-    _allInfoBoxes.push_back(&_sensorBoxes);
-    _allInfoBoxes.push_back(&_evolutionBoxes);
-    _allInfoBoxes.push_back(&_neuroBoxes);
-
+    reconstructInfoBoxes();
     return *this;
 }
 
@@ -85,15 +38,20 @@ void World::act() {
     if (!_paused) {
         _frameCount++;
 
+        std::lock_guard<std::mutex> lock(_populationMutex);
         if (_frameCount == _generation_frameDuration) {
-            for (Population &population: _populations) {
-                population.flood();
+            for (auto &pop: _populations) {
+                pop->flood();
             }
             _generation_count++;
             _frameCount = 0;
         }
-        for (Population &population: _populations) {
-            population.act();
+        for (auto &pop: _populations) {
+            if (!pop) {
+                std::cerr << "Null population" << std::endl;
+                continue;
+            }
+            pop->act();
         }
     }
 }
@@ -121,24 +79,25 @@ void World::drawGame() {
     _lines.draw();
 
     // colonies
-    for (Population &population: _populations) {
-        population.draw();
+    for (auto &population: _populations) {
+        population->draw();
     }
 
     switch (_drawVar_action) {
         case NONE:
-        case DELETE_WALL: break;
+        case DELETE_WALL:
+        case DELETE_COLONY: break;
 
         case DRAW_WALL: {
             DrawLineV(_drawVar_menuPos, GetMousePosition(), BLUE);
             break;
         }
         case MOVE_COLONY_INIT: {
-            _populations[_drawVar_popIdxClicked].drawXAt(GetMousePosition());
+            _populations[findClickedColonyIndex().value()]->drawXAt(GetMousePosition());
             break;
         }
         case MOVE_COLONY_TARGET: {
-            _populations[_drawVar_popIdxClicked].drawFlagAt(GetMousePosition());
+            _populations[findClickedTargetIndex().value()]->drawFlagAt(GetMousePosition());
             break;
         }
         default: std::cerr << "invalid action" << std::endl;
@@ -252,7 +211,8 @@ void World::handleMapEditing() {
     }
     switch (_drawVar_action) {
         case NONE:
-        case DELETE_WALL: break;
+        case DELETE_WALL:
+        case DELETE_COLONY: break;
 
         case DRAW_WALL: {
             if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
@@ -265,7 +225,7 @@ void World::handleMapEditing() {
         case MOVE_COLONY_INIT: {
             if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
                 // moving the colony init position
-                _populations[_drawVar_popIdxClicked]._init_position = GetMousePosition();
+                _populations[findClickedColonyIndex().value()]->_init_position = GetMousePosition();
                 _drawVar_action = NONE;
             }
             break;
@@ -273,52 +233,36 @@ void World::handleMapEditing() {
         case MOVE_COLONY_TARGET: {
             if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
                 // moving the colony target position
-                _populations[_drawVar_popIdxClicked]._target_position = GetMousePosition();
+                _populations[findClickedTargetIndex().value()]->_target_position = GetMousePosition();
                 _drawVar_action = NONE;
             }
             break;
         }
-        default: std::cerr << "invailid action" << std::endl;
+        default: std::cerr << "invalid action" << std::endl;
     }
 }
 
 void World::afterEditOptionSelected() {
     switch (_drawVar_action) {
         case NONE:
-        case DRAW_WALL: return;
+        case DRAW_WALL:
+        case MOVE_COLONY_INIT:
+        case MOVE_COLONY_TARGET: return;
         case DELETE_WALL: {
-            const std::optional<int> lineIdx = findIntersectingWallRayIndex(_drawVar_menuPos, _pickRadius, 16);
-            if (lineIdx.has_value()) {
-                _lines._lines.erase(_lines._lines.begin() + lineIdx.value());
-            } else {
-                std::cerr << "wall not found" << std::endl;
-            }
+            const int lineIdx = findIntersectingWallRayIndex(_drawVar_menuPos, _pickRadius, 16).value();
+            _lines._lines.erase(_lines._lines.begin() + lineIdx);
+            break;
         }
-        case MOVE_COLONY_INIT: {
-            for (int i = 0; i < _populations.size(); i++) {
-                const bool clicked_x = _populations[i]._init_position.x - _pickRadius < _drawVar_menuPos.x &&
-                                       _drawVar_menuPos.x < _populations[i]._init_position.x + _pickRadius;
-                const bool clicked_y = _populations[i]._init_position.y - _pickRadius < _drawVar_menuPos.y &&
-                                       _drawVar_menuPos.y < _populations[i]._init_position.y + _pickRadius;
-                if (clicked_x && clicked_y) {
-                    _drawVar_popIdxClicked = i;
-                    return;
-                }
+        case DELETE_COLONY: {
+            const int popIdx = findClickedColonyIndex().value();
+            {
+                std::lock_guard<std::mutex> lock(_populationMutex);
+                _populations.erase(_populations.begin() + popIdx);
             }
+            reconstructInfoBoxes();
+            break;
         }
-        case MOVE_COLONY_TARGET: {
-            for (int i = 0; i < _populations.size(); i++) {
-                const bool clicked_x = _populations[i]._target_position.x - _pickRadius < _drawVar_menuPos.x &&
-                                       _drawVar_menuPos.x < _populations[i]._target_position.x + _pickRadius;
-                const bool clicked_y = _populations[i]._target_position.y - _pickRadius < _drawVar_menuPos.y &&
-                                       _drawVar_menuPos.y < _populations[i]._target_position.y + _pickRadius;
-                if (clicked_x && clicked_y) {
-                    _drawVar_popIdxClicked = i;
-                    return;
-                }
-            }
-        }
-        default: std::cerr << "invailid action" << std::endl;
+        default: std::cerr << "invalid action" << std::endl;
     }
 }
 
@@ -331,22 +275,13 @@ bool World::menuOptionAvailable(const int option) const {
             return findIntersectingWallRayIndex(_drawVar_menuPos, _pickRadius, 16).has_value();
         }
         case MOVE_COLONY_INIT: {
-            return std::ranges::any_of(_populations, [this](const Population &pop) {
-                const bool clicked_x = pop._init_position.x - _pickRadius < _drawVar_menuPos.x &&
-                                       _drawVar_menuPos.x < pop._init_position.x + _pickRadius;
-                const bool clicked_y = pop._init_position.y - _pickRadius < _drawVar_menuPos.y &&
-                                       _drawVar_menuPos.y < pop._init_position.y + _pickRadius;
-                return clicked_x && clicked_y;
-            });
+            return findClickedColonyIndex().has_value();
         }
         case MOVE_COLONY_TARGET: {
-            return std::ranges::any_of(_populations, [this](const Population &pop) {
-                const bool clicked_x = pop._target_position.x - _pickRadius < _drawVar_menuPos.x &&
-                                       _drawVar_menuPos.x < pop._target_position.x + _pickRadius;
-                const bool clicked_y = pop._target_position.y - _pickRadius < _drawVar_menuPos.y &&
-                                       _drawVar_menuPos.y < pop._target_position.y + _pickRadius;
-                return clicked_x && clicked_y;
-            });
+            return findClickedTargetIndex().has_value();
+        }
+        case DELETE_COLONY: {
+            return findClickedColonyIndex().has_value();
         }
         default: return false;
     }
@@ -395,19 +330,19 @@ void World::updateInfoBoxes() {
         // graphs
         dynamic_cast<Graph *>(_aliveGraphs[i])->addPoint(
             _generation_frameDuration * _generation_count + _frameCount,
-            _populations[i].getAliveCount()
+            _populations[i]->getAliveCount()
         );
         dynamic_cast<Graph *>(_bestDistGraphs[i])->addPoint(
             _generation_frameDuration * _generation_count + _frameCount,
-            _populations[i].getBestDist()
+            _populations[i]->getBestDist()
         );
         dynamic_cast<Graph *>(_avgDistGraphs[i])->addPoint(
             _generation_frameDuration * _generation_count + _frameCount,
-            _populations[i].getAvgDist()
+            _populations[i]->getAvgDist()
         );
         // neuroboxes
         dynamic_cast<NeuroBox *>(_neuroBoxes[i])->setEntity(
-            _populations[i]._best
+            _populations[i]->_best
         );
     }
 }
@@ -417,6 +352,64 @@ void World::displayInfoBoxes() const {
         _allInfoBoxes[_shownGraphTypeIdx]->at(i)->draw();
     }
 }
+
+void World::reconstructInfoBoxes() {
+    _allInfoBoxes.clear();
+
+    _aliveGraphs.clear();
+    _bestDistGraphs.clear();
+    _avgDistGraphs.clear();
+    _sensorBoxes.clear();
+    _evolutionBoxes.clear();
+    _neuroBoxes.clear();
+
+    for (int i = 0; i < _populations.size(); i++) {
+        _populations[i]->initAnts();
+
+        const Rectangle boxPos(
+            GetScreenWidth() - 400,
+            GetScreenHeight() / 2 * (1 + static_cast<float>(i) / _populations.size()),
+            400,
+            GetScreenHeight() / 2 / _populations.size() - 15
+        );
+        // graphs
+        _aliveGraphs.push_back(new Graph(
+            boxPos,
+            _populations[i]->_entityColor
+        ));
+        _bestDistGraphs.push_back(new Graph(
+            boxPos,
+            _populations[i]->_entityColor
+        ));
+        _avgDistGraphs.push_back(new Graph(
+            boxPos,
+            _populations[i]->_entityColor
+        ));
+        // parameters
+        _sensorBoxes.push_back(new RaysEditBox(
+            *_populations[i],
+            boxPos
+        ));
+        _evolutionBoxes.push_back(new EvolutionEditBox(
+            *_populations[i],
+            boxPos
+        ));
+
+        // brains
+        _neuroBoxes.push_back(new NeuroBox(
+            boxPos,
+            _populations[i]->_entityColor
+        ));
+    }
+
+    _allInfoBoxes.push_back(&_aliveGraphs);
+    _allInfoBoxes.push_back(&_bestDistGraphs);
+    _allInfoBoxes.push_back(&_avgDistGraphs);
+    _allInfoBoxes.push_back(&_sensorBoxes);
+    _allInfoBoxes.push_back(&_evolutionBoxes);
+    _allInfoBoxes.push_back(&_neuroBoxes);
+}
+
 
 std::optional<int> World::findIntersectingWallRayIndex(Vector2 origin, float radius, int rayCount) const {
     const std::vector<Vector2> deltas = _lines._getRaysPoints(radius, rayCount, 0, 2 * PI);
@@ -451,6 +444,32 @@ std::optional<int> World::findIntersectingWallRayIndex(Vector2 origin, float rad
     return std::nullopt;
 }
 
+std::optional<int> World::findClickedColonyIndex() const {
+    for (int i = 0; i < _populations.size(); i++) {
+        const bool clicked_x = _populations[i]->_init_position.x - _pickRadius < _drawVar_menuPos.x &&
+                               _drawVar_menuPos.x < _populations[i]->_init_position.x + _pickRadius;
+        const bool clicked_y = _populations[i]->_init_position.y - _pickRadius < _drawVar_menuPos.y &&
+                               _drawVar_menuPos.y < _populations[i]->_init_position.y + _pickRadius;
+        if (clicked_x && clicked_y) {
+            return i;
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<int> World::findClickedTargetIndex() const {
+    for (int i = 0; i < _populations.size(); i++) {
+        const bool clicked_x = _populations[i]->_target_position.x - _pickRadius < _drawVar_menuPos.x &&
+                               _drawVar_menuPos.x < _populations[i]->_target_position.x + _pickRadius;
+        const bool clicked_y = _populations[i]->_target_position.y - _pickRadius < _drawVar_menuPos.y &&
+                               _drawVar_menuPos.y < _populations[i]->_target_position.y + _pickRadius;
+        if (clicked_x && clicked_y) {
+            return i;
+        }
+    }
+    return std::nullopt;
+}
+
 void World::drawLineOfText(const char *str, const int idx) {
     GuiDrawText(
         str,
@@ -460,7 +479,7 @@ void World::drawLineOfText(const char *str, const int idx) {
             400,
             10
         ),
-        TEXT_ALIGN_LEFT | TEXT_ALIGN_TOP,
+        TEXT_ALIGN_CENTER,
         BLACK
     );
 }
@@ -475,11 +494,12 @@ const char *World::strFromUserMode() const {
 
 const char *World::strFromDrawMode(const int action) {
     switch (action) {
-        case NONE: return "None";
+        case NONE: return "Close";
         case DRAW_WALL: return "Draw Wall";
         case DELETE_WALL: return "Delete Wall";
-        case MOVE_COLONY_INIT: return "Move Colony Init";
-        case MOVE_COLONY_TARGET: return "Move Colony Target";
+        case MOVE_COLONY_INIT: return "Move Origin";
+        case MOVE_COLONY_TARGET: return "Move Target";
+        case DELETE_COLONY: return "Delete Colony";
         default: std::cerr << "undefined action" << std::endl;
     }
     return "?";

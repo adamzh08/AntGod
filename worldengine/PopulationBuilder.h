@@ -54,7 +54,7 @@ public:
     PopulationBuilder& setMutation(float probability, float _mutation_strength);
 
 
-    Population build();
+    std::unique_ptr<Population> build();
 };
 
 
