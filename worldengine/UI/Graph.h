@@ -29,7 +29,7 @@ public:
 
     void draw() const override;
 
-    void addPoint(int, int);
+    void addPoint(float, float);
     void addPointV(Vector2);
 };
 

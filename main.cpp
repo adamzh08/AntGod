@@ -73,18 +73,18 @@ int main() {
 
     // Populations
     std::unique_ptr<Population> yellowPopulation = PopulationBuilder(*world)
-        .setCount(100)
-        .setElitePercentage(0.3)
-        .setNetwork(layers, "")
-        .setMutation(0.1, 0.2)
-        .setPositions(Vector2{400, 300}, Vector2{50, 300})
-        .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
-        .setRays(30, 100, 60 * DEG2RAD) // 60°
-        .setEntityTexture(TextureCollection::whiteAnt, DARKYELLOW)
-        .build();
+            .setCount(1000)
+            .setElitePercentage(0.3)
+            .setNetwork(layers, "")
+            .setMutation(0.1, 0.2)
+            .setPositions(Vector2{400, 300}, Vector2{50, 300})
+            .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
+            .setRays(30, 100, 60 * DEG2RAD) // 60°
+            .setEntityTexture(TextureCollection::whiteAnt, DARKYELLOW)
+            .build();
     std::unique_ptr<Population> redPopulation(
         PopulationBuilder(*world)
-        .setCount(100)
+        .setCount(1000)
         .setElitePercentage(0.3)
         .setNetwork(layers, "")
         .setMutation(0.1, 0.2)
@@ -95,7 +95,7 @@ int main() {
         .build()
     );
     std::unique_ptr<Population> purplePopulation(PopulationBuilder(*world)
-        .setCount(100)
+        .setCount(1000)
         .setElitePercentage(0.3)
         .setNetwork(layers, "")
         .setMutation(0.1, 0.2)
@@ -107,7 +107,7 @@ int main() {
     );
     std::unique_ptr<Population> greenPopulation(
         PopulationBuilder(*world)
-        .setCount(100)
+        .setCount(1000)
         .setElitePercentage(0.1)
         .setNetwork(layers, "")
         .setMutation(0.3, 0.2)
@@ -117,8 +117,7 @@ int main() {
         .setEntityTexture(TextureCollection::whiteAnt, DARKGREEN)
         .build()
     );
-    std::vector<std::unique_ptr<Population> > populations{
-    };
+    std::vector<std::unique_ptr<Population> > populations{};
 
     populations.push_back(std::move(yellowPopulation));
     populations.push_back(std::move(redPopulation));
@@ -129,14 +128,15 @@ int main() {
             .setGenerationDuration(20 * 60)
             .setPopulations(std::move(populations));
 
-    std::jthread t(gameLoop);
+    // std::jthread t(gameLoop);
 
     while (!WindowShouldClose()) {
         UpdateMusicStream(music); // Update music buffer with new stream data
+        world->act();
         draw();
     }
 
-    t.request_stop();
+    // t.request_stop();
     UnloadMusicStream(music); // Unload music stream buffers from RAM
     CloseAudioDevice(); // Close audio device (music streaming is automatically stopped)
     TextureCollection::FreeAll();

@@ -25,6 +25,9 @@ World &World::setLines(const Lines &lines) {
 
 World &World::setPopulations(std::vector<std::unique_ptr<Population> > &&populations) {
     _populations = std::move(populations);
+    for (auto& pop : _populations) {
+        pop->initAnts();
+    }
     reconstructInfoBoxes();
     return *this;
 }
@@ -364,8 +367,6 @@ void World::reconstructInfoBoxes() {
     _neuroBoxes.clear();
 
     for (int i = 0; i < _populations.size(); i++) {
-        _populations[i]->initAnts();
-
         const Rectangle boxPos(
             GetScreenWidth() - 400,
             GetScreenHeight() / 2 * (1 + static_cast<float>(i) / _populations.size()),

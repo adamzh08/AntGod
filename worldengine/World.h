@@ -46,7 +46,7 @@ private:
         "Evolutionary Params?",
         "Brain of the best?"
     };
-    int _framesPerGraphUpdate = 3;
+    int _framesPerGraphUpdate = 1;
     int _frameCounter_graphUpdate{};
 
     int _shownGraphTypeIdx{};

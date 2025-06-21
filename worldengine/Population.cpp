@@ -36,6 +36,7 @@ Population::Population(
 }
 
 void Population::initAnts() {
+    _ants.clear();
     _ants.reserve(_ants_amount);
 
     if (_filename.empty()) {

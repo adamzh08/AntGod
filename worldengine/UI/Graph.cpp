@@ -26,7 +26,7 @@ void Graph::addPointV(const Vector2 newPoint) {
     }
 }
 
-void Graph::addPoint(int x, int y) {
+void Graph::addPoint(float x, float y) {
     addPointV(Vector2(x, y));
 }
 
