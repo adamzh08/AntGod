@@ -47,14 +47,14 @@ void Lines::draw() const {
     }
 }
 
-void Lines::addRecord(float raysRadius) {
+float Lines::addRecord(float raysRadius) {
     auto it = std::find_if(_raysDB.begin(), _raysDB.end(),
     [raysRadius](const RaysDB& p) {
         return p.raysRadius == raysRadius;
     });
 
     if (it != _raysDB.end()) {
-        return; // Already exists
+        return raysRadius; // Already exists
     }
 
     std::cout << "Adding a record... " << std::endl;
@@ -70,19 +70,23 @@ void Lines::addRecord(float raysRadius) {
         _raysDB.back().deltaPoints[i].x = cos(angle * i) * raysRadius;
         _raysDB.back().deltaPoints[i].y = sin(angle * i) * raysRadius;
     }
+
+    return raysRadius;
 }
 
-std::vector<Vector2> Lines::_searchRaysDB(float raysRadius) {
+std::vector<Vector2> empty{};
+
+std::vector<Vector2> &Lines::_searchRaysDB(float raysRadius) {
     // ReSharper disable once CppUseStructuredBinding
     auto it = std::find_if(_raysDB.begin(), _raysDB.end(),
     [raysRadius](const RaysDB& p) {
         return p.raysRadius == raysRadius;
     });
 
-    if (it != _raysDB.end()) {
+    if (it != _raysDB.end() && !it->deltaPoints.empty()) {
         return it->deltaPoints; // Already exists
     } else {
-        exit(123); // Should never happen
+        return empty;
     }
 }
 
