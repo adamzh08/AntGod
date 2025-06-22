@@ -24,12 +24,10 @@ class Lines {
 private:
     static std::vector<RaysDB> _raysDB;
 
-    static std::vector<Vector2> _searchRaysDB(float raysRadius);
+    static std::vector<Vector2>& _searchRaysDB(float raysRadius);
 
 public:
     std::vector<Line> _lines;
-
-
 
     Lines();
     Lines addLine(Vector2 startPoint, Vector2 endPoint);
@@ -39,7 +37,7 @@ public:
 
     void draw() const;
 
-    static void addRecord(float raysRadius);
+    static float addRecord(float raysRadius);
 
     void drawRays(Vector2 mainPoint, float raysRadius, int rays_count, float main_angle, float area_angle);
 
