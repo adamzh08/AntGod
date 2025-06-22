@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <optional>
+#include <thread>
 
 #include "UI/Graph.h"
 #include "Lines.h"
@@ -55,6 +56,9 @@ private:
     bool _showInfo = true;
     bool _paused = false;
 
+    std::mutex _populationMutex;
+    std::atomic<bool> _UI_needsPops = false;
+
     // drawing
     UserMode _userMode = OBSERVE;
     bool _drawVar_hasRightClicked = false;
@@ -85,7 +89,9 @@ private:
     void reconstructInfoBoxes();
 
     std::optional<int> findIntersectingWallRayIndex(Vector2 origin, float radius, int rayCount) const;
+
     std::optional<int> findClickedColonyIndex() const;
+
     std::optional<int> findClickedTargetIndex() const;
 
     [[nodiscard]] bool menuOptionAvailable(int option) const;
@@ -94,12 +100,11 @@ private:
 
     [[nodiscard]] const char *strFromUserMode() const;
 
-    [[nodiscard]] static const char *strFromDrawMode(int action) ;
+    [[nodiscard]] static const char *strFromDrawMode(int action);
 
 public:
     Lines _lines;
-    std::vector<std::unique_ptr<Population>> _populations;
-    mutable std::mutex _populationMutex;
+    std::vector<std::unique_ptr<Population> > _populations;
 
     int _generation_frameDuration{};
     int _generation_count{};
@@ -111,7 +116,7 @@ public:
 
     World &setLines(const Lines &lines);
 
-    World &setPopulations(std::vector<std::unique_ptr<Population>>&& populations);
+    World &setPopulations(std::vector<std::unique_ptr<Population> > &&populations);
 
     World &setGenerationDuration(int duration);
 

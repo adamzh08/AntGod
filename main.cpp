@@ -128,15 +128,14 @@ int main() {
             .setGenerationDuration(20 * 60)
             .setPopulations(std::move(populations));
 
-    // std::jthread t(gameLoop);
+    std::jthread t(gameLoop);
 
     while (!WindowShouldClose()) {
         UpdateMusicStream(music); // Update music buffer with new stream data
-        world->act();
         draw();
     }
 
-    // t.request_stop();
+    t.request_stop();
     UnloadMusicStream(music); // Unload music stream buffers from RAM
     CloseAudioDevice(); // Close audio device (music streaming is automatically stopped)
     TextureCollection::FreeAll();

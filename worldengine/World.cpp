@@ -40,10 +40,19 @@ World &World::setGenerationDuration(int duration) {
 }
 
 void World::act() {
+    if (_UI_needsPops.load()) {
+        std::this_thread::yield();
+        return;
+    }
     if (!_paused) {
+        std::unique_lock<std::mutex> lock(_populationMutex, std::try_to_lock);
+        if (!lock.owns_lock()) {
+            std::this_thread::yield();
+            return;
+        }
+
         _frameCount++;
 
-        std::lock_guard<std::mutex> lock(_populationMutex);
         if (_frameCount == _generation_frameDuration) {
             for (auto &pop: _populations) {
                 pop->flood();
@@ -269,10 +278,11 @@ void World::handleMapEditing() {
                         .setEntityTexture(TextureCollection::whiteAnt, randomColor)
                         .build();
 
+                _UI_needsPops.store(true);
                 std::lock_guard<std::mutex> lock(_populationMutex);
-
                 _populations.push_back(std::move(newPop));
                 _populations.back()->initAnts();
+                _UI_needsPops.store(false);
 
                 reconstructInfoBoxes();
                 _drawVar_action = NONE;
@@ -297,8 +307,12 @@ void World::afterEditOptionSelected() {
         }
         case DELETE_COLONY: {
             const int popIdx = findClickedColonyIndex().value();
+
+            _UI_needsPops.store(true);
             std::lock_guard<std::mutex> lock(_populationMutex);
             _populations.erase(_populations.begin() + popIdx);
+            _UI_needsPops.store(false);
+
             reconstructInfoBoxes();
             break;
         }
