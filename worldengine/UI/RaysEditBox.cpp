@@ -24,11 +24,11 @@ void RaysEditBox::draw() const {
     );
     Rectangle iconRect(_rect.x + _rect.width * 0.65, _rect.y + _rect.height / 4 - _iconSize / 2, _iconSize, _iconSize);
     if (clickedMinus(iconRect)) {
-        _pop._rays_radius = Lines::addRecord(std::max(_length_min, _pop._rays_radius - _length_steps));
+        _pop._rays_radius = std::max(_length_min, _pop._rays_radius - _length_steps);
     }
     iconRect.x += _iconSize * 1.1;
     if (clickedPlus(iconRect)) {
-        _pop._rays_radius = Lines::addRecord(std::min(_length_max, _pop._rays_radius + _length_steps));
+        _pop._rays_radius = std::min(_length_max, _pop._rays_radius + _length_steps);
     }
     GuiLabel(
         Rectangle(

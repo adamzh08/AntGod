@@ -96,10 +96,6 @@ std::vector<Vector2> Lines::_getRaysPoints(float raysRadius, int rays_count, flo
     std::vector<Vector2> ray_points_source = _searchRaysDB(raysRadius);
     int start_index = static_cast<int>((main_angle - (area_angle / 2)) * raysRadius);
 
-    while (ray_points_source.empty()) {
-        ray_points_source = _searchRaysDB(raysRadius);
-    }
-
     std::vector<Vector2> ray_points_result;
     for (int i = 0; i < rays_count; i++) {
         int index = start_index + static_cast<int>(i * (area_angle * raysRadius) / (rays_count - 1));
