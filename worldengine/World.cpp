@@ -176,12 +176,14 @@ void World::handleButtons() {
     if (_drawVar_hasRightClicked) {
         const Color niceButtonGreen = Fade((Color){0, 0, 0}, 0.75f);
 
-        const Rectangle menuRect{
+        Rectangle menuRect{
             _drawVar_menuPos.x,
             _drawVar_menuPos.y,
             200,
             1.2f * _drawVar_editMenuButtonHeight * _drawVar_menuOptionsCount
         };
+        menuRect.x = std::min(menuRect.x, GetScreenWidth() - menuRect.width);
+        menuRect.y = std::min(menuRect.y, GetScreenHeight() - menuRect.height);
         for (int i = 0; i < _drawVar_menuOptionsCount; i++) {
             bool available = menuOptionAvailable(i);
             if (available) {
@@ -195,8 +197,8 @@ void World::handleButtons() {
             }
             if (!available) GuiDisable();
             if (GuiButton({
-                              _drawVar_menuPos.x,
-                              _drawVar_menuPos.y + menuRect.height * i / _drawVar_menuOptionsCount,
+                              menuRect.x,
+                              menuRect.y + menuRect.height * i / _drawVar_menuOptionsCount,
                               200,
                               _drawVar_editMenuButtonHeight
                           }, strFromDrawMode(i))) {
