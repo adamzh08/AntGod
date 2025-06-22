@@ -151,7 +151,7 @@ int main() {
 
 void draw() {
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+    ClearBackground(WHITE);
 
     world->draw();
     DrawFPS(GetScreenWidth() - 100, GetScreenHeight() - 25);

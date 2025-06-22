@@ -101,7 +101,7 @@ add_executable(AntGod main.cpp
 )
 
 target_compile_options(AntGod PRIVATE
-       # -O3                    # Maximum optimization
+        -O3                    # Maximum optimization
         -ffast-math           # Fast math operations
         -march=native         # Use all available CPU instructions
         -mtune=native         # Tune for native CPU

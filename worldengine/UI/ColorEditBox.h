@@ -9,12 +9,6 @@
 
 
 class ColorEditBox : public InfoBox {
-private:
-
-    int _mousePressedOnIdx = -1;
-
-    static Vector2 displaySlider(Rectangle bounds, float percentage, float radius, Color color);
-
 public:
     ColorEditBox(std::shared_ptr<Population> pop, const Rectangle rect) : InfoBox(rect, pop) {
     }
