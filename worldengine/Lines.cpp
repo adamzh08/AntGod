@@ -3,6 +3,9 @@
 //
 
 #include "Lines.h"
+
+#include <algorithm>
+
 #include "LineIntersection.h"
 
 #include <iostream>
@@ -44,33 +47,43 @@ void Lines::draw() const {
     }
 }
 
+void Lines::addRecord(float raysRadius) {
+    auto it = std::find_if(_raysDB.begin(), _raysDB.end(),
+    [raysRadius](const RaysDB& p) {
+        return p.raysRadius == raysRadius;
+    });
+
+    if (it != _raysDB.end()) {
+        return; // Already exists
+    }
+
+    std::cout << "Adding a record... " << std::endl;
+    _raysDB.emplace_back();
+
+    _raysDB.back().raysRadius = raysRadius;
+
+    int pointCount = static_cast<int>(std::round(2 * PI * raysRadius));
+    _raysDB.back().deltaPoints.resize(pointCount);
+
+    const float angle = 1 / raysRadius;
+    for (int i = 0; i < pointCount; i++) {
+        _raysDB.back().deltaPoints[i].x = cos(angle * i) * raysRadius;
+        _raysDB.back().deltaPoints[i].y = sin(angle * i) * raysRadius;
+    }
+}
+
 std::vector<Vector2> Lines::_searchRaysDB(float raysRadius) {
     // ReSharper disable once CppUseStructuredBinding
-    for (auto raysRec: _raysDB) {
-        if (raysRadius == raysRec.raysRadius) {
-            return raysRec.deltaPoints;
-        }
+    auto it = std::find_if(_raysDB.begin(), _raysDB.end(),
+    [raysRadius](const RaysDB& p) {
+        return p.raysRadius == raysRadius;
+    });
+
+    if (it != _raysDB.end()) {
+        return it->deltaPoints; // Already exists
+    } else {
+        exit(123); // Should never happen
     }
-#pragma omp critical
-    {
-        std::cout << "Adding a record... " << std::endl;
-        _raysDB.emplace_back();
-
-        _raysDB.back().raysRadius = raysRadius;
-
-        int pointCount = static_cast<int>(std::round(2 * PI * raysRadius));
-        _raysDB.back().deltaPoints.resize(pointCount);
-
-        const float angle = 1 / raysRadius;
-        for (int i = 0; i < pointCount; i++) {
-            _raysDB.back().deltaPoints[i].x = cos(angle * i) * raysRadius;
-            _raysDB.back().deltaPoints[i].y = sin(angle * i) * raysRadius;
-        }
-
-        std::cout << "Returned... " << std::endl;
-    }
-
-    return _raysDB.back().deltaPoints;
 }
 
 std::vector<Vector2> Lines::_getRaysPoints(float raysRadius, int rays_count, float main_angle, float area_angle) {

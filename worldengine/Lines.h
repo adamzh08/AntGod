@@ -38,6 +38,9 @@ public:
     static std::vector<Vector2> _getRaysPoints(float raysRadius, int rays_count, float main_angle, float area_angle);
 
     void draw() const;
+
+    static void addRecord(float raysRadius);
+
     void drawRays(Vector2 mainPoint, float raysRadius, int rays_count, float main_angle, float area_angle);
 
     bool validMove(Vector2 startPoint, Vector2 deltaPoint) const;

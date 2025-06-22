@@ -449,6 +449,7 @@ void World::reconstructInfoBoxes() {
 
 
 std::optional<int> World::findIntersectingWallRayIndex(Vector2 origin, float radius, int rayCount) const {
+    Lines::addRecord(radius);
     const std::vector<Vector2> deltas = _lines._getRaysPoints(radius, rayCount, 0, 2 * PI);
     const std::vector<float> dists = _lines.getRays(origin, radius, rayCount, 0, 2 * PI);
 

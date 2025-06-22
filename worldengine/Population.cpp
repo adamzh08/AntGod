@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cfloat>
 #include <iostream>
+#include <numeric>
 #include <random>
 #include <ranges>
 
@@ -33,6 +34,7 @@ Population::Population(
                                                        _max_angle(max_angle),
                                                        _rays_amount(rays_amount), _rays_radius(rays_radius),
                                                        _rays_fov(rays_fov) {
+    Lines::addRecord(rays_radius);
 }
 
 void Population::initAnts() {
@@ -154,7 +156,7 @@ void Population::draw() {
             _world._lines.drawRays(_best->_position,
                                    _rays_radius,
                                    _rays_amount,
-                                   _best->_rotation + PI,
+                                   _best->_rotation,
                                    _rays_fov
             );
         }
