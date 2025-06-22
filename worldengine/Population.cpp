@@ -12,7 +12,7 @@
 #include <random>
 #include <ranges>
 
-#include "TextureCollection.h"
+#include "UI/TextureCollection.h"
 #include "World.h"
 
 Population::Population(
@@ -72,9 +72,9 @@ void Population::act() {
 void Population::flood() {
     _bestIdx = -1;
 
-    std::vector<Ant*> selectedAnts;
+    std::vector<Ant *> selectedAnts;
     selectedAnts.reserve(_ants_amount);
-    for (auto& ant : _ants) {
+    for (auto &ant: _ants) {
         if (ant->_alive) {
             selectedAnts.push_back(ant.get()); // raw pointer for sorting & selection
         }
@@ -83,11 +83,11 @@ void Population::flood() {
         std::cerr << "Population " << this << " went extinct" << std::endl;
         return;
     }
-    std::ranges::sort(selectedAnts, [](const Ant* a, const Ant* b) {
+    std::ranges::sort(selectedAnts, [](const Ant *a, const Ant *b) {
         return a->calculateReward() > b->calculateReward();
     });
 
-    std::vector<std::unique_ptr<Ant>> nextGen;
+    std::vector<std::unique_ptr<Ant> > nextGen;
     nextGen.reserve(_ants_amount);
 
     // Top X percent pass to next gen unchanged (deep copy)
@@ -108,14 +108,14 @@ void Population::flood() {
 
         nextGen.push_back(std::make_unique<Ant>(std::move(child)));
     }
-    for (auto& ant : nextGen) {
+    for (auto &ant: nextGen) {
         ant->_position = _init_position;
     }
     _ants = std::move(nextGen);
 }
 
 
-int Population::tournamentSelectFromPool(const std::vector<Ant*>& pool, const int k) {
+int Population::tournamentSelectFromPool(const std::vector<Ant *> &pool, const int k) {
     std::vector<int> indices(pool.size());
     std::iota(indices.begin(), indices.end(), 0);
     std::ranges::shuffle(indices, std::mt19937{std::random_device{}()});
@@ -126,7 +126,7 @@ int Population::tournamentSelectFromPool(const std::vector<Ant*>& pool, const in
     float highestReward = -FLT_MAX;
 
     for (int i = 0; i < k; ++i) {
-        Ant* candidate = pool[selectedIndexes[i]];
+        Ant *candidate = pool[selectedIndexes[i]];
         float reward = candidate->calculateReward();
         if (reward > highestReward) {
             highestReward = reward;
@@ -145,7 +145,7 @@ void Population::draw() {
     setBest();
 
     if (_bestIdx != -1) {
-        std::unique_ptr<Ant>& bestAnt = _ants[_bestIdx];
+        std::unique_ptr<Ant> &bestAnt = _ants[_bestIdx];
         if (_world._showRays) {
             _world._lines.drawRays(bestAnt->_position,
                                    _rays_radius,
@@ -154,8 +154,19 @@ void Population::draw() {
                                    _rays_fov
             );
         }
-        // drawing a blue circle on the best ant
-        DrawEllipse(bestAnt->_position.x, bestAnt->_position.y, 10, 10, Color(0, 0, 255, 150));
+        // drawing a star on the best ant
+        const float scale = 0.5;
+        DrawTextureEx(
+            TextureCollection::whiteStar,
+            Vector2{
+                bestAnt->_position.x - (TextureCollection::whiteStar.width * scale) / 2.0f,
+                bestAnt->_position.y - (TextureCollection::whiteStar.height * scale) / 2.0f
+            },
+            0,
+            scale,
+            Fade(_entityColor, 0.5)
+        );
+        // DrawEllipse(bestAnt->_position.x, bestAnt->_position.y, 10, 10, Color(0, 0, 255, 150));
     } else {
         std::cerr << "[Warning] No more ants alive in population " << this << std::endl;
     }
@@ -253,7 +264,7 @@ float Population::getAvgDist() const {
 
 float Population::getBestDist() const {
     if (_bestIdx == -1) return FLT_MAX;
-    const std::unique_ptr<Ant>& bestAnt = _ants[_bestIdx];
+    const std::unique_ptr<Ant> &bestAnt = _ants[_bestIdx];
     const float dx = bestAnt->_position.x - _target_position.x;
     const float dy = bestAnt->_position.y - _target_position.y;
     return std::sqrt(dx * dx + dy * dy);

@@ -11,7 +11,7 @@
 #include "neuralengine/Activation.h"
 #include "worldengine/Population.h"
 #include "worldengine/PopulationBuilder.h"
-#include "worldengine/TextureCollection.h"
+#include "worldengine/UI/TextureCollection.h"
 #include "worldengine/World.h"
 #include "worldengine/Lines.h"
 

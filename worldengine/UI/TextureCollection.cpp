@@ -7,6 +7,8 @@ void TextureCollection::LoadAll() {
     whiteAnt = LoadTexture("assets/WhiteAnt.png");
     finishFlag = LoadTexture("assets/finishFlag.png");
     whiteX = LoadTexture("assets/whiteX.png");
+    star = LoadTexture("assets/star.png");
+    whiteStar = LoadTexture("assets/WhiteStar.png");
 }
 void TextureCollection::FreeAll() {
     UnloadTexture(ant);
@@ -14,4 +16,6 @@ void TextureCollection::FreeAll() {
     UnloadTexture(whiteAnt);
     UnloadTexture(finishFlag);
     UnloadTexture(whiteX);
+    UnloadTexture(star);
+    UnloadTexture(whiteStar);
 }

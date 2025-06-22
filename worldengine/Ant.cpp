@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "Population.h"
-#include "TextureCollection.h"
+#include "UI/TextureCollection.h"
 #include "World.h"
 
 Ant::Ant(Population &population, const std::vector<Layer> &layers): _population(population), _network(layers),
@@ -43,7 +43,7 @@ void Ant::act() {
             break;
         }
         case RADIAL_MOVE: {
-            const float speedOutput = output[0] * _population._max_speed;
+            const float speedOutput = (output[0] + 1) / 2 * _population._max_speed;
             const float rotationOutput = output[1] * _population._max_angle;
             rot_temp += rotationOutput;
 
@@ -64,8 +64,8 @@ void Ant::act() {
     if (_population._world._lines.validMove(_position, temp)) {
         _position = temp;
         _rotation = rot_temp;
-}   else {
-    _alive = false;
+    } else {
+        _alive = false;
     }
 }
 
@@ -78,12 +78,18 @@ float Ant::calculateReward() const {
 void Ant::draw() const {
     DrawTexturePro(
         _population._entityTexture,
-        Rectangle(0, 0, _population._entityTexture.width, _population._entityTexture.height), // Source rectangle
-        Rectangle(_position.x, _position.y, _population._entityTexture.width, _population._entityTexture.height),
-        // Destination rectangle
-        Vector2(_population._entityTexture.width / 2.0f, _population._entityTexture.height / 2.0f),
-        // Origin point for rotation
-        _rotation * RAD2DEG, // Rotation angle in degrees
-        _population._entityColor // Tint color
+        Rectangle{0, 0, static_cast<float>(_population._entityTexture.width), static_cast<float>(_population._entityTexture.height)}, // Source
+        Rectangle{
+            _position.x, // Center position
+            _position.y,
+            static_cast<float>(_population._entityTexture.width),
+            static_cast<float>(_population._entityTexture.height)
+        },
+        Vector2{
+            _population._entityTexture.width / 2.0f,
+            _population._entityTexture.height / 2.0f
+        }, // Origin: center of the sprite
+        _rotation * RAD2DEG,
+        _population._entityColor
     );
 }

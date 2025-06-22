@@ -78,8 +78,8 @@ add_executable(AntGod main.cpp
         worldengine/Population.h
         worldengine/Ant.cpp
         worldengine/Ant.h
-        worldengine/TextureCollection.h
-        worldengine/TextureCollection.cpp
+        worldengine/UI/TextureCollection.h
+        worldengine/UI/TextureCollection.cpp
         worldengine/World.cpp
         worldengine/World.h
         worldengine/PopulationBuilder.cpp

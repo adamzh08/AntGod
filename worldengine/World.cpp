@@ -14,7 +14,7 @@
 
 #include "LineIntersection.h"
 #include "PopulationBuilder.h"
-#include "TextureCollection.h"
+#include "UI/TextureCollection.h"
 #include "../raygui.h"
 #include "UI/ColorEditBox.h"
 #include "UI/EvolutionEditBox.h"

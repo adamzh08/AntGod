@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-#include "../TextureCollection.h"
+#include "TextureCollection.h"
 #include "../../raygui.h"
 #include "../Lines.h"
 
