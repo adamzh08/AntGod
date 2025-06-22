@@ -40,10 +40,19 @@ World &World::setGenerationDuration(int duration) {
 }
 
 void World::act() {
+    if (_UI_needsPops.load()) {
+        std::this_thread::yield();
+        return;
+    }
     if (!_paused) {
+        std::unique_lock<std::mutex> lock(_populationMutex, std::try_to_lock);
+        if (!lock.owns_lock()) {
+            std::this_thread::yield();
+            return;
+        }
+
         _frameCount++;
 
-        std::lock_guard<std::mutex> lock(_populationMutex);
         if (_frameCount == _generation_frameDuration) {
             for (auto &pop: _populations) {
                 pop->flood();
@@ -176,12 +185,14 @@ void World::handleButtons() {
     if (_drawVar_hasRightClicked) {
         const Color niceButtonGreen = Fade((Color){0, 0, 0}, 0.75f);
 
-        const Rectangle menuRect{
+        Rectangle menuRect{
             _drawVar_menuPos.x,
             _drawVar_menuPos.y,
             200,
             1.2f * _drawVar_editMenuButtonHeight * _drawVar_menuOptionsCount
         };
+        menuRect.x = std::min(menuRect.x, GetScreenWidth() - menuRect.width);
+        menuRect.y = std::min(menuRect.y, GetScreenHeight() - menuRect.height);
         for (int i = 0; i < _drawVar_menuOptionsCount; i++) {
             bool available = menuOptionAvailable(i);
             if (available) {
@@ -195,8 +206,8 @@ void World::handleButtons() {
             }
             if (!available) GuiDisable();
             if (GuiButton({
-                              _drawVar_menuPos.x,
-                              _drawVar_menuPos.y + menuRect.height * i / _drawVar_menuOptionsCount,
+                              menuRect.x,
+                              menuRect.y + menuRect.height * i / _drawVar_menuOptionsCount,
                               200,
                               _drawVar_editMenuButtonHeight
                           }, strFromDrawMode(i))) {
@@ -267,10 +278,11 @@ void World::handleMapEditing() {
                         .setEntityTexture(TextureCollection::whiteAnt, randomColor)
                         .build();
 
+                _UI_needsPops.store(true);
                 std::lock_guard<std::mutex> lock(_populationMutex);
-
                 _populations.push_back(std::move(newPop));
                 _populations.back()->initAnts();
+                _UI_needsPops.store(false);
 
                 reconstructInfoBoxes();
                 _drawVar_action = NONE;
@@ -295,8 +307,12 @@ void World::afterEditOptionSelected() {
         }
         case DELETE_COLONY: {
             const int popIdx = findClickedColonyIndex().value();
+
+            _UI_needsPops.store(true);
             std::lock_guard<std::mutex> lock(_populationMutex);
             _populations.erase(_populations.begin() + popIdx);
+            _UI_needsPops.store(false);
+
             reconstructInfoBoxes();
             break;
         }
