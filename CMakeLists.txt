@@ -96,6 +96,8 @@ add_executable(AntGod main.cpp
         worldengine/UI/RaysEditBox.h
         worldengine/UI/EvolutionEditBox.cpp
         worldengine/UI/EvolutionEditBox.h
+        worldengine/UI/ColorEditBox.cpp
+        worldengine/UI/ColorEditBox.h
 )
 
 target_compile_options(AntGod PRIVATE

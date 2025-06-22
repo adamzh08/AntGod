@@ -39,6 +39,7 @@ private:
     std::vector<InfoBox *> _avgDistGraphs{};
     std::vector<InfoBox *> _sensorBoxes{};
     std::vector<InfoBox *> _evolutionBoxes{};
+    std::vector<InfoBox *> _colorBoxes{};
     std::vector<InfoBox *> _neuroBoxes{};
     std::vector<const char *> _infoBoxDescriptions{
         "How many entities alive?",
@@ -46,12 +47,13 @@ private:
         "Average dist to goal?",
         "Environment Sensors?",
         "Evolutionary Params?",
+        "Color?",
         "Brain of the best?"
     };
     int _framesPerGraphUpdate = 1;
     int _frameCounter_graphUpdate{};
 
-    int _shownGraphTypeIdx{};
+    int _shownBoxTypeIdx{};
 
     bool _showInfo = true;
     bool _paused = false;
@@ -104,7 +106,7 @@ private:
 
 public:
     Lines _lines;
-    std::vector<std::unique_ptr<Population> > _populations;
+    std::vector<std::shared_ptr<Population> > _populations;
 
     int _generation_frameDuration{};
     int _generation_count{};
@@ -116,7 +118,7 @@ public:
 
     World &setLines(const Lines &lines);
 
-    World &setPopulations(std::vector<std::unique_ptr<Population> > &&populations);
+    World &setPopulations(std::vector<std::shared_ptr<Population> > populations);
 
     World &setGenerationDuration(int duration);
 

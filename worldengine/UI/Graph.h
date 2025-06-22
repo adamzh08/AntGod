@@ -23,11 +23,11 @@ private:
     float _biggestY = -FLT_MAX;
 
 public:
-    Graph(const Rectangle rect, const Color color): InfoBox(rect, color) {};
+    Graph(const Rectangle rect, std::shared_ptr<Population> pop): InfoBox(rect, pop) {};
 
     void reset();
 
-    void draw() const override;
+    void draw() override;
 
     void addPoint(float, float);
     void addPointV(Vector2);

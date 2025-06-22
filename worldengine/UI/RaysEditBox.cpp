@@ -12,7 +12,12 @@
 #include "../Lines.h"
 
 
-void RaysEditBox::draw() const {
+void RaysEditBox::draw() {
+    auto pop = _pop.lock();
+    if (!pop) {
+        std::cerr << "pop is nullptr" << std::endl;
+        return;
+    }
     GuiLabel(
         {
             _rect.x,
@@ -20,17 +25,17 @@ void RaysEditBox::draw() const {
             _rect.width / 2,
             _rect.height / 2,
         },
-        ("Ray length: " + std::to_string(_pop._rays_radius)).c_str()
+        ("Ray length: " + std::to_string(pop->_rays_radius)).c_str()
     );
     Rectangle iconRect(_rect.x + _rect.width * 0.65, _rect.y + _rect.height / 4 - _iconSize / 2, _iconSize, _iconSize);
     if (clickedMinus(iconRect)) {
-        Lines::addRecord(std::min(_length_max, _pop._rays_radius - _length_steps));
-        _pop._rays_radius = std::max(_length_min, _pop._rays_radius - _length_steps);
+        Lines::addRecord(std::min(_length_max, pop->_rays_radius - _length_steps));
+        pop->_rays_radius = std::max(_length_min, pop->_rays_radius - _length_steps);
     }
     iconRect.x += _iconSize * 1.1;
     if (clickedPlus(iconRect)) {
-        Lines::addRecord(std::min(_length_max, _pop._rays_radius + _length_steps));
-        _pop._rays_radius = std::min(_length_max, _pop._rays_radius + _length_steps);
+        Lines::addRecord(std::min(_length_max, pop->_rays_radius + _length_steps));
+        pop->_rays_radius = std::min(_length_max, pop->_rays_radius + _length_steps);
     }
     GuiLabel(
         Rectangle(
@@ -39,18 +44,17 @@ void RaysEditBox::draw() const {
             _rect.width * 0.6,
             _rect.height / 2
         ),
-        ("Field of view: " + std::to_string(static_cast<int>(_pop._rays_fov * RAD2DEG)) + "°").c_str()
+        ("Field of view: " + std::to_string(static_cast<int>(pop->_rays_fov * RAD2DEG)) + "°").c_str()
     );
     iconRect.x -= _iconSize * 1.1;
     iconRect.y += _rect.height / 2;
     if (clickedMinus(iconRect)) {
-        _pop._rays_fov = std::max(0.f, _pop._rays_fov - _fov_steps);
+        pop->_rays_fov = std::max(0.f, pop->_rays_fov - _fov_steps);
     }
     iconRect.x += _iconSize * 1.1;
     if (clickedPlus(iconRect)) {
-        _pop._rays_fov += _fov_steps;
+        pop->_rays_fov += _fov_steps;
     }
-    drawBounds();
 }
 
 bool RaysEditBox::clickedMinus(const Rectangle rect) {

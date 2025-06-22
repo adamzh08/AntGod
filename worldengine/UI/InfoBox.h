@@ -5,22 +5,26 @@
 #ifndef INFORECT_H
 #define INFORECT_H
 #include "raylib.h"
+#include "../Population.h"
 
+
+class Population;
 
 class InfoBox {
 protected:
     const Rectangle _rect;
-    const Color _color;
+    std::weak_ptr<Population> _pop;
 
 public:
-    explicit InfoBox(const Rectangle rect, const Color color): _rect(rect), _color(color) {};
+    explicit InfoBox(const Rectangle rect, std::shared_ptr<Population> pop): _rect(rect), _pop(pop) {};
 
-    ~InfoBox() {};
+    ~InfoBox() = default;
 
-    virtual void draw() const = 0;
-
+    virtual void draw() = 0;
     void drawBounds() const {
-        DrawRectangleLinesEx(_rect, 2, _color);
+        if (auto pop = _pop.lock()) {
+            DrawRectangleLinesEx(_rect, 5, pop->_entityColor);
+        }
     }
 };
 

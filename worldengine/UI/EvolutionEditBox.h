@@ -10,8 +10,6 @@
 
 class EvolutionEditBox : public InfoBox {
 private:
-    Population &_pop;
-
     float _iconSize;
 
     float _mutationP_steps = 0.05;
@@ -19,10 +17,10 @@ private:
     int _antCount_steps = 10;
 
 public:
-    EvolutionEditBox(Population &pop, const Rectangle rect): InfoBox(rect, pop._entityColor), _pop(pop), _iconSize(std::min(46.f, rect.height * 0.3f)) {
+    EvolutionEditBox(std::shared_ptr<Population> pop, const Rectangle rect): InfoBox(rect, pop), _iconSize(std::min(46.f, rect.height * 0.3f)) {
     }
 
-    void draw() const override;
+    void draw() override;
 };
 
 

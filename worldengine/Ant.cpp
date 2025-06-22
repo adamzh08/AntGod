@@ -23,7 +23,6 @@ Ant::Ant(const Ant &parent1, const Ant &parent2) : _population(parent1._populati
 
 
 void Ant::act() {
-    // Todo @Adam integrate _rotation and _population._rays_fov
     const std::vector<float> input = _population._world._lines.getRays(
         _position,
         _population._rays_radius,

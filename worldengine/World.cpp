@@ -16,6 +16,7 @@
 #include "PopulationBuilder.h"
 #include "TextureCollection.h"
 #include "../raygui.h"
+#include "UI/ColorEditBox.h"
 #include "UI/EvolutionEditBox.h"
 #include "UI/RaysEditBox.h"
 
@@ -25,8 +26,8 @@ World &World::setLines(const Lines &lines) {
     return *this;
 }
 
-World &World::setPopulations(std::vector<std::unique_ptr<Population> > &&populations) {
-    _populations = std::move(populations);
+World &World::setPopulations(std::vector<std::shared_ptr<Population> > populations) {
+    _populations = populations;
     for (auto &pop: _populations) {
         pop->initAnts();
     }
@@ -172,12 +173,12 @@ void World::handleButtons() {
     }
     if (_showInfo) {
         if (GuiButton(Rectangle(GetScreenWidth() - 400, GetScreenHeight() / 2 - 60, 50, 50), "#114#")) {
-            _shownGraphTypeIdx--;
-            _shownGraphTypeIdx = (_shownGraphTypeIdx + _allInfoBoxes.size()) % _allInfoBoxes.size();
+            _shownBoxTypeIdx--;
+            _shownBoxTypeIdx = (_shownBoxTypeIdx + _allInfoBoxes.size()) % _allInfoBoxes.size();
         }
         if (GuiButton(Rectangle(GetScreenWidth() - 50, GetScreenHeight() / 2 - 60, 50, 50), "#115#")) {
-            _shownGraphTypeIdx++;
-            _shownGraphTypeIdx %= _allInfoBoxes.size();
+            _shownBoxTypeIdx++;
+            _shownBoxTypeIdx %= _allInfoBoxes.size();
         }
     }
 
@@ -373,7 +374,7 @@ void World::drawUserInfo() const {
     );
 
     GuiDrawText(
-        _infoBoxDescriptions[_shownGraphTypeIdx],
+        _infoBoxDescriptions[_shownBoxTypeIdx],
         Rectangle(GetScreenWidth() - 350, GetScreenHeight() / 2 - 50, 300, 50),
         TEXT_ALIGN_CENTER,
         BLACK
@@ -395,16 +396,13 @@ void World::updateInfoBoxes() {
             _generation_frameDuration * _generation_count + _frameCount,
             _populations[i]->getAvgDist()
         );
-        // neuroboxes
-        dynamic_cast<NeuroBox *>(_neuroBoxes[i])->setEntity(
-            _populations[i]->_best
-        );
     }
 }
 
 void World::displayInfoBoxes() const {
     for (int i = 0; i < _populations.size(); i++) {
-        _allInfoBoxes[_shownGraphTypeIdx]->at(i)->draw();
+        _allInfoBoxes[_shownBoxTypeIdx]->at(i)->drawBounds();
+        _allInfoBoxes[_shownBoxTypeIdx]->at(i)->draw();
     }
 }
 
@@ -416,6 +414,7 @@ void World::reconstructInfoBoxes() {
     _avgDistGraphs.clear();
     _sensorBoxes.clear();
     _evolutionBoxes.clear();
+    _colorBoxes.clear();
     _neuroBoxes.clear();
 
     for (int i = 0; i < _populations.size(); i++) {
@@ -426,33 +425,15 @@ void World::reconstructInfoBoxes() {
             GetScreenHeight() / 2 / _populations.size() - 15
         );
         // graphs
-        _aliveGraphs.push_back(new Graph(
-            boxPos,
-            _populations[i]->_entityColor
-        ));
-        _bestDistGraphs.push_back(new Graph(
-            boxPos,
-            _populations[i]->_entityColor
-        ));
-        _avgDistGraphs.push_back(new Graph(
-            boxPos,
-            _populations[i]->_entityColor
-        ));
+        _aliveGraphs.push_back(new Graph(boxPos, _populations[i]));
+        _bestDistGraphs.push_back(new Graph(boxPos, _populations[i]));
+        _avgDistGraphs.push_back(new Graph(boxPos, _populations[i]));
         // parameters
-        _sensorBoxes.push_back(new RaysEditBox(
-            *_populations[i],
-            boxPos
-        ));
-        _evolutionBoxes.push_back(new EvolutionEditBox(
-            *_populations[i],
-            boxPos
-        ));
-
+        _sensorBoxes.push_back(new RaysEditBox(_populations[i], boxPos));
+        _evolutionBoxes.push_back(new EvolutionEditBox(_populations[i], boxPos));
+        _colorBoxes.push_back(new ColorEditBox(_populations[i], boxPos));
         // brains
-        _neuroBoxes.push_back(new NeuroBox(
-            boxPos,
-            _populations[i]->_entityColor
-        ));
+        _neuroBoxes.push_back(new NeuroBox(boxPos, _populations[i]));
     }
 
     _allInfoBoxes.push_back(&_aliveGraphs);
@@ -460,9 +441,9 @@ void World::reconstructInfoBoxes() {
     _allInfoBoxes.push_back(&_avgDistGraphs);
     _allInfoBoxes.push_back(&_sensorBoxes);
     _allInfoBoxes.push_back(&_evolutionBoxes);
+    _allInfoBoxes.push_back(&_colorBoxes);
     _allInfoBoxes.push_back(&_neuroBoxes);
 }
-
 
 std::optional<int> World::findIntersectingWallRayIndex(Vector2 origin, float radius, int rayCount) const {
     Lines::addRecord(radius);

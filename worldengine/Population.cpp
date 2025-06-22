@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cfloat>
+#include <csignal>
 #include <iostream>
 #include <numeric>
 #include <random>
@@ -44,13 +45,13 @@ void Population::initAnts() {
     if (_filename.empty()) {
         // completely random
         for (int i = 0; i < _ants_amount; i++) {
-            _ants.push_back(std::make_shared<Ant>(*this, _layers));
+            _ants.push_back(std::make_unique<Ant>(*this, _layers));
         }
     } else {
         // from file
         Ant defaultAnt(*this, _layers);
         for (int i = 0; i < _ants_amount; i++) {
-            _ants.push_back(std::make_shared<Ant>(defaultAnt));
+            _ants.push_back(std::make_unique<Ant>(defaultAnt));
         }
 
         for (auto &ant: this->_ants) {
@@ -69,72 +70,64 @@ void Population::act() {
 }
 
 void Population::flood() {
-    _best = nullptr;
+    _bestIdx = -1;
 
-    std::vector<std::shared_ptr<Ant> > selectedAnts;
+    std::vector<Ant*> selectedAnts;
     selectedAnts.reserve(_ants_amount);
-    for (auto &ant: _ants) {
+    for (auto& ant : _ants) {
         if (ant->_alive) {
-            selectedAnts.push_back(ant);
+            selectedAnts.push_back(ant.get()); // raw pointer for sorting & selection
         }
     }
     if (selectedAnts.empty()) {
         std::cerr << "Population " << this << " went extinct" << std::endl;
         return;
     }
-    std::ranges::sort(selectedAnts, [](const std::shared_ptr<Ant> &a, const std::shared_ptr<Ant> &b) {
+    std::ranges::sort(selectedAnts, [](const Ant* a, const Ant* b) {
         return a->calculateReward() > b->calculateReward();
     });
 
-    std::vector<std::shared_ptr<Ant> > nextGen;
+    std::vector<std::unique_ptr<Ant>> nextGen;
     nextGen.reserve(_ants_amount);
 
-
-    // top X percent pass to the next gen without modification
+    // Top X percent pass to next gen unchanged (deep copy)
     const int topX = static_cast<int>(_elite_percentage * selectedAnts.size());
     for (int i = 0; i < topX; ++i) {
-        nextGen.push_back(std::make_shared<Ant>(*selectedAnts[i]));
+        nextGen.push_back(std::make_unique<Ant>(*selectedAnts[i]));
     }
 
-    // the other part are combinations of 2 parent ants
-    for (int i = topX; i < _ants_amount; i++) {
-        const int parentIndex1 = tournamentSelectFromPool(
-            selectedAnts,
-            static_cast<int>(selectedAnts.size() * 0.3)
-        );
-        const int parentIndex2 = tournamentSelectFromPool(
-            selectedAnts,
-            static_cast<int>(selectedAnts.size() * 0.3)
-        );
+    // Other are offspring
+    for (int i = topX; i < _ants_amount; ++i) {
+        const int parentIndex1 = tournamentSelectFromPool(selectedAnts, static_cast<int>(selectedAnts.size() * 0.3));
+        const int parentIndex2 = tournamentSelectFromPool(selectedAnts, static_cast<int>(selectedAnts.size() * 0.3));
 
         Ant child(*selectedAnts[parentIndex1], *selectedAnts[parentIndex2]);
         if (static_cast<double>(rand()) / RAND_MAX < _mutation_probability) {
             child._network.mutate_weights(0.01, _mutation_strength);
         }
 
-        nextGen.push_back(std::make_shared<Ant>(std::move(child)));
+        nextGen.push_back(std::make_unique<Ant>(std::move(child)));
     }
-    for (auto& ant: nextGen) {
+    for (auto& ant : nextGen) {
         ant->_position = _init_position;
     }
     _ants = std::move(nextGen);
 }
 
-int Population::tournamentSelectFromPool(const std::vector<std::shared_ptr<Ant> > &pool, const int k) {
+
+int Population::tournamentSelectFromPool(const std::vector<Ant*>& pool, const int k) {
     std::vector<int> indices(pool.size());
-    std::iota(indices.begin(), indices.end(), 0); // Fill with 0..n-1
+    std::iota(indices.begin(), indices.end(), 0);
     std::ranges::shuffle(indices, std::mt19937{std::random_device{}()});
 
     const std::vector<int> selectedIndexes(indices.begin(), indices.begin() + k);
 
-
     int best = -1;
     float highestReward = -FLT_MAX;
 
-    for (int i = 0; i < k; i++) {
-        const std::shared_ptr<Ant> random = pool[selectedIndexes[i]];
-
-        float reward = random->calculateReward();
+    for (int i = 0; i < k; ++i) {
+        Ant* candidate = pool[selectedIndexes[i]];
+        float reward = candidate->calculateReward();
         if (reward > highestReward) {
             highestReward = reward;
             best = selectedIndexes[i];
@@ -151,17 +144,18 @@ void Population::draw() {
     }
     setBest();
 
-    if (_best != nullptr) {
+    if (_bestIdx != -1) {
+        std::unique_ptr<Ant>& bestAnt = _ants[_bestIdx];
         if (_world._showRays) {
-            _world._lines.drawRays(_best->_position,
+            _world._lines.drawRays(bestAnt->_position,
                                    _rays_radius,
                                    _rays_amount,
-                                   _best->_rotation,
+                                   bestAnt->_rotation,
                                    _rays_fov
             );
         }
         // drawing a blue circle on the best ant
-        DrawEllipse(_best->_position.x, _best->_position.y, 10, 10, Color(0, 0, 255, 150));
+        DrawEllipse(bestAnt->_position.x, bestAnt->_position.y, 10, 10, Color(0, 0, 255, 150));
     } else {
         std::cerr << "[Warning] No more ants alive in population " << this << std::endl;
     }
@@ -223,12 +217,12 @@ void Population::drawFlagAt(const Vector2 pos, const Color tint) {
 void Population::setBest() {
     float highestReward = -FLT_MAX;
 
-    for (auto &ant: this->_ants) {
-        if (ant->_alive) {
-            float reward = ant->calculateReward();
+    for (int i = 0; i < _ants_amount; i++) {
+        if (_ants[i]->_alive) {
+            const float reward = _ants[i]->calculateReward();
             if (reward > highestReward) {
                 highestReward = reward;
-                _best = ant;
+                _bestIdx = i;
             }
         }
     }
@@ -258,8 +252,9 @@ float Population::getAvgDist() const {
 }
 
 float Population::getBestDist() const {
-    if (_best == nullptr) return FLT_MAX;
-    const float dx = _best->_position.x - _target_position.x;
-    const float dy = _best->_position.y - _target_position.y;
+    if (_bestIdx == -1) return FLT_MAX;
+    const std::unique_ptr<Ant>& bestAnt = _ants[_bestIdx];
+    const float dx = bestAnt->_position.x - _target_position.x;
+    const float dy = bestAnt->_position.y - _target_position.y;
     return std::sqrt(dx * dx + dy * dy);
 }

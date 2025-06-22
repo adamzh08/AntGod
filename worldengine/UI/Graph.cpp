@@ -38,16 +38,21 @@ void Graph::reset() {
     _biggestY = -FLT_MAX;
 }
 
-void Graph::draw() const {
+void Graph::draw() {
+    auto pop = _pop.lock();
+    if (!pop) {
+        std::cerr << "pop is nullptr" << std::endl;
+        return;
+    }
+
     // graph
     for (int i = 1; i < _data.size(); i++) {
         double x1 = _rect.x + _rect.width * (_data[i - 1].x - _smallestX) / (_biggestX - _smallestX);
         double x2 = _rect.x + _rect.width * (_data[i].x - _smallestX) / (_biggestX - _smallestX);
         double y1 = _rect.y + _rect.height * (1 - (_data[i - 1].y - _smallestY) / (_biggestY - _smallestY));
         double y2 = _rect.y + _rect.height * (1 - (_data[i].y - _smallestY) / (_biggestY - _smallestY));
-        DrawLineEx(Vector2(x1, y1), Vector2(x2, y2), 3, _color);
+        DrawLineEx(Vector2(x1, y1), Vector2(x2, y2), 3, pop->_entityColor);
     }
-    drawBounds();
 
     // y axis
     const float amplitude = _biggestY - _smallestY;

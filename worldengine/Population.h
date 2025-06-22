@@ -24,8 +24,8 @@ public:
     World &_world;
 
     // -------- Population ---------
-    std::vector<std::shared_ptr<Ant> > _ants;
-    std::shared_ptr<Ant> _best = nullptr;
+    std::vector<std::unique_ptr<Ant> > _ants;
+    int _bestIdx = -1;
     int _ants_amount;
     float _elite_percentage;
 
@@ -78,11 +78,12 @@ public:
 
     [[nodiscard]] float getBestDist() const;
 
-    static int tournamentSelectFromPool(const std::vector<std::shared_ptr<Ant> > &pool, int k);
+    static int tournamentSelectFromPool(const std::vector<Ant *> &pool, int k);
 
     void draw();
 
     static void drawXAt(Vector2, Color);
+
     static void drawFlagAt(Vector2, Color);
 };
 

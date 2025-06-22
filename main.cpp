@@ -73,10 +73,10 @@ int main() {
 
     // Populations
     std::unique_ptr<Population> yellowPopulation = PopulationBuilder(*world)
-            .setCount(100)
-            .setElitePercentage(0.3)
+            .setCount(1000)
+            .setElitePercentage(0.1)
             .setNetwork(layers, "")
-            .setMutation(0.1, 0.2)
+            .setMutation(0.3, 0.2)
             .setPositions(Vector2{400, 300}, Vector2{50, 300})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 100, 60 * DEG2RAD) // 60°
@@ -84,10 +84,10 @@ int main() {
             .build();
     std::unique_ptr<Population> redPopulation(
         PopulationBuilder(*world)
-        .setCount(100)
-        .setElitePercentage(0.3)
+        .setCount(1000)
+        .setElitePercentage(0.1)
         .setNetwork(layers, "")
-        .setMutation(0.1, 0.2)
+        .setMutation(0.3, 0.2)
         .setPositions(Vector2{450, 700}, Vector2{50, 400})
         .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
         .setRays(30, 100, 60 * DEG2RAD) // 60°
@@ -95,10 +95,10 @@ int main() {
         .build()
     );
     std::unique_ptr<Population> purplePopulation(PopulationBuilder(*world)
-        .setCount(100)
-        .setElitePercentage(0.3)
+        .setCount(1000)
+        .setElitePercentage(0.1)
         .setNetwork(layers, "")
-        .setMutation(0.1, 0.2)
+        .setMutation(0.3, 0.2)
         .setPositions(Vector2{700, 500}, Vector2{50, 500})
         .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
         .setRays(30, 100, 60 * DEG2RAD) // 60°
@@ -107,7 +107,7 @@ int main() {
     );
     std::unique_ptr<Population> greenPopulation(
         PopulationBuilder(*world)
-        .setCount(100)
+        .setCount(1000)
         .setElitePercentage(0.1)
         .setNetwork(layers, "")
         .setMutation(0.3, 0.2)
@@ -117,7 +117,7 @@ int main() {
         .setEntityTexture(TextureCollection::whiteAnt, DARKGREEN)
         .build()
     );
-    std::vector<std::unique_ptr<Population> > populations{};
+    std::vector<std::shared_ptr<Population> > populations{};
 
     populations.push_back(std::move(yellowPopulation));
     populations.push_back(std::move(redPopulation));

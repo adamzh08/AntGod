@@ -14,14 +14,12 @@ class Ant;
 
 class NeuroBox : public InfoBox {
 private:
-    std::weak_ptr<Ant> _ant;
-
+    int _bestIdx = -1;
+    Network* _network = nullptr;
 public:
-    NeuroBox(const Rectangle rect, Color const color): InfoBox(rect, color) {};
-
-    void draw() const override;
-
-    void setEntity(std::shared_ptr<Ant>);
+    NeuroBox(const Rectangle rect, std::shared_ptr<Population> pop): InfoBox(rect, pop) {
+    };
+    void draw() override;
 };
 
 
