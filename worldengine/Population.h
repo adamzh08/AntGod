@@ -18,6 +18,8 @@ class World;
 
 class Population {
 private:
+    int _ants_amount;
+
     void setBest();
 
 public:
@@ -25,8 +27,8 @@ public:
 
     // -------- Population ---------
     std::vector<std::unique_ptr<Ant> > _ants;
+    int _next_ants_amount;
     int _bestIdx = -1;
-    int _ants_amount;
     float _elite_percentage;
 
     // Ant settings

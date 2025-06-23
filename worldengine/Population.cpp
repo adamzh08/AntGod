@@ -36,6 +36,7 @@ Population::Population(
                                                        _rays_amount(rays_amount), _rays_radius(rays_radius),
                                                        _rays_fov(rays_fov) {
     Lines::addRecord(rays_radius);
+    _next_ants_amount = _ants_amount;
 }
 
 void Population::initAnts() {
@@ -71,6 +72,7 @@ void Population::act() {
 
 void Population::flood() {
     _bestIdx = -1;
+    _ants_amount = _next_ants_amount;
 
     std::vector<Ant *> selectedAnts;
     selectedAnts.reserve(_ants_amount);
@@ -138,7 +140,7 @@ int Population::tournamentSelectFromPool(const std::vector<Ant *> &pool, const i
 
 void Population::draw() {
     for (const auto &ant: _ants) {
-        if (ant->_alive) {
+        if (ant != nullptr && ant->_alive) {
             ant->draw();
         }
     }
@@ -229,7 +231,7 @@ void Population::setBest() {
     float highestReward = -FLT_MAX;
 
     for (int i = 0; i < _ants_amount; i++) {
-        if (_ants[i]->_alive) {
+        if (i < _ants.size() && _ants[i]->_alive) {
             const float reward = _ants[i]->calculateReward();
             if (reward > highestReward) {
                 highestReward = reward;

@@ -348,29 +348,25 @@ void World::drawUserInfo() const {
     GuiSetStyle(DEFAULT, TEXT_SIZE, 27);
 
     drawLineOfText(
-        ("user mode: " + std::string(strFromUserMode())).c_str(),
+        "----- Generation -----",
         0
     );
     drawLineOfText(
-        "----- Generation -----",
+        ("frames left: " + std::to_string(_generation_frameDuration - _frameCount)).c_str(),
         1
     );
     drawLineOfText(
-        ("frames left: " + std::to_string(_generation_frameDuration - _frameCount)).c_str(),
-        2
-    );
-    drawLineOfText(
         ("gen count: " + std::to_string(_generation_count)).c_str(),
-        3
+        2
     );
 
     drawLineOfText(
         "----- General -----",
-        4
+        3
     );
     drawLineOfText(
         "Edit mode + right click = menu",
-        5
+        4
     );
 
     GuiDrawText(

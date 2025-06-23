@@ -60,15 +60,15 @@ void EvolutionEditBox::draw() {
             _rect.width * 0.6,
             _rect.height / 3
         ),
-        ("Population: " + std::to_string(pop->_ants_amount)).c_str()
+        ("(next) Pop: " + std::to_string(pop->_next_ants_amount)).c_str()
     );
     iconRect.x -= _iconSize * 1.1;
     iconRect.y += _rect.height / 3;
     if (RaysEditBox::clickedMinus(iconRect)) {
-        pop->_ants_amount = std::max(10.f, pop->_ants_amount * 0.9f);
+        pop->_next_ants_amount = std::max(10.f, pop->_next_ants_amount * 0.9f);
     }
     iconRect.x += _iconSize * 1.1;
     if (RaysEditBox::clickedPlus(iconRect)) {
-        pop->_ants_amount *= 1.1;
+        pop->_next_ants_amount *= 1.1;
     }
 }
