@@ -54,7 +54,7 @@ int main() {
     srand(time(nullptr));
 
     // Init the window
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "prometheus simulator");
 
     // raygui
     setGuiStyles();

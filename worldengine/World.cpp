@@ -379,6 +379,20 @@ void World::drawUserInfo() const {
         TEXT_ALIGN_CENTER,
         BLACK
     );
+
+    float soundValue = GetMasterVolume();
+    GuiSlider(
+        Rectangle{
+            GetScreenWidth() - 325.f,
+            GetScreenHeight() / 2.f - 150,
+            250.f,
+            50.f
+        }, "leise", "laut",
+        &soundValue,
+        0,
+        1
+    );
+    SetMasterVolume(soundValue);
 }
 
 void World::updateInfoBoxes() {
