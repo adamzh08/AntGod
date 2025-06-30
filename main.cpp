@@ -27,8 +27,8 @@ Lines lines = Lines()
         .addLine(Vector2{0, 0}, Vector2{0, SCREEN_HEIGHT})
         .addLine(Vector2{SCREEN_WIDTH, 0}, Vector2{SCREEN_WIDTH, SCREEN_HEIGHT})
         .addLine(Vector2{0, SCREEN_HEIGHT}, Vector2{SCREEN_WIDTH, SCREEN_HEIGHT})
-        .addLine(Vector2{500, 0}, Vector2{500, 300})
-        .addLine(Vector2{600, 450}, Vector2{600, 150})
+        .addLine(Vector2{500, 0}, Vector2{525, 325})
+        .addLine(Vector2{600, 450}, Vector2{400, 350})
         .addLine(Vector2{800, 450}, Vector2{800, 850})
         .addLine(Vector2{200, 450}, Vector2{350, 750});
 
@@ -65,7 +65,7 @@ int main() {
             .setCount(1000)
             .setElitePercentage(0.1)
             .setMutation(0.3, 0.2)
-            .setPositions(Vector2{700, 500}, Vector2{50, 500})
+            .setPositions(Vector2{700, 500}, Vector2{50, 700})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 200, 60 * DEG2RAD) // 60°
             .setEntityTexture(TextureCollection::whiteAnt, DARKPURPLE)
@@ -74,7 +74,7 @@ int main() {
             .setCount(1000)
             .setElitePercentage(0.1)
             .setMutation(0.3, 0.2)
-            .setPositions(Vector2{800, 300}, Vector2{50, 300})
+            .setPositions(Vector2{800, 300}, Vector2{50, 150})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
             .setRays(30, 200, 60 * DEG2RAD) // 60°
             .setEntityTexture(TextureCollection::whiteAnt, DARKGREEN)
@@ -86,7 +86,7 @@ int main() {
     populations.push_back(std::move(greenPopulation));
 
     world->setLines(lines)
-            .setGenerationDuration(30 * 60)
+            .setGenerationDuration(20 * 60)
             .setPopulations(std::move(populations));
 
     Lines::addRecord(30);
