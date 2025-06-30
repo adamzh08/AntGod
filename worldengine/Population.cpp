@@ -5,8 +5,8 @@
 #include "Population.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cfloat>
-#include <csignal>
 #include <iostream>
 #include <numeric>
 #include <random>
@@ -15,22 +15,24 @@
 #include "UI/TextureCollection.h"
 #include "World.h"
 
+class Layer;
+
 Population::Population(
     World &world,
     int ants_amount,
     float elite_percentage,
-    const Texture2D &texture, const Color color,
-    std::vector<Layer> &layers, const std::string &filename, float mutation_probability, float mutation_strength,
+    Texture2D &texture, Color color,
+    float mutation_probability, float mutation_strength,
     Vector2 init_position, Vector2 target_position,
     int move_method, float max_speed, float max_angle,
-    int rays_amount, int rays_radius, float rays_fov): _world(world),
-                                                       _ants_amount(ants_amount),
+    int rays_amount, int rays_radius, float rays_fov): _ants_amount(ants_amount),
+                                                       _world(world),
                                                        _elite_percentage(elite_percentage),
                                                        _entityTexture(texture), _entityColor(color),
-                                                       _layers(layers), _filename(filename),
-                                                       _init_position(init_position), _target_position(target_position),
                                                        _mutation_probability(mutation_probability),
                                                        _mutation_strength(mutation_strength),
+                                                       _init_position(init_position),
+                                                       _target_position(target_position),
                                                        _move_method(move_method), _max_speed(max_speed),
                                                        _max_angle(max_angle),
                                                        _rays_amount(rays_amount), _rays_radius(rays_radius),
@@ -43,21 +45,9 @@ void Population::initAnts() {
     _ants.clear();
     _ants.reserve(_ants_amount);
 
-    if (_filename.empty()) {
-        // completely random
-        for (int i = 0; i < _ants_amount; i++) {
-            _ants.push_back(std::make_unique<Ant>(*this, _layers));
-        }
-    } else {
-        // from file
-        Ant defaultAnt(*this, _layers);
-        for (int i = 0; i < _ants_amount; i++) {
-            _ants.push_back(std::make_unique<Ant>(defaultAnt));
-        }
-
-        for (auto &ant: this->_ants) {
-            ant->_network.mutate_weights(0.05, 0.1);
-        }
+    for (int i = 0; i < _ants_amount; i++) {
+        _ants.push_back(std::make_unique<Ant>(*this, _rays_amount, 2));
+        _ants.back()->_network.TryAddRandomConnection();
     }
 }
 
@@ -83,7 +73,20 @@ void Population::flood() {
     }
     if (selectedAnts.empty()) {
         std::cerr << "Population " << this << " went extinct" << std::endl;
-        return;
+       //  return; // Todo
+        /*
+        std::ranges::sort(_ants.begin(), _ants.end(), [](const std::unique_ptr<Ant>& a, const std::unique_ptr<Ant>& b) {
+            return a->_framesAlive > b->_framesAlive;
+        });
+        selectedAnts.push_back(_ants[0].get());
+        selectedAnts.push_back(_ants[1].get());
+        selectedAnts.push_back(_ants[2].get());
+        selectedAnts.push_back(_ants[3].get());
+        selectedAnts.push_back(_ants[4].get());
+*/
+        for (auto& ant : _ants) {
+            selectedAnts.push_back(ant.get());
+        }
     }
     std::ranges::sort(selectedAnts, [](const Ant *a, const Ant *b) {
         return a->calculateReward() > b->calculateReward();
@@ -101,13 +104,15 @@ void Population::flood() {
     // Other are offspring
     for (int i = topX; i < _ants_amount; ++i) {
         const int parentIndex1 = tournamentSelectFromPool(selectedAnts, static_cast<int>(selectedAnts.size() * 0.3));
-        const int parentIndex2 = tournamentSelectFromPool(selectedAnts, static_cast<int>(selectedAnts.size() * 0.3));
+        // const int parentIndex2 = tournamentSelectFromPool(selectedAnts, static_cast<int>(selectedAnts.size() * 0.3));
 
-        Ant child(*selectedAnts[parentIndex1], *selectedAnts[parentIndex2]);
+        // Ant child(*selectedAnts[parentIndex1], *selectedAnts[parentIndex2]);
+        Ant child(*selectedAnts[parentIndex1]);
         if (static_cast<double>(rand()) / RAND_MAX < _mutation_probability) {
-            child._network.mutate_weights(0.01, _mutation_strength);
+            child._network.TryAddRandomConnection();
+            // child._network.tryAddRandomNeuron();
         }
-
+        child._network.TryMutateRandomConnection(_mutation_strength);
         nextGen.push_back(std::make_unique<Ant>(std::move(child)));
     }
     for (auto &ant: nextGen) {

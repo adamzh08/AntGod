@@ -5,9 +5,7 @@
 #include <thread>
 
 #include "raylib.h"
-#include "raymath.h"
-#include "neuralengine/Layer.h"
-#include "neuralengine/Network.h"
+#include "neuralengine/NEAT_Network.h"
 #include "neuralengine/Activation.h"
 #include "worldengine/Population.h"
 #include "worldengine/PopulationBuilder.h"
@@ -22,7 +20,6 @@
 
 void draw();
 
-void setGuiStyles();
 
 // Initializing Obstacles
 Lines lines = Lines()
@@ -31,15 +28,9 @@ Lines lines = Lines()
         .addLine(Vector2{SCREEN_WIDTH, 0}, Vector2{SCREEN_WIDTH, SCREEN_HEIGHT})
         .addLine(Vector2{0, SCREEN_HEIGHT}, Vector2{SCREEN_WIDTH, SCREEN_HEIGHT})
         .addLine(Vector2{500, 0}, Vector2{500, 300})
-        .addLine(Vector2{600, 450}, Vector2{600, 150});
-
-// Layers
-std::vector<Layer> layers = {
-    Layer(30),
-    Layer(8, Activation::tanh),
-    Layer(4, Activation::tanh),
-    Layer(2, Activation::tanh),
-};
+        .addLine(Vector2{600, 450}, Vector2{600, 150})
+        .addLine(Vector2{800, 450}, Vector2{800, 850})
+        .addLine(Vector2{200, 450}, Vector2{350, 750});
 
 World *world = nullptr;
 
@@ -56,8 +47,6 @@ int main() {
     // Init the window
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "prometheus simulator");
 
-    // raygui
-    setGuiStyles();
 
     InitAudioDevice(); // Initialize audio device
     Music music = LoadMusicStream("assets/main_theme.wav");
@@ -72,60 +61,22 @@ int main() {
     world = new World();
 
     // Populations
-    std::unique_ptr<Population> yellowPopulation = PopulationBuilder(*world)
-            .setCount(1000)
+    std::unique_ptr<Population> purplePopulation = PopulationBuilder(*world)
+            .setCount(2000)
             .setElitePercentage(0.1)
-            .setNetwork(layers, "")
             .setMutation(0.3, 0.2)
-            .setPositions(Vector2{400, 300}, Vector2{50, 300})
+            .setPositions(Vector2{700, 500}, Vector2{50, 500})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
-            .setRays(30, 100, 60 * DEG2RAD) // 60°
-            .setEntityTexture(TextureCollection::whiteAnt, DARKYELLOW)
+            .setRays(30, 200, 60 * DEG2RAD) // 60°
+            .setEntityTexture(TextureCollection::whiteAnt, DARKPURPLE)
             .build();
-    std::unique_ptr<Population> redPopulation(
-        PopulationBuilder(*world)
-        .setCount(1000)
-        .setElitePercentage(0.1)
-        .setNetwork(layers, "")
-        .setMutation(0.3, 0.2)
-        .setPositions(Vector2{450, 700}, Vector2{50, 400})
-        .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
-        .setRays(30, 100, 60 * DEG2RAD) // 60°
-        .setEntityTexture(TextureCollection::whiteAnt, RED)
-        .build()
-    );
-    std::unique_ptr<Population> purplePopulation(PopulationBuilder(*world)
-        .setCount(1000)
-        .setElitePercentage(0.1)
-        .setNetwork(layers, "")
-        .setMutation(0.3, 0.2)
-        .setPositions(Vector2{700, 500}, Vector2{50, 500})
-        .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
-        .setRays(30, 100, 60 * DEG2RAD) // 60°
-        .setEntityTexture(TextureCollection::whiteAnt, DARKPURPLE)
-        .build()
-    );
-    std::unique_ptr<Population> greenPopulation(
-        PopulationBuilder(*world)
-        .setCount(1000)
-        .setElitePercentage(0.1)
-        .setNetwork(layers, "")
-        .setMutation(0.3, 0.2)
-        .setPositions(Vector2{900, 200}, Vector2{50, 600})
-        .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
-        .setRays(30, 100, 60 * DEG2RAD) // 60°
-        .setEntityTexture(TextureCollection::whiteAnt, DARKGREEN)
-        .build()
-    );
-    std::vector<std::shared_ptr<Population> > populations{};
 
-    populations.push_back(std::move(yellowPopulation));
-    populations.push_back(std::move(redPopulation));
+
+    std::vector<std::shared_ptr<Population> > populations{};
     populations.push_back(std::move(purplePopulation));
-    populations.push_back(std::move(greenPopulation));
 
     world->setLines(lines)
-            .setGenerationDuration(20 * 60)
+            .setGenerationDuration(30 * 60)
             .setPopulations(std::move(populations));
 
     Lines::addRecord(30);
@@ -157,7 +108,4 @@ void draw() {
     DrawFPS(GetScreenWidth() - 100, GetScreenHeight() - 25);
 
     EndDrawing();
-}
-
-void setGuiStyles() {
 }

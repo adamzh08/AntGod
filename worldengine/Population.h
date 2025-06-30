@@ -10,6 +10,7 @@
 
 #include "Ant.h"
 #include "raylib.h"
+#include "../neuralengine/NEAT_Network.h"
 
 #define CARTESIAN_MOVE 0
 #define RADIAL_MOVE 1
@@ -34,11 +35,8 @@ public:
     // Ant settings
     Texture2D _entityTexture;
     Color _entityColor;
-    Vector2 _origin_point;
 
     // Neural network
-    std::vector<Layer> _layers;
-    std::string _filename;
     float _mutation_probability;
     float _mutation_strength;
 
@@ -61,8 +59,8 @@ public:
         World &world,
         int ants_amount,
         float elite_percentage,
-        const Texture2D &texture, Color color,
-        std::vector<Layer> &layers, const std::string &filename, float mutation_probability, float _mutation_strength,
+        Texture2D &texture, Color color,
+        float mutation_probability, float mutation_strength,
         Vector2 init_position, Vector2 target_position,
         int move_method, float max_speed, float max_angle,
         int rays_amount, int rays_radius, float rays_fov

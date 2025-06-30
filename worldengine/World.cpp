@@ -271,7 +271,6 @@ void World::handleMapEditing() {
                 auto newPop = PopulationBuilder(*this)
                         .setCount(100)
                         .setElitePercentage(0.3)
-                        .setNetwork(_populations[0]->_layers, "")
                         .setMutation(0.1, 0.2)
                         .setPositions(_drawVar_menuPos, GetMousePosition())
                         .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)

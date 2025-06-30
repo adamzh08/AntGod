@@ -15,7 +15,7 @@ class Ant;
 class NeuroBox : public InfoBox {
 private:
     int _bestIdx = -1;
-    Network* _network = nullptr;
+    NEAT_Network* _network = nullptr;
 public:
     NeuroBox(const Rectangle rect, std::shared_ptr<Population> pop): InfoBox(rect, pop) {
     };

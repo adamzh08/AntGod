@@ -69,11 +69,9 @@ find_package(MKL CONFIG)
 find_package(OpenMP REQUIRED)
 
 add_executable(AntGod main.cpp
-        neuralengine/Layer.cpp
-        neuralengine/Layer.h
-        neuralengine/Network.cpp
-        neuralengine/Network.h
         neuralengine/Activation.h
+        neuralengine/NEAT_Network.cpp
+        neuralengine/NEAT_Network.h
         worldengine/Population.cpp
         worldengine/Population.h
         worldengine/Ant.cpp

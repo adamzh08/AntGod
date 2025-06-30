@@ -21,8 +21,6 @@ public:
     std::optional<Color> _entityColor;
 
     // Neural network
-    std::optional<std::vector<Layer>> _layers;
-    std::optional<std::string> _filename;
     std::optional<float> _mutation_probability;
     std::optional<float> _mutation_strength;
 
@@ -41,12 +39,10 @@ public:
     std::optional<int> _rays_fov;
 
 
-
-    PopulationBuilder(World& world);
+    explicit PopulationBuilder(World& world);
 
     PopulationBuilder& setEntityTexture(const Texture2D &texture, const Color color);
     PopulationBuilder& setCount(int ants_amount);
-    PopulationBuilder& setNetwork(std::vector<Layer> &layers, const std::string &filename);
     PopulationBuilder& setPositions(Vector2 init_position, Vector2 target_position);
     PopulationBuilder& setMovement(int move_method, float max_speed, float max_angle);
     PopulationBuilder& setRays(int rays_amount, int rays_radius, float rays_fov);

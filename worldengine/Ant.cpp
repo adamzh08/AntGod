@@ -1,28 +1,37 @@
 #include "Ant.h"
 
+#include "raylib.h"
+
 #include <assert.h>
+#include <cmath>
 #include <iostream>
 
 #include "Population.h"
-#include "UI/TextureCollection.h"
 #include "World.h"
+#include "../neuralengine/NEAT_Network.h"
 
-Ant::Ant(Population &population, const std::vector<Layer> &layers): _population(population), _network(layers),
-                                                                    _position(population._init_position) {
+Ant::Ant(Population &population, const int inputCount, const int outputCount): _population(population),
+                                                                               _network(inputCount, outputCount),
+                                                                               _position(population._init_position) {
 }
 
-Ant::Ant(const Ant &other) : _population(other._population), _network(other._network),
+Ant::Ant(const Ant &other) :
+_population(other._population),
+                             _network(other._network),
                              _position(other._population._init_position) {
 }
 
+/* Todo
 Ant::Ant(const Ant &parent1, const Ant &parent2) : _population(parent1._population), _network(parent1._network),
                                                    _position(_population._init_position) {
     assert(&parent1._population == &parent2._population);
-    _network.replaceWeightsWithOther(parent2._network, 0.5);
 }
+*/
 
 
 void Ant::act() {
+    _framesAlive++;
+
     const std::vector<float> input = _population._world._lines.getRays(
         _position,
         _population._rays_radius,
@@ -30,7 +39,14 @@ void Ant::act() {
         _rotation + PI,
         _population._rays_fov
     );
-    const std::vector<float> output = _network.feed_forward(input);
+
+    const std::vector<float> output = _network.FeedForward(input);
+
+    for (int i = 0; i < output.size(); i++) {
+        if (std::abs(output[i]) > 1) {
+            std::cout << output[i] << std::endl;
+        }
+    }
 
     Vector2 temp = _position;
     float rot_temp = _rotation;
@@ -43,7 +59,7 @@ void Ant::act() {
             break;
         }
         case RADIAL_MOVE: {
-            const float speedOutput = (output[0] + 1) / 2 * _population._max_speed;
+            const float speedOutput = output[0] * _population._max_speed;
             const float rotationOutput = output[1] * _population._max_angle;
             rot_temp += rotationOutput;
 
@@ -78,7 +94,10 @@ float Ant::calculateReward() const {
 void Ant::draw() const {
     DrawTexturePro(
         _population._entityTexture,
-        Rectangle{0, 0, static_cast<float>(_population._entityTexture.width), static_cast<float>(_population._entityTexture.height)}, // Source
+        Rectangle{
+            0, 0, static_cast<float>(_population._entityTexture.width),
+            static_cast<float>(_population._entityTexture.height)
+        }, // Source
         Rectangle{
             _position.x, // Center position
             _position.y,

@@ -6,23 +6,25 @@
 #define ANT_H
 
 #include "raylib.h"
-#include "../neuralengine/Network.h"
+#include "../neuralengine/NEAT_Network.h"
 
 class Population;
 
 class Ant {
 public:
     Population &_population;
-    Network _network;
+    NEAT_Network _network;
 
     Vector2 _position;
     float _rotation{};
     bool _alive = true;
 
-    Ant(Population &population, const std::vector<Layer> &layers);
-    Ant(const Ant& parent1, const Ant& parent2);
+    int _framesAlive{};
 
-    Ant(const Ant& other);
+    Ant(Population &population, int inputCount, int outputCount);
+    // Ant(const Ant& parent1, const Ant& parent2); // Todo
+
+    explicit Ant(const Ant& other);
 
     void act();
 

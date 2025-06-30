@@ -9,6 +9,11 @@
 #define M_PI 3.14159265358979323846
 
 namespace Activation {
+
+    inline float identity(const float x) {
+        return x;
+    }
+
     inline float sigmoid(const float x) {
         return 1.0 / (1.0 + std::exp(-x));
     }
