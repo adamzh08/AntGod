@@ -20,7 +20,7 @@ struct Neuron {
 
 class NEAT_Network {
 private:
-
+    static float RandomWeight();
 public:
     std::vector<std::vector<Neuron> > _neurons{};
 
@@ -29,10 +29,8 @@ public:
     std::vector<float> FeedForward(const std::vector<float> &input);
 
     bool TryMutateRandomConnection(float strength);
-
     bool TryAddRandomConnection();
-
-    // bool TryAddRandomNeuron();
+    bool TryAddRandomNeuron();
 };
 
 

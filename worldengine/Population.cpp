@@ -110,7 +110,7 @@ void Population::flood() {
         Ant child(*selectedAnts[parentIndex1]);
         if (static_cast<double>(rand()) / RAND_MAX < _mutation_probability) {
             child._network.TryAddRandomConnection();
-            // child._network.tryAddRandomNeuron();
+            child._network.TryAddRandomNeuron();
         }
         child._network.TryMutateRandomConnection(_mutation_strength);
         nextGen.push_back(std::make_unique<Ant>(std::move(child)));

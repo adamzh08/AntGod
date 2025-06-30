@@ -16,7 +16,7 @@ public:
     NEAT_Network _network;
 
     Vector2 _position;
-    float _rotation{};
+    float _rotation = PI;
     bool _alive = true;
 
     int _framesAlive{};

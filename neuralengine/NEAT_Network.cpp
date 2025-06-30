@@ -11,11 +11,13 @@
 
 NEAT_Network::NEAT_Network(const int inputCount, const int outputCount) {
     // bias already inserted
-    std::vector<Neuron> inputLayer{{
-        0,
-        Activation::identity,
-        {}
-    }};
+    std::vector<Neuron> inputLayer{
+        {
+            0,
+            Activation::identity,
+            {}
+        }
+    };
     std::vector<Neuron> outputLayer{};
 
     for (int i = 0; i < inputCount; i++) {
@@ -53,7 +55,7 @@ std::vector<float> NEAT_Network::FeedForward(const std::vector<float> &input) {
         }
         // forward pass
         for (Neuron &neuron: _neurons[l]) {
-            for (const Connection& connection: neuron.connections) {
+            for (const Connection &connection: neuron.connections) {
                 _neurons[connection.l_to][connection.n_to].value += neuron.value * connection.weight;
             }
         }
@@ -85,7 +87,7 @@ bool NEAT_Network::TryMutateRandomConnection(const float strength) {
 
 
         // mutate a random connection
-        connections[rand() % connections.size()].weight += strength * (2 * static_cast<float>(rand()) / RAND_MAX - 1);
+        connections[rand() % connections.size()].weight += strength * RandomWeight();
         return true; // successful
     }
     return false; // failed
@@ -116,58 +118,82 @@ bool NEAT_Network::TryAddRandomConnection() {
             l_to,
             n_from,
             n_to,
-            2 * static_cast<float>(rand()) / RAND_MAX - 1
+            RandomWeight()
         });
         return true; // successful
     }
     return false; // failed
 }
 
-/*
 bool NEAT_Network::TryAddRandomNeuron() {
     const int maxTries = 10; // to avoid being stuck in while loop
 
     for (int tryCount = 0; tryCount < maxTries; tryCount++) {
-        const int randLayerIdx = rand() % (_layers.size() - 1); // exclude output layer
-        const int randNeuronIdx = rand() % _layers[randLayerIdx].neurons.size(); // chose a random neuron in the layer
+        const int l_from = rand() % (_neurons.size() - 1); // exclude output layer
+        const int n_from = rand() % _neurons[l_from].size();
 
-        // make sure the chosen neuron has outgoing connections
-        if (_layers[randLayerIdx].neurons[randNeuronIdx].connections.empty()) continue;
+        std::vector<Connection> &connections = _neurons[l_from][n_from].connections;
+        if (connections.empty()) continue;
+        const int connectionIdx = rand() % connections.size();
 
-        // chose a random neuron in the next layer
-        const int randConnectionIdx = rand() % _layers[randLayerIdx].neurons[randNeuronIdx].connections.size();
+        int insertionLayerIdx = (l_from + connections[connectionIdx].l_to) / 2;
 
-        Neuron newNeuron{
-            0,
-            Activation::tanh,
-            {
-                // new layer -> 2nd chosen layer
-                {
-                    _layers[randLayerIdx].neurons[randNeuronIdx].connections[randConnectionIdx].first,
-                    2 * static_cast<float>(rand()) / RAND_MAX - 1
+        if (l_from == insertionLayerIdx) {
+            // the connection goes from one layer directly to the next
+            // we have to create a new layer and insert it inbetween
+            insertionLayerIdx++;
+            std::vector<Neuron> newLayer{
+                Neuron{
+                    0,
+                    Activation::tanh,
+                    {
+                        {
+                            insertionLayerIdx,
+                            insertionLayerIdx,
+                            0,
+                            connections[connectionIdx].n_to,
+                            RandomWeight()
+                        }
+                    }
+                }
+            };
+            _neurons.insert(_neurons.begin() + insertionLayerIdx, newLayer);
+
+            // shift all the connections one to the right
+            for (auto &layer : _neurons) {
+                for (auto &neuron : layer) {
+                    for (auto &conn : neuron.connections) {
+                        if (conn.l_to >= insertionLayerIdx) {
+                            conn.l_to++;
+                        }
+                    }
                 }
             }
-        };
+        } else {
+            // add a new neuron to a layer in the middle
+            _neurons[insertionLayerIdx].push_back(Neuron{
+                0,
+                Activation::tanh,
+                {
+                    Connection{
+                        insertionLayerIdx,
+                        connections[connectionIdx].l_to,
+                        static_cast<int>(_neurons[insertionLayerIdx].size()),
+                        connections[connectionIdx].n_to,
+                        RandomWeight()
+                    }
+                }
+            });
+        }
+        // redirect old connection
+        connections[connectionIdx].l_to = insertionLayerIdx;
+        connections[connectionIdx].n_to = _neurons[insertionLayerIdx].size() - 1;
 
-        // create a new layer consisting of only 1 neuron
-        Layer newLayer{
-            randLayerIdx + 1,
-            &_layers[randLayerIdx + 1],
-            {
-                newNeuron
-            },
-        };
-        _layers.insert(_layers.begin() + randLayerIdx, newLayer);
-
-        // 1st chosen layer -> new layer
-        auto &connections = _layers[randLayerIdx].neurons[randNeuronIdx].connections;
-        connections.erase(connections.begin() + randConnectionIdx);
-        connections.push_back({
-            0,
-            2 * static_cast<float>(rand()) / RAND_MAX - 1
-        });
         return true; // successful
     }
     return false; // failed
 }
-*/
+
+float NEAT_Network::RandomWeight() {
+    return 2 * static_cast<float>(rand()) / RAND_MAX - 1;
+}

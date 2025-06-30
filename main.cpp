@@ -62,7 +62,7 @@ int main() {
 
     // Populations
     std::unique_ptr<Population> purplePopulation = PopulationBuilder(*world)
-            .setCount(2000)
+            .setCount(1000)
             .setElitePercentage(0.1)
             .setMutation(0.3, 0.2)
             .setPositions(Vector2{700, 500}, Vector2{50, 500})
@@ -70,10 +70,20 @@ int main() {
             .setRays(30, 200, 60 * DEG2RAD) // 60°
             .setEntityTexture(TextureCollection::whiteAnt, DARKPURPLE)
             .build();
+    std::unique_ptr<Population> greenPopulation = PopulationBuilder(*world)
+            .setCount(1000)
+            .setElitePercentage(0.1)
+            .setMutation(0.3, 0.2)
+            .setPositions(Vector2{800, 300}, Vector2{50, 300})
+            .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
+            .setRays(30, 200, 60 * DEG2RAD) // 60°
+            .setEntityTexture(TextureCollection::whiteAnt, DARKGREEN)
+            .build();
 
 
     std::vector<std::shared_ptr<Population> > populations{};
     populations.push_back(std::move(purplePopulation));
+    populations.push_back(std::move(greenPopulation));
 
     world->setLines(lines)
             .setGenerationDuration(30 * 60)
