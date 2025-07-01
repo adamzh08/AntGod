@@ -14,7 +14,8 @@ std::unique_ptr<Population> PopulationBuilder::build() {
             _entityCount.value(),
             _elite_percentage.value(),
             _entityTexture.value(), _entityColor.value(),
-            _mutation_probability.value(), _mutation_strength.value(),
+            _mutation_newConnection_probability.value(), _mutation_newNeuron_probability.value(),
+            _mutation_connection_probability.value(), _mutation_connection_strength.value(),
             _init_position.value(), _target_position.value(),
             _move_method.value(), _max_speed.value(), _max_angle.value(),
             _rays_amount.value(), _rays_radius.value(), _rays_fov.value()
@@ -59,8 +60,13 @@ PopulationBuilder &PopulationBuilder::setRays(const int rays_amount, const int r
     return *this;
 }
 
-PopulationBuilder &PopulationBuilder::setMutation(const float mutation_probability, const float mutation_strength) {
-    _mutation_probability = mutation_probability;
-    _mutation_strength = mutation_strength;
+PopulationBuilder &PopulationBuilder::setMutation(float mutation_newConnection_probability,
+                                                  float mutation_newNeuron_probability,
+                                                  float mutation_connection_probability,
+                                                  float mutation_connection_strength) {
+    _mutation_newConnection_probability = mutation_newConnection_probability;
+    _mutation_newNeuron_probability = mutation_newNeuron_probability;
+    _mutation_connection_probability = mutation_connection_probability;
+    _mutation_connection_strength = mutation_connection_strength;
     return *this;
 }

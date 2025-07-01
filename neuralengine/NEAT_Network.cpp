@@ -49,20 +49,13 @@ std::vector<float> NEAT_Network::FeedForward(const std::vector<float> &input) {
     }
 
     for (int l = 0; l < _neurons.size(); l++) {
-        // apply activation function
         for (Neuron &neuron: _neurons[l]) {
+            // apply activation function
             neuron.value = neuron.af(neuron.value);
-        }
-        // forward pass
-        for (Neuron &neuron: _neurons[l]) {
+
+            // forward pass
             for (const Connection &connection: neuron.connections) {
                 _neurons[connection.l_to][connection.n_to].value += neuron.value * connection.weight;
-            }
-        }
-        // reset if not output layer
-        if (l != _neurons.size() - 1) {
-            for (Neuron &neuron: _neurons[l]) {
-                neuron.value = 0;
             }
         }
     }
@@ -70,7 +63,13 @@ std::vector<float> NEAT_Network::FeedForward(const std::vector<float> &input) {
     std::vector<float> output;
     for (Neuron &outputNeuron: _neurons.back()) {
         output.push_back(outputNeuron.value);
-        outputNeuron.value = 0;
+    }
+
+    // reset all values
+    for (std::vector<Neuron> &layer: _neurons) {
+        for (Neuron &neuron: layer) {
+            neuron.value = 0.0f;
+        }
     }
     return output;
 }
@@ -160,9 +159,9 @@ bool NEAT_Network::TryAddRandomNeuron() {
             _neurons.insert(_neurons.begin() + insertionLayerIdx, newLayer);
 
             // shift all the connections one to the right
-            for (auto &layer : _neurons) {
-                for (auto &neuron : layer) {
-                    for (auto &conn : neuron.connections) {
+            for (auto &layer: _neurons) {
+                for (auto &neuron: layer) {
+                    for (auto &conn: neuron.connections) {
                         if (conn.l_to >= insertionLayerIdx) {
                             conn.l_to++;
                         }

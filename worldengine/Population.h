@@ -37,8 +37,10 @@ public:
     Color _entityColor;
 
     // Neural network
-    float _mutation_probability;
-    float _mutation_strength;
+    float _mutation_newConnection_probability;
+    float _mutation_newNeuron_probability;
+    float _mutation_connection_probability;
+    float _mutation_connection_strength;
 
     // Positions
     Vector2 _init_position;
@@ -60,7 +62,8 @@ public:
         int ants_amount,
         float elite_percentage,
         Texture2D &texture, Color color,
-        float mutation_probability, float mutation_strength,
+        float mutation_newConnection_probability, float mutation_newNeuron_probability,
+        float mutation_connection_probability, float mutation_connection_strength,
         Vector2 init_position, Vector2 target_position,
         int move_method, float max_speed, float max_angle,
         int rays_amount, int rays_radius, float rays_fov

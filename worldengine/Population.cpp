@@ -22,15 +22,26 @@ Population::Population(
     int ants_amount,
     float elite_percentage,
     Texture2D &texture, Color color,
-    float mutation_probability, float mutation_strength,
+    float mutation_newConnection_probability, float mutation_newNeuron_probability,
+    float mutation_connection_probability, float mutation_connection_strength,
     Vector2 init_position, Vector2 target_position,
     int move_method, float max_speed, float max_angle,
     int rays_amount, int rays_radius, float rays_fov): _ants_amount(ants_amount),
                                                        _world(world),
                                                        _elite_percentage(elite_percentage),
                                                        _entityTexture(texture), _entityColor(color),
-                                                       _mutation_probability(mutation_probability),
-                                                       _mutation_strength(mutation_strength),
+                                                       _mutation_newConnection_probability(
+                                                           mutation_newConnection_probability
+                                                       ),
+                                                       _mutation_newNeuron_probability(
+                                                           mutation_newNeuron_probability
+                                                       ),
+                                                       _mutation_connection_probability(
+                                                           mutation_connection_probability
+                                                       ),
+                                                       _mutation_connection_strength(
+                                                           mutation_connection_strength
+                                                       ),
                                                        _init_position(init_position),
                                                        _target_position(target_position),
                                                        _move_method(move_method), _max_speed(max_speed),
@@ -73,7 +84,7 @@ void Population::flood() {
     }
     if (selectedAnts.empty()) {
         std::cerr << "Population " << this << " went extinct" << std::endl;
-       //  return; // Todo
+        //  return; // Todo
         /*
         std::ranges::sort(_ants.begin(), _ants.end(), [](const std::unique_ptr<Ant>& a, const std::unique_ptr<Ant>& b) {
             return a->_framesAlive > b->_framesAlive;
@@ -84,7 +95,7 @@ void Population::flood() {
         selectedAnts.push_back(_ants[3].get());
         selectedAnts.push_back(_ants[4].get());
 */
-        for (auto& ant : _ants) {
+        for (auto &ant: _ants) {
             selectedAnts.push_back(ant.get());
         }
     }
@@ -108,11 +119,16 @@ void Population::flood() {
 
         // Ant child(*selectedAnts[parentIndex1], *selectedAnts[parentIndex2]);
         Ant child(*selectedAnts[parentIndex1]);
-        if (static_cast<double>(rand()) / RAND_MAX < _mutation_probability) {
+        // mutations
+        if (static_cast<double>(rand()) / RAND_MAX < _mutation_connection_probability) {
+            child._network.TryMutateRandomConnection(_mutation_connection_strength);
+        }
+        if (static_cast<double>(rand()) / RAND_MAX < _mutation_newConnection_probability) {
             child._network.TryAddRandomConnection();
+        }
+        if (static_cast<double>(rand()) / RAND_MAX < _mutation_newNeuron_probability) {
             child._network.TryAddRandomNeuron();
         }
-        child._network.TryMutateRandomConnection(_mutation_strength);
         nextGen.push_back(std::make_unique<Ant>(std::move(child)));
     }
     for (auto &ant: nextGen) {

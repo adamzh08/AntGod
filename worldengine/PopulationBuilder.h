@@ -8,6 +8,7 @@
 
 #include "Population.h"
 #include "raylib.h"
+#include "World.h"
 
 
 class PopulationBuilder {
@@ -21,8 +22,10 @@ public:
     std::optional<Color> _entityColor;
 
     // Neural network
-    std::optional<float> _mutation_probability;
-    std::optional<float> _mutation_strength;
+    std::optional<float> _mutation_newConnection_probability;
+    std::optional<float> _mutation_newNeuron_probability;
+    std::optional<float> _mutation_connection_probability;
+    std::optional<float> _mutation_connection_strength;
 
     // Positions
     std::optional<Vector2> _init_position;
@@ -47,7 +50,7 @@ public:
     PopulationBuilder& setMovement(int move_method, float max_speed, float max_angle);
     PopulationBuilder& setRays(int rays_amount, int rays_radius, float rays_fov);
     PopulationBuilder& setElitePercentage(float elite_percentage);
-    PopulationBuilder& setMutation(float probability, float _mutation_strength);
+    PopulationBuilder& setMutation(float mutation_newConnection_probability, float mutation_newNeuron_probability, float mutation_connection_probability, float mutation_connection_strength);
 
 
     std::unique_ptr<Population> build();

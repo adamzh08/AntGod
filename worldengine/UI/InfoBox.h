@@ -4,11 +4,11 @@
 
 #ifndef INFORECT_H
 #define INFORECT_H
+#include <memory>
+
 #include "raylib.h"
+
 #include "../Population.h"
-
-
-class Population;
 
 class InfoBox {
 protected:
