@@ -88,11 +88,6 @@ int main() {
             .setGenerationDuration(20 * 60)
             .setPopulations(std::move(populations));
 
-    Lines::addRecord(30);
-    for (float i = 50; i < 505; i += 5) {
-        Lines::addRecord(i);
-    }
-
     std::jthread t(gameLoop);
 
     while (!WindowShouldClose()) {

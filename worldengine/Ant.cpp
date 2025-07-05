@@ -34,9 +34,9 @@ void Ant::act() {
     const std::vector<float> input = _population._world._lines.getRays(
         _position,
         _population._rays_radius,
-        _population._rays_amount,
-        _rotation + PI,
-        _population._rays_fov
+        _rotation,
+        _population._rays_fov,
+        _population._rays_amount
     );
 
     const std::vector<float> output = _network.FeedForward(input);
