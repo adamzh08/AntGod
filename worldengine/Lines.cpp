@@ -39,7 +39,7 @@ std::vector<float> Lines::getRays(ProVector2 mainPoint, float raysRadius, float 
 
                 float temp_ray = 1.0f - (sqrt(square(deltaPoint.x) + square(deltaPoint.y)) / raysRadius);
 
-                if (temp_ray > rays[i]) {
+                if (temp_ray - rays[i] >= 0.0001f) {
                     rays[i] = temp_ray;
                 }
             }
