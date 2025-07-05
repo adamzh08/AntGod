@@ -1,0 +1,10 @@
+cmake-build-debug/
+
+# web
+build_web/
+*.data
+*.html
+*.js
+*.wasm
+*.bat
+*.sh

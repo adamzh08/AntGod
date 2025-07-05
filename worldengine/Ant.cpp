@@ -15,8 +15,7 @@ Ant::Ant(Population &population, const int inputCount, const int outputCount): _
                                                                                _position(population._init_position) {
 }
 
-Ant::Ant(const Ant &other) :
-_population(other._population),
+Ant::Ant(const Ant &other) : _population(other._population),
                              _network(other._network),
                              _position(other._population._init_position) {
 }
@@ -41,12 +40,6 @@ void Ant::act() {
     );
 
     const std::vector<float> output = _network.FeedForward(input);
-
-    for (int i = 0; i < output.size(); i++) {
-        if (std::abs(output[i]) > 1) {
-            std::cout << output[i] << std::endl;
-        }
-    }
 
     Vector2 temp = _position;
     float rot_temp = _rotation;
