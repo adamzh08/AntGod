@@ -5,43 +5,69 @@
 #ifndef LINES_H
 #define LINES_H
 
-#include <vector>
-
 #include "raylib.h"
 
-struct Line {
-    Vector2 startPoint;
-    Vector2 endPoint;
+#include <vector>
+
+struct ProVector2 {
+    float x;
+    float y;
+
+    ProVector2 operator-(const ProVector2& other) const {
+        return {x - other.x, y - other.y};
+    }
+
+    ProVector2 operator+(const ProVector2& other) const {
+        return {x + other.x, y + other.y};
+    }
+
+    void operator+=(const ProVector2& other) {
+        x += other.x;
+        y += other.y;
+    }
+
+    void operator-=(const ProVector2& other) {
+        x -= other.x;
+        y -= other.y;
+    }
+
+    bool operator<(const ProVector2& other) const {
+        return x*x + y*y < other.x*other.x + other.y*other.y;
+    }
+
+    operator Vector2() const {
+        return Vector2{x, y};
+    }
+
+    ProVector2(const Vector2& other) {
+        x = other.x;
+        y = other.y;
+    }
+
+    ProVector2(float x, float y) : x(x), y(y) {}
+    ProVector2() : x(0), y(0) {}
 };
 
-struct RaysDB {
-    float raysRadius;
-
-    std::vector<Vector2> deltaPoints;
+struct Line {
+    ProVector2 startPoint;
+    ProVector2 endPoint;
 };
 
 class Lines {
-private:
-    static std::vector<RaysDB> _raysDB;
-
-    static std::vector<Vector2>& _searchRaysDB(float raysRadius);
-
 public:
-    std::vector<Line> _lines;
+    std::vector<Line> lines;
 
     Lines();
-    Lines addLine(Vector2 startPoint, Vector2 endPoint);
-
-    std::vector<float> getRays(Vector2 mainPoint, float raysRadius, int rays_count, float main_angle, float area_angle) const;
-    static std::vector<Vector2> _getRaysPoints(float raysRadius, int rays_count, float main_angle, float area_angle);
-
+    Lines addLine(ProVector2 startPoint, ProVector2 endPoint);
     void draw() const;
 
-    static float addRecord(float raysRadius);
+    std::vector<float> getRays(ProVector2 mainPoint, float raysRadius, float center_angle, float area_angle, int rays_count) const;
 
-    void drawRays(Vector2 mainPoint, float raysRadius, int rays_count, float main_angle, float area_angle);
+    int getIntersectionLine(ProVector2 mainPoint, float raysRadius, float center_angle, float area_angle, int rays_count) const;
 
-    bool validMove(Vector2 startPoint, Vector2 deltaPoint) const;
+    void drawRays(ProVector2 mainPoint, float raysRadius, float center_angle, float area_angle, int rays_count);
+
+    bool validMove(ProVector2 startPoint, ProVector2 deltaPoint) const;
 };
 
 #endif //LINES_H

@@ -302,7 +302,7 @@ void World::afterEditOptionSelected() {
         case CREATE_COLONY: return;
         case DELETE_WALL: {
             const int lineIdx = findIntersectingWallRayIndex(_drawVar_menuPos, _pickRadius, 16).value();
-            _lines._lines.erase(_lines._lines.begin() + lineIdx);
+            _lines.lines.erase(_lines.lines.begin() + lineIdx);
             break;
         }
         case DELETE_COLONY: {
@@ -455,34 +455,10 @@ void World::reconstructInfoBoxes() {
 }
 
 std::optional<int> World::findIntersectingWallRayIndex(Vector2 origin, float radius, int rayCount) const {
-    Lines::addRecord(radius);
-    const std::vector<Vector2> deltas = _lines._getRaysPoints(radius, rayCount, 0, 2 * PI);
-    const std::vector<float> dists = _lines.getRays(origin, radius, rayCount, 0, 2 * PI);
+    const int index = _lines.getIntersectionLine(origin, radius, 0, 2 * PI, rayCount);
 
-    int bestIdx = -1;
-    float bestValue = -1;
-
-    for (int i = 0; i < rayCount; i++) {
-        if (dists[i] > bestValue) {
-            bestValue = dists[i];
-            bestIdx = i;
-        }
-    }
-
-    if (bestValue > 0 && bestIdx >= 0) {
-        const Vector2 rayEnd = Vector2{
-            origin.x + deltas[bestIdx].x,
-            origin.y + deltas[bestIdx].y
-        };
-
-        for (int j = 0; j < _lines._lines.size(); j++) {
-            const Line &line = _lines._lines[j];
-
-            if (doIntersect(origin, rayEnd, line.startPoint, line.endPoint)) {
-                return j;
-            }
-        }
-        std::cerr << "Warning: best ray had value > 0, but no intersection was found." << std::endl;
+    if (index != -1) {
+        return index;
     }
 
     return std::nullopt;
