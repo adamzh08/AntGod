@@ -48,7 +48,6 @@ Population::Population(
                                                        _max_angle(max_angle),
                                                        _rays_amount(rays_amount), _rays_radius(rays_radius),
                                                        _rays_fov(rays_fov) {
-    Lines::addRecord(rays_radius);
     _next_ants_amount = _ants_amount;
 }
 
@@ -172,9 +171,9 @@ void Population::draw() {
         if (_world._showRays) {
             _world._lines.drawRays(bestAnt->_position,
                                    _rays_radius,
-                                   _rays_amount,
                                    bestAnt->_rotation,
-                                   _rays_fov
+                                   _rays_fov,
+                                   _rays_amount
             );
         }
         // drawing a star on the best ant
