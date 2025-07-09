@@ -36,8 +36,8 @@ Lines lines = Lines()
 // Layers
 std::vector<Layer> layers = {
     Layer(30),
-    Layer(8, Activation::tanh),
-    Layer(4, Activation::tanh),
+    Layer(1, Activation::tanh),
+    Layer(1, Activation::tanh),
     Layer(2, Activation::tanh),
 };
 
@@ -127,11 +127,6 @@ int main() {
     world->setLines(lines)
             .setGenerationDuration(20 * 60)
             .setPopulations(std::move(populations));
-
-    Lines::addRecord(30);
-    for (float i = 50; i < 505; i += 5) {
-        Lines::addRecord(i);
-    }
 
     std::jthread t(gameLoop);
 
