@@ -66,7 +66,7 @@ int main() {
             .setMutation(0.3, 0.2, 0.5, 0.1)
             .setPositions(Vector2{700, 500}, Vector2{50, 700})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
-            .setRays(30, 400, 60 * DEG2RAD) // 60°
+            .setRays(30, 100, 60 * DEG2RAD) // 60°
             .setEntityTexture(TextureCollection::whiteAnt, DARKPURPLE)
             .build();
     std::unique_ptr<Population> greenPopulation = PopulationBuilder(*world)
@@ -75,7 +75,7 @@ int main() {
             .setMutation(0.3, 0.2, 0.5, 0.1)
             .setPositions(Vector2{800, 300}, Vector2{50, 150})
             .setMovement(RADIAL_MOVE, 2, 10 * DEG2RAD)
-            .setRays(30, 400, 60 * DEG2RAD) // 60°
+            .setRays(30, 100, 60 * DEG2RAD) // 60°
             .setEntityTexture(TextureCollection::whiteAnt, DARKGREEN)
             .build();
 
