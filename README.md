@@ -1,19 +1,23 @@
-<h1>An interactive evolution simulation game</h1>
+# Ant God
 
-<h3>The creation structure</h3>
+[Play now in the web](https://adam-yan.de)
 
-main constructs World  
--> <ins>World</ins> holds list of Populations, obstacles  
----> <ins>Population</ins> hold World&, list of Ants  
------> <ins>Ant</ins> holds Population&  
+An interactive simulation game where ants with neural networks move and try to reach a target in a given amount of time.  
+Each ant has a few ray casts that act like eyes to see walls.  
+The ants closest to the target after the time runs out mutate and get to live in the next generation.  
 
-<h3>The usage structure</h3>
+**You can customize the environment by**
+- moving targets
+- adding and removing walls
+- changing ray length and field of view
+- changing mutation probability and strength
+- changing population size
 
-main calls World::act() / draw() each frame  
--> calls foreach Population:act() / draw()  
----> calls foreach Ant::act() / draw()  
+## Demo
 
+### Many insights 
+https://github.com/user-attachments/assets/2e58b172-050b-4b46-b856-5002669e8af5
 
-<h3>Gui with RayGui</h3>
-Action buttons in the bottom of the window  
-info texts on the right side of the window
+### Be the God and mess with the ants
+https://github.com/user-attachments/assets/d51f33fe-8234-440f-ab36-18534c16cdc0
+
